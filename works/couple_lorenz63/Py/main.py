@@ -49,16 +49,5 @@ def main():
     all_fcst.tofile("data/%s_fcst.bin" % exp[0])
     all_obs.tofile("data/%s_obs.bin" % exp[0])
 
-def getr():
-  r = np.matrix(np.identity(DIMO)) * (OERR * OERR)
-  return r
-
-def geth(diag_h):
-  # DIMO == DIMM is assumed
-  h = np.matrix(np.zeros((DIMO,DIMM)))
-  for i in range(0, DIMM):
-    h[i,i] = diag_h[i]
-  return h
-
 main()
 
