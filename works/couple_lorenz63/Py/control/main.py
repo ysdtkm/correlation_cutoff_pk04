@@ -2,8 +2,9 @@
 
 import numpy as np
 import sys, os
-sys.path.append(os.pardir)
-from const import *
+py_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(py_dir)
+from control.const import *
 from model.model import *
 
 def main():
