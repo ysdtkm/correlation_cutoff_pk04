@@ -1,10 +1,14 @@
 #!/usr/bin/env python
 
 import numpy as np
+import sys, os
+sys.path.append(os.pardir)
 from const import *
+from model.model import *
 
 def main():
   exec_nature()
+  sys.exit()
   exec_obs()
   exec_free_run()
   for exp in EXPLIST:
@@ -17,7 +21,7 @@ def exec_nature():
   for i in range(0, STEPS):
     true[:] = timestep(true[:])
     all_true[i,:] = true[:]
-  all_true.tofile("data/%s_true.bin" % exp[0])
+  all_true.tofile("data/true.bin")
   return 0
 
 def exec_obs():
