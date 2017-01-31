@@ -10,12 +10,12 @@
 # cmd_step : 実行コマンド
 #================================
 
-STEP_ALL = 1 2
+STEP_ALL = 1
 
-src_1 = Py/main.py Py/const.py
+src_1 = Py/control/main.py Py/control/const.py
 dep_1 =
 out_1 = data/*.bin
-cmd_1 = python Py/main.py
+cmd_1 = python Py/control/main.py
 
 src_2 = Py/plot.py Py/const.py
 dep_2 = 1
