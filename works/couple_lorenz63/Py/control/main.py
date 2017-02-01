@@ -16,8 +16,7 @@ def main():
     obs  = exec_obs(exp, nature)
     free = exec_free_run(exp)
     anl  = exec_assim_cycle(exp, free, obs)
-    # sys.exit()
-    # exec_fcst(fcst)
+    exec_fcst(exp, anl)
 
 def exec_nature():
   all_true = np.empty((STEPS, DIMM))
@@ -64,10 +63,17 @@ def exec_assim_cycle(exp, all_fcst, all_obs):
         fcst[0,:] = fdvar(np.matrix(all_fcst[i-exp["aint"],:,:]).T, \
           h[:,:], r[:,:], yo[:,:], exp["aint"])
     all_fcst[i,:,:] = fcst[:,:]
+  all_fcst.tofile("data/%s_cycle.bin" % exp["name"])
   return all_fcst
 
-def exec_fcst():
-  all_fcst.tofile("data/%s_fcst.bin" % exp[0])
+def exec_fcst(exp, anl):
+  fcst_all = np.empty((STEPS, FCST_LT, exp["nmem"], DIMM))
+  for i in range(STEP_FREE, STEPS):
+    if (i % exp["aint"] == 0):
+      for m in range(0, exp["nmem"]):
+        for lt in range(1, FCST_LT):
+          fcst_all[i,lt,m,:] = timestep(fcst_all[i-1,lt,m,:])
+  fcst_all.tofile("data/%s_fcst.bin" % exp["name"])
   return 0
 
 main()
