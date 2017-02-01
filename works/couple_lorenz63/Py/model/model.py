@@ -16,6 +16,8 @@ def timestep(x):
   return x
 
 # a31p63-64
+# input:  np.array(DIMM)
+# output: np.array(DIMM)
 def tendency(x):
   ### model constants
   # dynamic
@@ -39,11 +41,11 @@ def tendency(x):
   dx[2] =   x[0] * x[1] - b * x[2]
   # tropic atm
   dx[3] = -sigma * x[3]            + sigma * x[4] - c  * (s * x[6] + k2) - ce * (s * x[0] + k1)
-  dx[4] =  -x[3] * x[5] + r * x[3] -         x[4] + c  * (s * x[7] + k2) - ce * (s * x[1] + k1)
+  dx[4] =  -x[3] * x[5] + r * x[3] -         x[4] + c  * (s * x[7] + k2) + ce * (s * x[1] + k1)
   dx[5] =   x[3] * x[4] - b * x[5]                + cz * x[8]
   # tropic ocn
-  dx[6] = tau * (-sigma * x[6]            + sigma * x[7]) - c  * (x[3] + k2)
-  dx[7] = tau * ( -x[6] * x[8] + r * x[6] -         x[7]) + c  * (x[4] + k2)
-  dx[8] = tau * (  x[6] * x[7] - b * x[8]               ) - cz * x[5]
+  dx[6] = tau * (-sigma * x[6]                + sigma * x[7]) - c  * (x[3] + k2)
+  dx[7] = tau * ( -s * x[6] * x[8] + r * x[6] -         x[7]) + c  * (x[4] + k2)
+  dx[8] = tau * (  s * x[6] * x[7] - b * x[8]               ) - cz * x[5]
   return dx
 
