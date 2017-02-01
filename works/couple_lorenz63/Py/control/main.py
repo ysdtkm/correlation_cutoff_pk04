@@ -9,10 +9,10 @@ from model.model import *
 
 def main():
   exec_nature()
-  sys.exit()
-  exec_obs()
-  exec_free_run()
   for exp in EXPLIST:
+    exec_obs(exp)
+    exec_free_run(exp)
+    sys.exit()
     exec_assim(exp)
     exec_fcst(fcst)
 
@@ -25,14 +25,14 @@ def exec_nature():
   all_true.tofile("data/true.bin")
   return 0
 
-def exec_obs():
+def exec_obs(exp):
   all_obs  = np.empty((STEPS, DIMO))
-  all_obs.tofile("data/%s_obs.bin" % exp[0])
+  all_obs.tofile("data/%s_obs.bin" % exp["name"])
   return 0
 
-def exec_free_run():
-  all_fcst = np.empty((STEPS, nmem, DIMM))
-  h = geth(exp[3])
+def exec_free_run(exp):
+  all_fcst = np.empty((STEPS, exp["nmem"], DIMM))
+  h = geth(exp["diag"])
   r = getr()
   np.random.seed(1)
 
@@ -40,9 +40,7 @@ def exec_free_run():
   fcst = np.empty((exp["nmem"], DIMM))
   for m in range(0, exp["nmem"]):
     fcst[m,:] = np.random.normal(0.0, FERR_INI, DIMM)
-  for i in range(0, int(50 / DT)):
-    true = timestep(true)
-    for m in range(0, exp["nmem"]):
+    for i in range(0, int(50 / DT)):
       fcst[m,:] = timestep(fcst[m,:])
   return 0
 
