@@ -3,6 +3,8 @@
 import numpy as np
 from const import *
 
+# input:  np.array(DIMM)
+# output: np.array(DIMM)
 def timestep(x):
   # np.array x[DIMM]
   k1 = tendency(x)
