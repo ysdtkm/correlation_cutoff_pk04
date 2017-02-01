@@ -15,7 +15,7 @@ STEP_ALL = nature
 src_nature = Py/control/main.py Py/control/const.py Py/model/model.py
 dep_nature =
 out_nature = data/*.bin
-cmd_nature = python Py/control/main.py
+cmd_nature = mkdir -p data; python Py/control/main.py
 
 src_2 = Py/plot.py Py/const.py
 dep_2 = 1
