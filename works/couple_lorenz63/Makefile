@@ -10,12 +10,12 @@
 # cmd_step : 実行コマンド
 #================================
 
-STEP_ALL = 1
+STEP_ALL = nature
 
-src_1 = Py/control/main.py Py/control/const.py
-dep_1 =
-out_1 = data/*.bin
-cmd_1 = python Py/control/main.py
+src_nature = Py/control/main.py Py/control/const.py Py/model/model.py
+dep_nature =
+out_nature = data/*.bin
+cmd_nature = python Py/control/main.py
 
 src_2 = Py/plot.py Py/const.py
 dep_2 = 1
