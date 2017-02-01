@@ -10,17 +10,17 @@
 # cmd_step : 実行コマンド
 #================================
 
-STEP_ALL = nature
+STEP_ALL = nature plot
 
 src_nature = Py/control/main.py Py/control/const.py Py/model/model.py
 dep_nature =
 out_nature = data/*.bin
 cmd_nature = python Py/control/main.py
 
-src_2 = Py/plot.py Py/const.py
-dep_2 = 1
-out_2 = image/*
-cmd_2 = python Py/plot.py
+src_plot = Py/verif/plot.py Py/control/const.py
+dep_plot = nature
+out_plot = image/*
+cmd_plot = mkdir -p image; python Py/verif/plot.py
 
 # ===============================================
 # end of settings

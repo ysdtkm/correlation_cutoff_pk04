@@ -19,15 +19,15 @@ FERR_INI = 10.0
 # name, inf, aint, diag(h), nmem, method
 EXPLIST = [ \
   {"name":"xyz_long",  "inf":1.20, "aint":25, "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], "nmem":3, "method":"etkf"}, \
-  {"name":"xyz_short", "inf":1.05, "aint":8,  "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], "nmem":3, "method":"etkf"}, \
-  {"name":"xy",        "inf":1.05, "aint":8,  "diag":[1.0,1.0,0.0,1.0,1.0,0.0,1.0,1.0,0.0], "nmem":3, "method":"etkf"}, \
-  {"name":"yz",        "inf":1.05, "aint":8,  "diag":[0.0,1.0,1.0,0.0,1.0,1.0,0.0,1.0,1.0], "nmem":3, "method":"etkf"}, \
-  {"name":"zx",        "inf":1.05, "aint":8,  "diag":[1.0,0.0,1.0,1.0,0.0,1.0,1.0,0.0,1.0], "nmem":3, "method":"etkf"}, \
-  {"name":"x",         "inf":1.05, "aint":8,  "diag":[1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0], "nmem":3, "method":"etkf"}, \
-  {"name":"y",         "inf":1.05, "aint":8,  "diag":[0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0], "nmem":3, "method":"etkf"}, \
-  {"name":"z",         "inf":1.05, "aint":8,  "diag":[0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0], "nmem":3, "method":"etkf"}, \
-  {"name":"xyz_3dvar", "inf":1.0 , "aint":8,  "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], "nmem":1, "method":"3dvar"},\
-  {"name":"xyz_4dvar", "inf":1.0 , "aint":8,  "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], "nmem":1, "method":"4dvar"} \
+  # {"name":"xyz_short", "inf":1.05, "aint":8,  "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], "nmem":3, "method":"etkf"}, \
+  # {"name":"xy",        "inf":1.05, "aint":8,  "diag":[1.0,1.0,0.0,1.0,1.0,0.0,1.0,1.0,0.0], "nmem":3, "method":"etkf"}, \
+  # {"name":"yz",        "inf":1.05, "aint":8,  "diag":[0.0,1.0,1.0,0.0,1.0,1.0,0.0,1.0,1.0], "nmem":3, "method":"etkf"}, \
+  # {"name":"zx",        "inf":1.05, "aint":8,  "diag":[1.0,0.0,1.0,1.0,0.0,1.0,1.0,0.0,1.0], "nmem":3, "method":"etkf"}, \
+  # {"name":"x",         "inf":1.05, "aint":8,  "diag":[1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0], "nmem":3, "method":"etkf"}, \
+  # {"name":"y",         "inf":1.05, "aint":8,  "diag":[0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0], "nmem":3, "method":"etkf"}, \
+  # {"name":"z",         "inf":1.05, "aint":8,  "diag":[0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0], "nmem":3, "method":"etkf"}, \
+  # {"name":"xyz_3dvar", "inf":1.0 , "aint":8,  "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], "nmem":1, "method":"3dvar"},\
+  {"name":"xyz_4dvar", "inf":1.0 , "aint":25, "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], "nmem":1, "method":"4dvar"} \
 ]
 
 def getr():
