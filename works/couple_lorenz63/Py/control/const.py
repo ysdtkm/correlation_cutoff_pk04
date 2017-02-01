@@ -9,6 +9,7 @@ DIMO = DIMM # dimension of observation variable m
 DT = 0.01
 TMAX = 20
 STEPS = int(TMAX / DT)
+STEP_FREE = STEPS // 4
 VRFS = int(STEPS * 0.25) # verification period: [VRFS,STEPS)
 
 OERR = math.sqrt(2.0)

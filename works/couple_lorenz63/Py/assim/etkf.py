@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 
 import numpy as np
-from const import *
+from scipy.linalg import sqrtm
+import sys, os
+py_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(py_dir)
+from control.const import *
 
 def etkf(fcst, h, r, yo, inf, nmem, istep):
   ### DA variables
