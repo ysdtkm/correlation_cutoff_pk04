@@ -41,50 +41,54 @@ def plot(name, nmem):
   plt.savefig("./image/%s_%s.png" % (name, 1))
   plt.clf()
 
-  # xyz time series
-  plt.rcParams["font.size"] = 12
-  fig, (ax1, ax2, ax3) = plt.subplots(3, sharex=True)
-  ax1.set_title(name)
-  ax1.plot(hist_true[:,0], label="true")
-  ax1.plot(hist_fcst_mean[:,0], label="model")
-  if "x" in name:
-    ax1.plot(hist_obs[:,0], label="obs", linestyle='None', marker=".")
-  ax1.set_ylabel("x")
-  ax1.legend(loc="upper right")
-  ax2.plot(hist_true[:,1], label="true")
-  ax2.plot(hist_fcst_mean[:,1], label="model")
-  if "y" in name:
-    ax2.plot(hist_obs[:,1], label="obs", linestyle='None', marker=".")
-  ax2.set_ylabel("y")
-  ax3.plot(hist_true[:,2], label="true")
-  ax3.plot(hist_fcst_mean[:,2], label="model")
-  if "z" in name:
-    ax3.plot(hist_obs[:,2], label="obs", linestyle='None', marker=".")
-  ax3.set_ylabel("z")
-  plt.xlabel("timestep")
-  plt.savefig("./image/%s_%s.png" % (name, 2))
-  plt.clf()
+  for i_component in range(3):
+    i_adjust = i_component * 3
+    name_component = ["extro", "trop", "ocn"][i_component]
 
-  # 3D trajectory
-  plt.rcParams["font.size"] = 16
-  fig = plt.figure()
-  fig.subplots_adjust(left=0.02, bottom=0.02, right=0.98, top=0.98, \
-    wspace=0.04, hspace=0.04)
-  ax = fig.add_subplot(111, projection='3d')
-  ax.plot(hist_true[:,0], hist_true[:,1], \
-    hist_true[:,2], label="true")
-  ax.plot(hist_fcst_mean[:,0], hist_fcst_mean[:,1], \
-    hist_fcst_mean[:,2], label="model")
-  ax.legend()
-  ax.set_xlim([-30,30])
-  ax.set_ylim([-30,30])
-  ax.set_zlim([0,50])
-  ax.set_xlabel("x")
-  ax.set_ylabel("y")
-  ax.set_zlabel("z")
-  plt.savefig("./image/%s_traj.png" % name)
-  plt.clf()
-  plt.close()
+    # xyz time series
+    plt.rcParams["font.size"] = 12
+    fig, (ax1, ax2, ax3) = plt.subplots(3, sharex=True)
+    ax1.set_title(name)
+    ax1.plot(hist_true[:,0+i_adjust], label="true")
+    ax1.plot(hist_fcst_mean[:,0+i_adjust], label="model")
+    if "x" in name:
+      ax1.plot(hist_obs[:,0+i_adjust], label="obs", linestyle='None', marker=".")
+    ax1.set_ylabel("x")
+    ax1.legend(loc="upper right")
+    ax2.plot(hist_true[:,1+i_adjust], label="true")
+    ax2.plot(hist_fcst_mean[:,1+i_adjust], label="model")
+    if "y" in name:
+      ax2.plot(hist_obs[:,1+i_adjust], label="obs", linestyle='None', marker=".")
+    ax2.set_ylabel("y")
+    ax3.plot(hist_true[:,2+i_adjust], label="true")
+    ax3.plot(hist_fcst_mean[:,2+i_adjust], label="model")
+    if "z" in name:
+      ax3.plot(hist_obs[:,2+i_adjust], label="obs", linestyle='None', marker=".")
+    ax3.set_ylabel("z")
+    plt.xlabel("timestep")
+    plt.savefig("./image/%s_%s_%s.png" % (name, name_component, 2))
+    plt.clf()
+
+    # 3D trajectory
+    plt.rcParams["font.size"] = 16
+    fig = plt.figure()
+    fig.subplots_adjust(left=0.02, bottom=0.02, right=0.98, top=0.98, \
+      wspace=0.04, hspace=0.04)
+    ax = fig.add_subplot(111, projection='3d')
+    ax.plot(hist_true[:,0+i_adjust], hist_true[:,1+i_adjust], \
+      hist_true[:,2+i_adjust], label="true")
+    ax.plot(hist_fcst_mean[:,0+i_adjust], hist_fcst_mean[:,1+i_adjust], \
+      hist_fcst_mean[:,2+i_adjust], label="model")
+    ax.legend()
+    ax.set_xlim([-30,30])
+    ax.set_ylim([-30,30])
+    ax.set_zlim([0,50])
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
+    ax.set_zlabel("z")
+    plt.savefig("./image/%s_%s_traj.png" % (name, name_component))
+    plt.clf()
+    plt.close()
 
 def methods(obj):
   print([method for method in dir(obj) if callable(getattr(obj, method))])
