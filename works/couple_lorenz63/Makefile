@@ -15,12 +15,12 @@ STEP_ALL = calc plot
 src_calc = Py/main.py Py/const.py Py/model.py Py/etkf.py Py/fdvar.py Py/tdvar.py
 dep_calc =
 out_calc = data/*.bin
-cmd_calc = mkdir -p data; python Py/main.py
+cmd_calc = rm -r data; mkdir -p data; python Py/main.py
 
 src_plot = Py/plot.py Py/const.py
 dep_plot = calc
 out_plot = image/*
-cmd_plot = mkdir -p image; python Py/plot.py
+cmd_plot = rm -r image; mkdir -p image; python Py/plot.py
 
 # ===============================================
 # end of settings
