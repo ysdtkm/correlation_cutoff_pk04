@@ -5,13 +5,11 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from const import *
 
-def plot(name, nmem):
+def plot_rmse_spread(name, nmem):
   hist_true = np.fromfile("data/true.bin", np.float64)
   hist_true = hist_true.reshape((STEPS, DIMM))
   hist_fcst = np.fromfile("data/%s_cycle.bin" % name, np.float64)
   hist_fcst = hist_fcst.reshape((STEPS, nmem, DIMM))
-  hist_obs = np.fromfile("data/%s_obs.bin" % name, np.float64)
-  hist_obs = hist_obs.reshape((STEPS, DIMO))
 
   hist_fcst_mean = np.mean(hist_fcst, axis=1)
   hist_fcst_sprd = np.sqrt(np.mean(hist_fcst**2, axis=1) - hist_fcst_mean**2)
@@ -37,6 +35,15 @@ def plot(name, nmem):
   plt.title("[%s] RMSE:%6g Spread:%6g" % (name, rmse, sprd))
   plt.savefig("./image/%s_%s.png" % (name, 1))
   plt.clf()
+
+def plot_time_value(name, nmem):
+  hist_true = np.fromfile("data/true.bin", np.float64)
+  hist_true = hist_true.reshape((STEPS, DIMM))
+  hist_fcst = np.fromfile("data/%s_cycle.bin" % name, np.float64)
+  hist_fcst = hist_fcst.reshape((STEPS, nmem, DIMM))
+  hist_obs = np.fromfile("data/%s_obs.bin" % name, np.float64)
+  hist_obs = hist_obs.reshape((STEPS, DIMO))
+  hist_fcst_mean = np.mean(hist_fcst, axis=1)
 
   for i_component in range(DIMM//3):
     i_adjust = i_component * 3
@@ -66,6 +73,17 @@ def plot(name, nmem):
     plt.savefig("./image/%s_%s_%s.png" % (name, name_component, 2))
     plt.clf()
 
+def plot_3d_trajectory(name, nmem):
+  hist_true = np.fromfile("data/true.bin", np.float64)
+  hist_true = hist_true.reshape((STEPS, DIMM))
+  hist_fcst = np.fromfile("data/%s_cycle.bin" % name, np.float64)
+  hist_fcst = hist_fcst.reshape((STEPS, nmem, DIMM))
+  hist_fcst_mean = np.mean(hist_fcst, axis=1)
+
+  for i_component in range(DIMM//3):
+    i_adjust = i_component * 3
+    name_component = ["extro", "trop", "ocn"][i_component]
+
     # 3D trajectory
     plt.rcParams["font.size"] = 16
     fig = plt.figure()
@@ -87,8 +105,7 @@ def plot(name, nmem):
     plt.clf()
     plt.close()
 
-def methods(obj):
-  print([method for method in dir(obj) if callable(getattr(obj, method))])
-
 for exp in EXPLIST:
-  plot(exp["name"], exp["nmem"])
+  plot_rmse_spread(exp["name"], exp["nmem"])
+  plot_time_value(exp["name"], exp["nmem"])
+  plot_3d_trajectory(exp["name"], exp["nmem"])
