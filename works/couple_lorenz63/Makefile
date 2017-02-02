@@ -18,7 +18,7 @@ out_calc = data/*.bin
 cmd_calc = mkdir -p data; python Py/main.py
 
 src_plot = Py/plot.py Py/const.py
-dep_plot = nature
+dep_plot = calc
 out_plot = image/*
 cmd_plot = mkdir -p image; python Py/plot.py
 
