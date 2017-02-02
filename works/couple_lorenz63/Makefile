@@ -39,7 +39,6 @@ clean_$1:
 	@echo "clean $1:"
 	rm -rf $(out_$1)
 	rm -f $(VPATH)/$1
-	$(foreach i, $(dep_$1), rm -f $VPATH/$i)
 endef
 
 # 第三要素の$i部分をSTEP_ALL変数の各要素で置換
