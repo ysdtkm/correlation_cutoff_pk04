@@ -2,7 +2,6 @@
 
 import numpy as np
 from scipy.optimize import fmin_bfgs
-import sys, os
 from const import *
 
 def tdvar(fcst, h, r, yo):

@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import numpy as np
-import sys, os
 from const import *
 from model import *
 from etkf import *

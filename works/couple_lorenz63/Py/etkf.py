@@ -2,7 +2,6 @@
 
 import numpy as np
 from scipy.linalg import sqrtm
-import sys, os
 from const import *
 
 def etkf(fcst, h, r, yo, inf, nmem, istep):

@@ -3,7 +3,6 @@
 import numpy as np
 from scipy.linalg import sqrtm
 from scipy.optimize import fmin_bfgs
-import sys, os
 from const import *
 from tdvar import *
 from model import *
