@@ -38,7 +38,7 @@ def plot(name, nmem):
   plt.savefig("./image/%s_%s.png" % (name, 1))
   plt.clf()
 
-  for i_component in range(3):
+  for i_component in range(DIMM//3):
     i_adjust = i_component * 3
     name_component = ["extro", "trop", "ocn"][i_component]
 

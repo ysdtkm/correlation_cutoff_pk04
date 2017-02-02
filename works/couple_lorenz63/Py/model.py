@@ -62,3 +62,23 @@ def tendency(x):
     dx[8] = tau * ( s * x[6] * x[7] - b * x[8]               ) - cz * x[5]
     return dx
 
+def tangent_linear(x):
+  if (DIMM == 3):
+    sigma = 10.0
+    r = 28.0
+    b = 8.0 / 3.0
+    k = np.zeros((3,3))
+
+    k[0][0] = -sigma
+    k[0][1] = sigma
+    k[0][2] = 0.0
+
+    k[1][0] = -x[2] + r
+    k[1][1] = -1.0
+    k[1][2] = -x[0]
+
+    k[2][0] = x[1]
+    k[2][1] = x[0]
+    k[2][2] = -b
+    return k
+
