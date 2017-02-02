@@ -11,6 +11,7 @@ from assim.tdvar import *
 from assim.fdvar import *
 
 def main():
+  np.random.seed(1)
   nature = exec_nature()
   for exp in EXPLIST:
     obs  = exec_obs(exp, nature)
@@ -37,7 +38,6 @@ def exec_obs(exp, nature):
   return all_obs
 
 def exec_free_run(exp):
-  # np.random.seed(1)
   free_run = np.empty((STEPS, exp["nmem"], DIMM))
   for m in range(0, exp["nmem"]):
     free_run[0,m,:] = np.random.normal(0.0, FERR_INI, DIMM)

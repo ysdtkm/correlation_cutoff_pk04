@@ -33,8 +33,8 @@ def plot(name, nmem):
   plt.yscale('log')
   plt.plot(np.sqrt(np.mean(1.0/DIMM*hist_err**2, axis=1)), label="RMSE")
   if (nmem > 1):
-    plt.plot(np.sqrt(nmem/(nmem - 1.0) * \
-    np.mean(hist_fcst_sprd**2, axis=1)), label="Spread")
+    plt.plot(np.sqrt(nmem/(nmem - 1.0)/DIMM * \
+      np.mean(hist_fcst_sprd**2, axis=1)), label="Spread")
   plt.legend()
   plt.xlabel("timestep")
   plt.title("[%s] RMSE:%6g Spread:%6g" % (name, rmse, sprd))
@@ -48,7 +48,7 @@ def plot(name, nmem):
     # xyz time series
     plt.rcParams["font.size"] = 12
     fig, (ax1, ax2, ax3) = plt.subplots(3, sharex=True)
-    ax1.set_title(name)
+    ax1.set_title("%s %s" % (name, name_component))
     ax1.plot(hist_true[:,0+i_adjust], label="true")
     ax1.plot(hist_fcst_mean[:,0+i_adjust], label="model")
     if "x" in name:
@@ -80,9 +80,9 @@ def plot(name, nmem):
     ax.plot(hist_fcst_mean[:,0+i_adjust], hist_fcst_mean[:,1+i_adjust], \
       hist_fcst_mean[:,2+i_adjust], label="model")
     ax.legend()
-    ax.set_xlim([-30,30])
-    ax.set_ylim([-30,30])
-    ax.set_zlim([0,50])
+    # ax.set_xlim([-30,30])
+    # ax.set_ylim([-30,30])
+    # ax.set_zlim([0,50])
     ax.set_xlabel("x")
     ax.set_ylabel("y")
     ax.set_zlabel("z")
