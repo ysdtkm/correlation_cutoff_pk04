@@ -11,25 +11,29 @@ def plot_rmse_spread(name, nmem):
   hist_fcst = np.fromfile("data/%s_cycle.bin" % name, np.float64)
   hist_fcst = hist_fcst.reshape((STEPS, nmem, DIMM))
 
+  # Error and Spread_square for each grid and time
   hist_fcst_mean = np.mean(hist_fcst, axis=1)
-  hist_fcst_sprd = np.sqrt(np.mean(hist_fcst**2, axis=1) - hist_fcst_mean**2)
+  hist_fcst_sprd2 = np.zeros((STEPS, DIMM))
+  if (nmem > 1):
+    for i in range(nmem):
+      hist_fcst_sprd2[:,:] = hist_fcst_sprd2[:,:] + \
+        nmem / (nmem - 1.0) * (hist_fcst[:,i,:]**2 - hist_fcst_mean[:,:]**2)
   hist_err = hist_fcst_mean - hist_true
 
+  # MSE and Spread_square time series (grid average)
+  mse_time   = np.mean(hist_err**2, axis=1)
+  sprd2_time = np.mean(hist_fcst_sprd2, axis=1)
+
   # RMSE and Spread time average
-  rmse = np.sqrt(np.mean(1.0/DIMM*hist_err[VRFS:STEPS,:]**2, axis=(0,1)))
-  if (nmem > 1):
-    sprd = np.sqrt(nmem/(nmem - 1.0)/DIMM * \
-      np.mean(hist_fcst_sprd[VRFS:STEPS,:]**2, axis=(0,1)))
-  else:
-    sprd = 0.0
+  rmse = np.sqrt(np.mean(mse_time[STEP_FREE:STEPS]))
+  sprd = np.sqrt(np.mean(sprd2_time[STEP_FREE:STEPS]))
 
   # RMSE-Spread time series
   plt.rcParams["font.size"] = 16
   plt.yscale('log')
-  plt.plot(np.sqrt(np.mean(1.0/DIMM*hist_err**2, axis=1)), label="RMSE")
+  plt.plot(np.sqrt(mse_time), label="RMSE")
   if (nmem > 1):
-    plt.plot(np.sqrt(nmem/(nmem - 1.0)/DIMM * \
-      np.mean(hist_fcst_sprd**2, axis=1)), label="Spread")
+    plt.plot(np.sqrt(sprd2_time), label="Spread")
   plt.legend()
   plt.xlabel("timestep")
   plt.title("[%s] RMSE:%6g Spread:%6g" % (name, rmse, sprd))
