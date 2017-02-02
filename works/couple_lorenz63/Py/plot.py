@@ -4,9 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import sys, os
-py_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(py_dir)
-from control.const import *
+from const import *
 
 def plot(name, nmem):
   hist_true = np.fromfile("data/true.bin", np.float64)

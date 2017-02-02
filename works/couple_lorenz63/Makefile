@@ -10,17 +10,17 @@
 # cmd_step : 実行コマンド
 #================================
 
-STEP_ALL = nature plot
+STEP_ALL = calc plot
 
-src_nature = Py/control/main.py Py/control/const.py Py/model/model.py
-dep_nature =
-out_nature = data/*.bin
-cmd_nature = mkdir -p data; python Py/control/main.py
+src_calc = Py/main.py Py/const.py Py/model.py
+dep_calc =
+out_calc = data/*.bin
+cmd_calc = mkdir -p data; python Py/main.py
 
-src_plot = Py/verif/plot.py Py/control/const.py
+src_plot = Py/plot.py Py/const.py
 dep_plot = nature
 out_plot = image/*
-cmd_plot = mkdir -p image; python Py/verif/plot.py
+cmd_plot = mkdir -p image; python Py/plot.py
 
 # ===============================================
 # end of settings

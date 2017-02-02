@@ -7,11 +7,11 @@ DIMM = 9    # dimension of model variable n
 DIMO = DIMM # dimension of observation variable m
 
 DT = 0.01
-TMAX = 100
+TMAX = 10
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 VRFS = int(STEPS * 0.25) # verification period: [VRFS,STEPS)
-FCST_LT = 50
+FCST_LT = 5
 
 OERR = math.sqrt(2.0)
 FERR_INI = 10.0

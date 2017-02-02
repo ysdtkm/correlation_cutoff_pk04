@@ -2,13 +2,11 @@
 
 import numpy as np
 import sys, os
-py_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(py_dir)
-from control.const import *
-from model.model import *
-from assim.etkf import *
-from assim.tdvar import *
-from assim.fdvar import *
+from const import *
+from model import *
+from etkf import *
+from tdvar import *
+from fdvar import *
 
 def main():
   np.random.seed(1)

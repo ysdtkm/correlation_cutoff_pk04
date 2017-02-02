@@ -3,9 +3,7 @@
 import numpy as np
 from scipy.optimize import fmin_bfgs
 import sys, os
-py_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(py_dir)
-from control.const import *
+from const import *
 
 def tdvar(fcst, h, r, yo):
   anl = fcst
