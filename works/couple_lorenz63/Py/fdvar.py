@@ -3,12 +3,9 @@
 import numpy as np
 from scipy.linalg import sqrtm
 from scipy.optimize import fmin_bfgs
-import sys, os
-py_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(py_dir)
-from control.const import *
-from assim.tdvar import *
-from model.model import *
+from const import *
+from tdvar import *
+from model import *
 
 def fdvar(fcst_0, h, r, yo, aint):
   # only assimilate one set of obs at t1 = t0+dt*aint

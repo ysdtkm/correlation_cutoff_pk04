@@ -7,18 +7,18 @@ DIMM = 9    # dimension of model variable n
 DIMO = DIMM # dimension of observation variable m
 
 DT = 0.01
-TMAX = 100
+TMAX = 10
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 VRFS = int(STEPS * 0.25) # verification period: [VRFS,STEPS)
-FCST_LT = 50
+FCST_LT = 5
 
 OERR = math.sqrt(2.0)
 FERR_INI = 10.0
 
 # name, inf, aint, diag(h), nmem, method
 EXPLIST = [ \
-  {"name":"etkf_xyz_long",  "inf":1.20, "aint":25, "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], "nmem":9, "method":"etkf"}, \
+  {"name":"etkf_xyz_long",  "inf":1.05, "aint":25, "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], "nmem":9, "method":"etkf"}, \
   # {"name":"xyz_short", "inf":1.05, "aint":8,  "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], "nmem":3, "method":"etkf"}, \
   # {"name":"xy",        "inf":1.05, "aint":8,  "diag":[1.0,1.0,0.0,1.0,1.0,0.0,1.0,1.0,0.0], "nmem":3, "method":"etkf"}, \
   # {"name":"yz",        "inf":1.05, "aint":8,  "diag":[0.0,1.0,1.0,0.0,1.0,1.0,0.0,1.0,1.0], "nmem":3, "method":"etkf"}, \

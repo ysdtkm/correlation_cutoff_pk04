@@ -10,17 +10,17 @@
 # cmd_step : 実行コマンド
 #================================
 
-STEP_ALL = nature plot
+STEP_ALL = calc plot
 
-src_nature = Py/control/main.py Py/control/const.py Py/model/model.py
-dep_nature =
-out_nature = data/*.bin
-cmd_nature = mkdir -p data; python Py/control/main.py
+src_calc = Py/main.py Py/const.py Py/model.py Py/etkf.py Py/fdvar.py Py/tdvar.py
+dep_calc =
+out_calc = data/*.bin
+cmd_calc = rm -rf data; mkdir -p data; python Py/main.py
 
-src_plot = Py/verif/plot.py Py/control/const.py
-dep_plot = nature
+src_plot = Py/plot.py Py/const.py
+dep_plot = calc
 out_plot = image/*
-cmd_plot = mkdir -p image; python Py/verif/plot.py
+cmd_plot = rm -rf image; mkdir -p image; python Py/plot.py
 
 # ===============================================
 # end of settings
@@ -35,6 +35,10 @@ $1: $(src_$1) $(dep_$1)
 	$(cmd_$1)
 	@mkdir -p $(VPATH)
 	@touch $(VPATH)/$1
+clean_$1:
+	@echo "clean $1:"
+	rm -rf $(out_$1)
+	rm -f $(VPATH)/$1
 endef
 
 # 第三要素の$i部分をSTEP_ALL変数の各要素で置換

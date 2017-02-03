@@ -2,10 +2,7 @@
 
 import numpy as np
 from scipy.optimize import fmin_bfgs
-import sys, os
-py_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(py_dir)
-from control.const import *
+from const import *
 
 def tdvar(fcst, h, r, yo):
   anl = fcst
@@ -27,16 +24,6 @@ def tdvar_b():
   #   [ 0.5587116, 1.10975806,0.00229167], \
   #   [-0.08293288,0.00229167,0.60078791]  \
   # ])
-  b = np.matrix([ \
-    [1,0,0,0,0,0,0,0,0], \
-    [0,1,0,0,0,0,0,0,0], \
-    [0,0,1,0,0,0,0,0,0], \
-    [0,0,0,1,0,0,0,0,0], \
-    [0,0,0,0,1,0,0,0,0], \
-    [0,0,0,0,0,1,0,0,0], \
-    [0,0,0,0,0,0,1,0,0], \
-    [0,0,0,0,0,0,0,1,0], \
-    [0,0,0,0,0,0,0,0,1] \
-  ])
+  b = np.matrix(np.diag(np.ones(DIMM)))
   return b
 
