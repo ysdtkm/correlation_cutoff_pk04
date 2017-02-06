@@ -22,25 +22,29 @@ def plot_rmse_spread(name, nmem):
         nmem / (nmem - 1.0) * (hist_fcst[:,i,:]**2 - hist_fcst_mean[:,:]**2)
   hist_err = hist_fcst_mean - hist_true
 
-  # MSE and Spread_square time series (grid average)
-  mse_time   = np.mean(hist_err**2, axis=1)
-  sprd2_time = np.mean(hist_fcst_sprd2, axis=1)
+  for i_component in range(DIMM//3):
+    grid_from = 3 * i_component
+    name_component = ["extro", "trop", "ocn"][i_component]
 
-  # RMSE and Spread time average
-  rmse = np.sqrt(np.mean(mse_time[STEP_FREE:STEPS]))
-  sprd = np.sqrt(np.mean(sprd2_time[STEP_FREE:STEPS]))
+    # MSE and Spread_square time series (grid average)
+    mse_time   = np.mean(hist_err[:,grid_from:grid_from+3]**2,     axis=1)
+    sprd2_time = np.mean(hist_fcst_sprd2[:,grid_from:grid_from+3], axis=1)
 
-  # RMSE-Spread time series
-  plt.rcParams["font.size"] = 16
-  plt.yscale('log')
-  plt.plot(np.sqrt(mse_time), label="RMSE")
-  if (nmem > 1):
-    plt.plot(np.sqrt(sprd2_time), label="Spread")
-  plt.legend()
-  plt.xlabel("timestep")
-  plt.title("[%s] RMSE:%6g Spread:%6g" % (name, rmse, sprd))
-  plt.savefig("./image/%s_%s_%s.png" % (name, "all", "time"))
-  plt.clf()
+    # RMSE and Spread time average
+    rmse = np.sqrt(np.mean(mse_time[STEP_FREE:STEPS]))
+    sprd = np.sqrt(np.mean(sprd2_time[STEP_FREE:STEPS]))
+
+    # RMSE-Spread time series
+    plt.rcParams["font.size"] = 16
+    plt.yscale('log')
+    plt.plot(np.sqrt(mse_time), label="RMSE")
+    if (nmem > 1):
+      plt.plot(np.sqrt(sprd2_time), label="Spread")
+    plt.legend()
+    plt.xlabel("timestep")
+    plt.title("[%s %s] RMSE:%6g Spread:%6g" % (name, name_component, rmse, sprd))
+    plt.savefig("./image/%s_%s_%s.png" % (name, name_component, "time"))
+    plt.clf()
   return 0
 
 # name <- string
@@ -122,7 +126,7 @@ def plot_3d_trajectory(name, nmem):
 def plot_covariance_matr(name):
   hist_covar = np.fromfile("data/%s_covr_post.bin" % name, np.float64)
   hist_covar = hist_covar.reshape((STEPS, DIMM, DIMM))
-  mean_covar = np.mean(hist_covar, axis=0)
+  mean_covar = np.sqrt(np.nanmean(hist_covar**2, axis=0))
 
   fig, ax = plt.subplots(1)
   fig.subplots_adjust(left=0.12, right=0.95, bottom=0.12, top=0.92)
@@ -134,7 +138,7 @@ def plot_covariance_matr(name):
   ax.set_aspect(abs(x1-x0)/abs(y1-y0))
   ax.set_xlabel("x")
   cbar = plt.colorbar(map1)
-  plt.title("covariance matrix %s", (name,))
+  plt.title("covariance matrix %s" % (name,))
   plt.gca().invert_yaxis()
   plt.savefig("./image/%s_covar.png" % (name,))
   plt.close()
