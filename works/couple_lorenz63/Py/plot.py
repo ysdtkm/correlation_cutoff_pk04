@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from const import *
 
+## refer to a32p23
 # name <- string
 # nmem <- int
 def plot_rmse_spread(name, nmem):
@@ -19,7 +20,7 @@ def plot_rmse_spread(name, nmem):
   if (nmem > 1):
     for i in range(nmem):
       hist_fcst_sprd2[:,:] = hist_fcst_sprd2[:,:] + \
-        nmem / (nmem - 1.0) * (hist_fcst[:,i,:]**2 - hist_fcst_mean[:,:]**2)
+        1.0 / (nmem - 1.0) * (hist_fcst[:,i,:]**2 - hist_fcst_mean[:,:]**2)
   hist_err = hist_fcst_mean - hist_true
 
   for i_component in range(DIMM//3):
