@@ -3,8 +3,8 @@
 import numpy as np
 from const import *
 
-# input:  np.array(DIMM)
-# output: np.array(DIMM)
+# x      <- np.array(DIMM)
+# return -> np.array(DIMM)
 def timestep(x):
   # np.array x[DIMM]
   k1 = tendency(x)
@@ -18,8 +18,8 @@ def timestep(x):
   return x
 
 # a31p63-64
-# input:  np.array(DIMM)
-# output: np.array(DIMM)
+# x      <- np.array(DIMM)
+# return -> np.array(DIMM)
 def tendency(x):
   if (DIMM == 3):
     sigma = 10.0
@@ -62,6 +62,8 @@ def tendency(x):
     dx[8] = tau * ( s * x[6] * x[7] - b * x[8]               ) - cz * x[5]
     return dx
 
+# x      <- np.array(DIMM)
+# return -> np.array(DIMM,DIMM)
 def tangent_linear(x):
   if (DIMM == 3):
     sigma = 10.0

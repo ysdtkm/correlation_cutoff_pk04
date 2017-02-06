@@ -127,12 +127,18 @@ def plot_3d_trajectory(name, nmem):
 def plot_covariance_matr(name):
   hist_covar = np.fromfile("data/%s_covr_post.bin" % name, np.float64)
   hist_covar = hist_covar.reshape((STEPS, DIMM, DIMM))
-  mean_covar = np.sqrt(np.nanmean(hist_covar**2, axis=0))
+  rms_covar  = np.sqrt(np.nanmean(hist_covar**2, axis=0))
+  mean_covar = np.nanmean(hist_covar, axis=0)
+  plot_matrix(rms_covar , "covar_rms_%s"  % name)
+  plot_matrix(mean_covar, "covar_mean_%s" % name)
 
+# data <- np.array[n,n]
+# name <- string
+def plot_matrix(data, name):
   fig, ax = plt.subplots(1)
   fig.subplots_adjust(left=0.12, right=0.95, bottom=0.12, top=0.92)
-  cmax = np.max(np.abs(mean_covar))
-  map1 = ax.pcolor(mean_covar, cmap=plt.cm.bwr)
+  cmax = np.max(np.abs(data))
+  map1 = ax.pcolor(data, cmap=plt.cm.bwr)
   map1.set_clim(-1.0 * cmax, cmax)
   x0,x1 = ax.get_xlim()
   y0,y1 = ax.get_ylim()

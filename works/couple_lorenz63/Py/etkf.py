@@ -50,5 +50,5 @@ def etkf(fcst, h, r, yo, inf, nmem):
   xapt = (xfm - xf * I_1m) * wam
   xa   = xf + xfm * wa
   xam  = xapt + xa * I_1m
-  return np.real(xam.T.A), pa
+  return np.real(xam.T.A), xapt * xapt.T
 
