@@ -14,7 +14,7 @@ def main():
   for exp in EXPLIST:
     free = exec_free_run(exp)
     anl  = exec_assim_cycle(exp, free, obs)
-    exec_fcst(exp, anl)
+    exec_deterministic_fcst(exp, anl)
 
 # return   -> np.array[STEPS, DIMM]
 def exec_nature():
@@ -77,7 +77,7 @@ def exec_assim_cycle(exp, all_fcst, all_obs):
 # exp    <- hash
 # anl    <- np.array[STEPS, nmem, DIMM]
 # return -> np.array[STEPS, FCST_LT, DIMM]
-def exec_fcst(exp, anl):
+def exec_deterministic_fcst(exp, anl):
   fcst_all = np.empty((STEPS, FCST_LT, DIMM))
   for i in range(STEP_FREE, STEPS):
     if (i % exp["aint"] == 0):
