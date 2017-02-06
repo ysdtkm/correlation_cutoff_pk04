@@ -25,7 +25,7 @@ def fdvar_2j(anl_0, fcst_0, h, r, yo, aint):
   for i in range(0, aint):
     anl_1_ar = timestep(anl_1_ar)
   anl_1 = np.matrix(anl_1_ar).T
-  twoj = (anl_0 - fcst_0).T * np.linalg.inv(b) * (anl_0 - fcst_0) + \
-       (h * anl_1 - yo).T * np.linalg.inv(r) * (h * anl_1 - yo)
+  twoj = (anl_0 - fcst_0).T * b.I * (anl_0 - fcst_0) + \
+       (h * anl_1 - yo).T * r.I * (h * anl_1 - yo)
   return twoj.A
 

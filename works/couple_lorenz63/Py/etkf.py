@@ -46,7 +46,7 @@ def etkf(fcst, h, r, yo, inf, nmem):
   yb   = h * xf
   pa   = (((nmem-1.0)/inf**2) * I_mm + ybpt.T * r.I * ybpt).I
   wam  = np.matrix(sqrtm((nmem-1.0) * pa))
-  wa   = pa * ybpt.T * np.linalg.inv(r) * (yo - yb)
+  wa   = pa * ybpt.T * r.I * (yo - yb)
   xapt = (xfm - xf * I_1m) * wam
   xa   = xf + xfm * wa
   xam  = xapt + xa * I_1m
