@@ -16,6 +16,7 @@ def main():
     anl  = exec_assim_cycle(exp, free, obs)
     exec_fcst(exp, anl)
 
+# return   -> np.array[STEPS, DIMM]
 def exec_nature():
   all_true = np.empty((STEPS, DIMM))
   true = np.random.normal(0.0, FERR_INI, DIMM)
@@ -25,6 +26,8 @@ def exec_nature():
   all_true.tofile("data/true.bin")
   return all_true
 
+# nature   <- np.array[STEPS, DIMM]
+# return   -> np.array[STEPS, DIMO]
 def exec_obs(nature):
   all_obs = np.empty((STEPS, DIMO))
   for i in range(0, STEPS):
@@ -32,6 +35,8 @@ def exec_obs(nature):
   all_obs.tofile("data/obs.bin")
   return all_obs
 
+# exp      <- hash
+# return   -> np.array[STEPS, nmem, DIMM]
 def exec_free_run(exp):
   free_run = np.empty((STEPS, exp["nmem"], DIMM))
   for m in range(0, exp["nmem"]):
@@ -40,6 +45,10 @@ def exec_free_run(exp):
       free_run[i,m,:] = timestep(free_run[i-1,m,:])
   return free_run
 
+# exp      <- hash
+# all_fcst <- np.array[STEPS, nmem, DIMM]
+# all_obs  <- np.array[STEPS, DIMO]
+# return   -> np.array[STEPS, nmem, DIMM]
 def exec_assim_cycle(exp, all_fcst, all_obs):
   # forecast-analysis cycle
   r = getr()
@@ -65,13 +74,16 @@ def exec_assim_cycle(exp, all_fcst, all_obs):
   all_fcst.tofile("data/%s_cycle.bin" % exp["name"])
   return all_fcst
 
+# exp    <- hash
+# anl    <- np.array[STEPS, nmem, DIMM]
+# return -> np.array[STEPS, FCST_LT, DIMM]
 def exec_fcst(exp, anl):
-  fcst_all = np.empty((STEPS, FCST_LT, exp["nmem"], DIMM))
+  fcst_all = np.empty((STEPS, FCST_LT, DIMM))
   for i in range(STEP_FREE, STEPS):
     if (i % exp["aint"] == 0):
-      for m in range(0, exp["nmem"]):
-        for lt in range(1, FCST_LT):
-          fcst_all[i,lt,m,:] = timestep(fcst_all[i-1,lt,m,:])
+      fcst_all[i,0,:] = np.mean(anl[i,:,:], axis=0)
+      for lt in range(1, FCST_LT):
+        fcst_all[i,lt,:] = timestep(fcst_all[i-1,lt,:])
   fcst_all.tofile("data/%s_fcst.bin" % exp["name"])
   return 0
 
