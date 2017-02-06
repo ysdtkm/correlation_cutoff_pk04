@@ -54,6 +54,8 @@ def exec_assim_cycle(exp, all_fcst, all_obs):
   r = getr()
   h = geth(exp["diag"])
   fcst = np.empty((exp["nmem"], DIMM))
+  all_pa = np.empty((STEPS, DIMM, DIMM))
+  all_pa[:,:,:] = np.nan
   obs_used = np.empty((STEPS, DIMO))
   obs_used[:,:] = np.nan
   for i in range(STEP_FREE, STEPS):
@@ -63,7 +65,8 @@ def exec_assim_cycle(exp, all_fcst, all_obs):
       obs_used[i,:] = all_obs[i,:]
       yo = h * np.matrix(all_obs[i,:]).T
       if (exp["method"] == "etkf"):
-        fcst[:,:] = etkf(fcst[:,:], h[:,:], r[:,:], yo[:,:], exp["inf"], exp["nmem"], i)
+        fcst[:,:], all_pa[i,:,:] = \
+          etkf(fcst[:,:], h[:,:], r[:,:], yo[:,:], exp["inf"], exp["nmem"])
       elif (exp["method"] == "3dvar"):
         fcst[0,:] = tdvar(np.matrix(fcst[:,:]).T, h[:,:], r[:,:], yo[:,:])
       elif (exp["method"] == "4dvar"):
@@ -72,6 +75,7 @@ def exec_assim_cycle(exp, all_fcst, all_obs):
     all_fcst[i,:,:] = fcst[:,:]
   obs_used.tofile("data/%s_obs.bin" % exp["name"])
   all_fcst.tofile("data/%s_cycle.bin" % exp["name"])
+  all_pa.tofile("data/%s_covr_post.bin" % exp["name"])
   return all_fcst
 
 # exp    <- hash

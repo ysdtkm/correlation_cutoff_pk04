@@ -37,7 +37,7 @@ def plot_rmse_spread(name, nmem):
   plt.legend()
   plt.xlabel("timestep")
   plt.title("[%s] RMSE:%6g Spread:%6g" % (name, rmse, sprd))
-  plt.savefig("./image/%s_time_%s.png" % (name, 1))
+  plt.savefig("./image/%s_%s_%s.png" % (name, "all", "time"))
   plt.clf()
 
 def plot_time_value(name, nmem):
@@ -74,7 +74,7 @@ def plot_time_value(name, nmem):
       ax3.plot(hist_obs[:,2+i_adjust], label="obs", linestyle='None', marker=".")
     ax3.set_ylabel("z")
     plt.xlabel("timestep")
-    plt.savefig("./image/%s_%s_%s.png" % (name, name_component, 2))
+    plt.savefig("./image/%s_%s_%s.png" % (name, name_component, "val"))
     plt.clf()
 
 def plot_3d_trajectory(name, nmem):
