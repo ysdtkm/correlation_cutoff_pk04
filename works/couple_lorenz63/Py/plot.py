@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from const import *
 
+# name <- string
+# nmem <- int
 def plot_rmse_spread(name, nmem):
   hist_true = np.fromfile("data/true.bin", np.float64)
   hist_true = hist_true.reshape((STEPS, DIMM))
@@ -39,7 +41,10 @@ def plot_rmse_spread(name, nmem):
   plt.title("[%s] RMSE:%6g Spread:%6g" % (name, rmse, sprd))
   plt.savefig("./image/%s_%s_%s.png" % (name, "all", "time"))
   plt.clf()
+  return 0
 
+# name <- string
+# nmem <- int
 def plot_time_value(name, nmem):
   hist_true = np.fromfile("data/true.bin", np.float64)
   hist_true = hist_true.reshape((STEPS, DIMM))
@@ -76,7 +81,10 @@ def plot_time_value(name, nmem):
     plt.xlabel("timestep")
     plt.savefig("./image/%s_%s_%s.png" % (name, name_component, "val"))
     plt.clf()
+  return 0
 
+# name <- string
+# nmem <- int
 def plot_3d_trajectory(name, nmem):
   hist_true = np.fromfile("data/true.bin", np.float64)
   hist_true = hist_true.reshape((STEPS, DIMM))
@@ -108,8 +116,33 @@ def plot_3d_trajectory(name, nmem):
     plt.savefig("./image/%s_%s_traj.png" % (name, name_component))
     plt.clf()
     plt.close()
+  return 0
+
+# name <- string
+def plot_covariance_matr(name):
+  hist_covar = np.fromfile("data/%s_covr_post.bin" % name, np.float64)
+  hist_covar = hist_covar.reshape((STEPS, DIMM, DIMM))
+  mean_covar = np.mean(hist_covar, axis=0)
+
+  fig, ax = plt.subplots(1)
+  fig.subplots_adjust(left=0.12, right=0.95, bottom=0.12, top=0.92)
+  cmax = np.max(np.abs(mean_covar))
+  map1 = ax.pcolor(mean_covar, cmap=plt.cm.bwr)
+  map1.set_clim(-1.0 * cmax, cmax)
+  x0,x1 = ax.get_xlim()
+  y0,y1 = ax.get_ylim()
+  ax.set_aspect(abs(x1-x0)/abs(y1-y0))
+  ax.set_xlabel("x")
+  cbar = plt.colorbar(map1)
+  plt.title("covariance matrix %s", (name,))
+  plt.gca().invert_yaxis()
+  plt.savefig("./image/%s_covar.png" % (name,))
+  plt.close()
+  return 0
 
 for exp in EXPLIST:
   plot_rmse_spread(exp["name"], exp["nmem"])
   plot_time_value(exp["name"], exp["nmem"])
   plot_3d_trajectory(exp["name"], exp["nmem"])
+  if (exp["method"] == "etkf"):
+    plot_covariance_matr(exp["name"])
