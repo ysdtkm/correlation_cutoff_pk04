@@ -37,7 +37,7 @@ def plot_rmse_spread(name, nmem):
   plt.legend()
   plt.xlabel("timestep")
   plt.title("[%s] RMSE:%6g Spread:%6g" % (name, rmse, sprd))
-  plt.savefig("./image/%s_%s.png" % (name, 1))
+  plt.savefig("./image/%s_time_%s.png" % (name, 1))
   plt.clf()
 
 def plot_time_value(name, nmem):
