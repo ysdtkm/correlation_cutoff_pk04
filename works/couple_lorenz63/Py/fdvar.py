@@ -11,6 +11,7 @@ def fdvar(fcst_0, h, r, yo, aint):
   # only assimilate one set of obs at t1 = t0+dt*aint
   # input fcst_0 is [aint] steps former than analysis time
   anl_0 = fcst_0
+  print(anl_0, yo)
   anl_0 = fmin_bfgs(fdvar_2j, anl_0, args=(fcst_0, h, r, yo, aint))
   anl_1 = anl_0
   for i in range(0, aint):
