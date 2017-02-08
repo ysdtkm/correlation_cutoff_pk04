@@ -90,4 +90,24 @@ def test_tangent_sv():
   print(m * m.T)
   return 0
 
-test_tangent_sv()
+def test_finite_tangent_sv():
+  x_t0 = np.random.normal(0.0, FERR_INI, DIMM)
+  for i in range(STEPS):
+    x_t0 = timestep(x_t0, DT)
+  m_finite = finite_time_tangent(x_t0, 5)
+  mt_finite = finite_time_tangent(x_t0, 5).T
+  eig_vals2, eig_vects2 = np.linalg.eig(m_finite * mt_finite)
+  eig_vals3, eig_vects3 = np.linalg.eig(m_finite)
+  print("SV growth rates:")
+  print(eig_vals2)
+  print("LV growth rates:")
+  print(eig_vals3)
+  print("covariant LVs:")
+  print(eig_vects3)
+  print("M:")
+  print(m_finite)
+  print("M.T:")
+  print(mt_finite)
+  return 0
+
+test_finite_tangent_sv()
