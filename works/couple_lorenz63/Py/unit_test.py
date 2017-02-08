@@ -40,9 +40,9 @@ def test_tangent_model():
   x_t0 = np.random.normal(0.0, FERR_INI, DIMM)
   for i in range(STEPS):
     x_t0 = timestep(x_t0)
-  dx_t0 = tendency(x_t0)
+  x_t1 = timestep(x_t0)
   ptb = 1.0e-9
-  m = tangent_linear(x_t0)
+  m = tangent_linear(x_t0, DT)
   sum_sq_diff = 0.0
 
   for i in range(DIMM):
@@ -50,14 +50,14 @@ def test_tangent_model():
     x_t0_ptb[i] = x_t0[i] + ptb
 
     print(i)
-    dx_t0_ptb = tendency(x_t0_ptb)
+    x_t1_ptb = timestep(x_t0_ptb)
 
     print("nonlinear:")
-    print((dx_t0_ptb - dx_t0) / ptb)
+    print((x_t1_ptb - x_t1) / ptb)
     print("tangent linear:")
     print(m[:,i].A.flatten())
     print("diff (NL - TL):")
-    diff = (dx_t0_ptb - dx_t0) / ptb - m[:,i].A.flatten()
+    diff = (x_t1_ptb - x_t1) / ptb - m[:,i].A.flatten()
     print(diff)
     sum_sq_diff = sum_sq_diff + np.sum(diff ** 2)
 
