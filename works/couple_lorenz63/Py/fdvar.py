@@ -20,7 +20,7 @@ def fdvar(fcst_0, h, r, yo, aint):
     anl_0 = fmin(fdvar_2j, anl_0, args=(fcst_0, h, r, yo, aint))
   anl_1 = anl_0
   for i in range(0, aint):
-    anl_1 = timestep(anl_1)
+    anl_1 = timestep(anl_1, DT)
   return anl_1.T
 
 def fdvar_2j(anl_0, fcst_0, h, r, yo, aint):
@@ -29,7 +29,7 @@ def fdvar_2j(anl_0, fcst_0, h, r, yo, aint):
   anl_0 = np.matrix(anl_tmp).T
   anl_1_ar = anl_0.A.flatten()
   for i in range(0, aint):
-    anl_1_ar = timestep(anl_1_ar)
+    anl_1_ar = timestep(anl_1_ar, DT)
   anl_1 = np.matrix(anl_1_ar).T
   twoj = (anl_0 - fcst_0).T * b.I * (anl_0 - fcst_0) + \
        (h * anl_1 - yo).T * r.I * (h * anl_1 - yo)

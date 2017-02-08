@@ -21,7 +21,7 @@ def exec_nature():
   all_true = np.empty((STEPS, DIMM))
   true = np.random.normal(0.0, FERR_INI, DIMM)
   for i in range(0, STEPS):
-    true[:] = timestep(true[:])
+    true[:] = timestep(true[:], DT)
     all_true[i,:] = true[:]
   all_true.tofile("data/true.bin")
   return all_true
@@ -42,7 +42,7 @@ def exec_free_run(exp):
   for m in range(0, exp["nmem"]):
     free_run[0,m,:] = np.random.normal(0.0, FERR_INI, DIMM)
     for i in range(1, STEP_FREE):
-      free_run[i,m,:] = timestep(free_run[i-1,m,:])
+      free_run[i,m,:] = timestep(free_run[i-1,m,:], DT)
   return free_run
 
 # exp      <- hash
@@ -60,7 +60,7 @@ def exec_assim_cycle(exp, all_fcst, all_obs):
   obs_used[:,:] = np.nan
   for i in range(STEP_FREE, STEPS):
     for m in range(0, exp["nmem"]):
-      fcst[m,:] = timestep(all_fcst[i-1,m,:])
+      fcst[m,:] = timestep(all_fcst[i-1,m,:], DT)
     if (i % exp["aint"] == 0):
       obs_used[i,:] = all_obs[i,:]
       yo = h * np.matrix(all_obs[i,:]).T
@@ -87,7 +87,7 @@ def exec_deterministic_fcst(exp, anl):
     if (i % exp["aint"] == 0):
       fcst_all[i,0,:] = np.mean(anl[i,:,:], axis=0)
       for lt in range(1, FCST_LT):
-        fcst_all[i,lt,:] = timestep(fcst_all[i-1,lt,:])
+        fcst_all[i,lt,:] = timestep(fcst_all[i-1,lt,:], DT)
   fcst_all.tofile("data/%s_fcst.bin" % exp["name"])
   return 0
 

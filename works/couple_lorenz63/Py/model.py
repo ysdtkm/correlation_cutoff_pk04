@@ -4,17 +4,18 @@ import numpy as np
 from const import *
 
 # x      <- np.array(DIMM)
+# dt     <- float
 # return -> np.array(DIMM)
-def timestep(x):
+def timestep(x, dt):
   # np.array x[DIMM]
   k1 = tendency(x)
-  x2 = x + k1 * DT / 2.0
+  x2 = x + k1 * dt / 2.0
   k2 = tendency(x2)
-  x3 = x + k2 * DT / 2.0
+  x3 = x + k2 * dt / 2.0
   k3 = tendency(x3)
-  x4 = x + k3 * DT
+  x4 = x + k3 * dt
   k4 = tendency(x4)
-  x = x + (k1 + 2.0 * k2 + 2.0 * k3 + k4) * DT / 6.0
+  x = x + (k1 + 2.0 * k2 + 2.0 * k3 + k4) * dt / 6.0
   return x
 
 # a31p63-64
