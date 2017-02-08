@@ -2,7 +2,7 @@
 
 import numpy as np
 from scipy.linalg import sqrtm
-from scipy.optimize import fmin_bfgs
+from scipy.optimize import fmin, fmin_bfgs
 from const import *
 from tdvar import *
 from model import *
@@ -13,7 +13,11 @@ def fdvar(fcst_0, h, r, yo, aint):
   anl_0 = fcst_0
   print_ndarray(anl_0, "anl_0")
   print_ndarray(yo, "yo")
-  anl_0 = fmin_bfgs(fdvar_2j, anl_0, args=(fcst_0, h, r, yo, aint))
+  try:
+    anl_0 = fmin_bfgs(fdvar_2j, anl_0, args=(fcst_0, h, r, yo, aint))
+  except:
+    print("Method fmin_bfgs failed to converge. Use fmin for this step instead.")
+    anl_0 = fmin(fdvar_2j, anl_0, args=(fcst_0, h, r, yo, aint))
   anl_1 = anl_0
   for i in range(0, aint):
     anl_1 = timestep(anl_1)
