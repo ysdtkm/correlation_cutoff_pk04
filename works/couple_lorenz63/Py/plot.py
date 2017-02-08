@@ -125,12 +125,13 @@ def plot_3d_trajectory(name, nmem):
 
 # name <- string
 def plot_covariance_matr(name):
-  hist_covar = np.fromfile("data/%s_covr_post.bin" % name, np.float64)
-  hist_covar = hist_covar.reshape((STEPS, DIMM, DIMM))
-  rms_covar  = np.sqrt(np.nanmean(hist_covar**2, axis=0))
-  mean_covar = np.nanmean(hist_covar, axis=0)
-  plot_matrix(rms_covar , "covar_rms_%s"  % name)
-  plot_matrix(mean_covar, "covar_mean_%s" % name)
+  for sel in ["back", "anl"]:
+    hist_covar = np.fromfile("data/%s_covr_%s.bin" % (name, sel), np.float64)
+    hist_covar = hist_covar.reshape((STEPS, DIMM, DIMM))
+    rms_covar  = np.sqrt(np.nanmean(hist_covar**2, axis=0))
+    mean_covar = np.nanmean(hist_covar, axis=0)
+    plot_matrix(rms_covar , "%s_covar_rms_%s"  % (sel, name))
+    plot_matrix(mean_covar, "%s_covar_mean_%s" % (sel, name))
 
 # data <- np.array[n,n]
 # name <- string
@@ -145,9 +146,9 @@ def plot_matrix(data, name):
   ax.set_aspect(abs(x1-x0)/abs(y1-y0))
   ax.set_xlabel("x")
   cbar = plt.colorbar(map1)
-  plt.title("covariance matrix %s" % (name,))
+  plt.title(name)
   plt.gca().invert_yaxis()
-  plt.savefig("./image/%s_covar.png" % (name,))
+  plt.savefig("./image/%s.png" % (name,))
   plt.close()
   return 0
 

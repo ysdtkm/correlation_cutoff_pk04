@@ -18,7 +18,7 @@ FERR_INI = 10.0
 
 # name, inf, aint, diag(h), nmem, method
 EXPLIST = [ \
-  {"name":"etkf_xyz_long",  "inf":1.05, "aint":25, "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], "nmem":9, "method":"etkf"}, \
+  {"name":"etkf_strong_int25",  "inf":1.05, "aint":25, "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], "nmem":9, "method":"etkf"}, \
   # {"name":"xyz_short", "inf":1.05, "aint":8,  "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], "nmem":3, "method":"etkf"}, \
   # {"name":"xy",        "inf":1.05, "aint":8,  "diag":[1.0,1.0,0.0,1.0,1.0,0.0,1.0,1.0,0.0], "nmem":3, "method":"etkf"}, \
   # {"name":"yz",        "inf":1.05, "aint":8,  "diag":[0.0,1.0,1.0,0.0,1.0,1.0,0.0,1.0,1.0], "nmem":3, "method":"etkf"}, \
@@ -27,7 +27,7 @@ EXPLIST = [ \
   # {"name":"y",         "inf":1.05, "aint":8,  "diag":[0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0], "nmem":3, "method":"etkf"}, \
   # {"name":"z",         "inf":1.05, "aint":8,  "diag":[0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0], "nmem":3, "method":"etkf"}, \
   # {"name":"xyz_3dvar", "inf":1.0 , "aint":8,  "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], "nmem":1, "method":"3dvar"},\
-  {"name":"fdvar_xyz_long", "inf":1.0 , "aint":25, "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], "nmem":1, "method":"4dvar"} \
+  {"name":"fdvar_strong_int25", "inf":1.0 , "aint":25, "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], "nmem":1, "method":"4dvar"} \
 ]
 
 def getr():
