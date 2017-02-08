@@ -62,7 +62,6 @@ def tendency(x):
     dx[8] = tau * ( s * x[6] * x[7] - b * x[8]               ) - cz * x[5]
     return dx
 
-### NEEDS CHECK
 # x      <- np.array(DIMM)       : state vector
 # return -> np.matrix(DIMM,DIMM) : unit time tangent linear matrix M/(delta t)
 def tangent_linear(x):

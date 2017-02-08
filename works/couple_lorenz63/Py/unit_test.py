@@ -38,6 +38,8 @@ def test_fdvar_overflow():
 
 def test_tangent_model():
   x_t0 = np.random.normal(0.0, FERR_INI, DIMM)
+  for i in range(STEPS):
+    x_t0 = timestep(x_t0)
   dx_t0 = tendency(x_t0)
   ptb = 1.0e-9
   m = tangent_linear(x_t0)
@@ -63,7 +65,7 @@ def test_tangent_model():
   print(np.sqrt(sum_sq_diff))
   return 0
 
-def test_tanjent_sv():
+def test_tangent_sv():
   x_t0 = np.random.normal(0.0, FERR_INI, DIMM)
   for i in range(STEPS):
     x_t0 = timestep(x_t0)
@@ -86,4 +88,5 @@ def test_tanjent_sv():
   print(m)
   return 0
 
-test_tanjent_sv()
+test_tangent_model()
+# test_tangent_sv()
