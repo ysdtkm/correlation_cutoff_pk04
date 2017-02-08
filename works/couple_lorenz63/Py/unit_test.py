@@ -39,23 +39,28 @@ def test_fdvar_overflow():
 def test_tangent_model():
   x_t0 = np.random.normal(0.0, FERR_INI, DIMM)
   dx_t0 = tendency(x_t0)
-  diff = 1.0e-9
+  ptb = 1.0e-9
   m = tangent_linear(x_t0)
+  sum_sq_diff = 0.0
 
   for i in range(DIMM):
     x_t0_ptb = np.copy(x_t0)
-    x_t0_ptb[i] = x_t0[i] + diff
+    x_t0_ptb[i] = x_t0[i] + ptb
 
     print(i)
     dx_t0_ptb = tendency(x_t0_ptb)
 
     print("nonlinear:")
-    print((dx_t0_ptb - dx_t0) / diff)
+    print((dx_t0_ptb - dx_t0) / ptb)
     print("tangent linear:")
     print(m[:,i].A.flatten())
     print("diff (NL - TL):")
-    print((dx_t0_ptb - dx_t0) / diff - m[:,i].A.flatten())
+    diff = (dx_t0_ptb - dx_t0) / ptb - m[:,i].A.flatten()
+    print(diff)
+    sum_sq_diff = sum_sq_diff + np.sum(diff ** 2)
 
+  print("total RMS of diff:")
+  print(np.sqrt(sum_sq_diff))
   return 0
 
 test_tangent_model()
