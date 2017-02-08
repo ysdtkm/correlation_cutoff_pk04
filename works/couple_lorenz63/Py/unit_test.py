@@ -69,7 +69,7 @@ def test_tangent_sv():
   x_t0 = np.random.normal(0.0, FERR_INI, DIMM)
   for i in range(STEPS):
     x_t0 = timestep(x_t0, DT)
-  m = tangent_linear(x_t0)
+  m = tangent_linear(x_t0, DT)
   eig_vals1, eig_vects1 = np.linalg.eig(m * m.T)
   eig_vals2, eig_vects2 = np.linalg.eig(m.T * m)
   eig_vals3, eig_vects3 = np.linalg.eig(m)
@@ -86,7 +86,8 @@ def test_tangent_sv():
   print(eig_vects3)
   print("M:")
   print(m)
+  print("M * M.T:")
+  print(m * m.T)
   return 0
 
-test_tangent_model()
-# test_tangent_sv()
+test_tangent_sv()
