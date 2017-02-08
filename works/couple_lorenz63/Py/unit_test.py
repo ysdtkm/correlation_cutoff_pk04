@@ -2,6 +2,7 @@
 
 import numpy as np
 from const import *
+from model import *
 from fdvar import *
 
 def test_fdvar_overflow():
@@ -33,5 +34,28 @@ def test_fdvar_overflow():
   aint = exp["aint"]
 
   fdvar(fcst_0, h, r, yo, aint)
+  return 0
 
-test_fdvar_overflow()
+def test_tangent_model():
+  x_t0 = np.random.normal(0.0, FERR_INI, DIMM)
+  dx_t0 = tendency(x_t0)
+  diff = 1.0e-9
+  m = tangent_linear(x_t0)
+
+  for i in range(DIMM):
+    x_t0_ptb = np.copy(x_t0)
+    x_t0_ptb[i] = x_t0[i] + diff
+
+    print(i)
+    dx_t0_ptb = tendency(x_t0_ptb)
+
+    print("nonlinear:")
+    print((dx_t0_ptb - dx_t0) / diff)
+    print("tangent linear:")
+    print(m[:,i].A.flatten())
+    print("diff (NL - TL):")
+    print((dx_t0_ptb - dx_t0) / diff - m[:,i].A.flatten())
+
+  return 0
+
+test_tangent_model()
