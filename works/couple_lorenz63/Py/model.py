@@ -147,7 +147,6 @@ def tangent_linear(x, dt):
   m = np.matrix(np.identity(DIMM) + dx * dt)
   return m
 
-### 掛け算の方向が正しいか要チェック
 # x0     <- np.array(DIMM)       : state vector at t0
 # iw     <- int                  : integration window (time in steps)
 # return -> np.matrix(DIMM,DIMM) : finite time (t0 -> t0 + iw*DT) tangent linear matrix M
@@ -159,18 +158,4 @@ def finite_time_tangent(x0, iw):
     m_finite = m_inst * m_finite
     x = timestep(x, DT)
   return m_finite
-
-# ### TLの転置に一致するような順番（TLを求めてから積分）にしている
-# # x0     <- np.array(DIMM)       : state vector at t0
-# # iw     <- int                  : integration window (time in steps)
-# # return -> np.matrix(DIMM,DIMM) : finite time (t0 <- t0 + iw*DT) adjoint matrix M.T
-# def finite_time_adjoint(x0, iw):
-#   mt_finite = np.matrix(np.identity(DIMM))
-#   x = np.copy(x0)
-#   for i in range(iw):
-#     m_inst = tangent_linear(x, DT)
-#     mt_finite = mt_finite * m_inst.T
-#     x = timestep(x, DT)
-#   return mt_finite
-
 

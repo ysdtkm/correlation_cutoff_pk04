@@ -37,20 +37,29 @@ def test_fdvar_overflow():
   return 0
 
 def test_tangent_model():
+  ptb = 1.0e-9
+  step_verif = 10
+
+  # initialization (verification t0 -> t1)
   x_t0 = np.random.normal(0.0, FERR_INI, DIMM)
   for i in range(STEPS):
     x_t0 = timestep(x_t0, DT)
-  x_t1 = timestep(x_t0, DT)
-  ptb = 1.0e-9
-  m = tangent_linear(x_t0, DT)
-  sum_sq_diff = 0.0
+  x_t1 = np.copy(x_t0)
+  for i in range(step_verif):
+    x_t1 = timestep(x_t1, DT)
 
+  # get tangent linear
+  m = finite_time_tangent(x_t0, step_verif)
+
+  sum_sq_diff = 0.0
   for i in range(DIMM):
+    # nonlinear perturbation
     x_t0_ptb = np.copy(x_t0)
     x_t0_ptb[i] = x_t0[i] + ptb
-
     print(i)
-    x_t1_ptb = timestep(x_t0_ptb, DT)
+    x_t1_ptb = np.copy(x_t0_ptb)
+    for j in range(step_verif):
+      x_t1_ptb = timestep(x_t1_ptb, DT)
 
     print("nonlinear:")
     print((x_t1_ptb - x_t1) / ptb)
@@ -66,36 +75,13 @@ def test_tangent_model():
   return 0
 
 def test_tangent_sv():
-  x_t0 = np.random.normal(0.0, FERR_INI, DIMM)
-  for i in range(STEPS):
-    x_t0 = timestep(x_t0, DT)
-  m = tangent_linear(x_t0, DT)
-  eig_vals1, eig_vects1 = np.linalg.eig(m * m.T)
-  eig_vals2, eig_vects2 = np.linalg.eig(m.T * m)
-  eig_vals3, eig_vects3 = np.linalg.eig(m)
-  print("SV growth rates:")
-  print(eig_vals1)
-  print(eig_vals2)
-  print("initial SVs:")
-  print(eig_vects1)
-  print("final SVs:")
-  print(eig_vects2)
-  print("LV growth rates:")
-  print(eig_vals3)
-  print("covariant LVs:")
-  print(eig_vects3)
-  print("M:")
-  print(m)
-  print("M * M.T:")
-  print(m * m.T)
-  return 0
+  step_verif = 10
 
-def test_finite_tangent_sv():
   x_t0 = np.random.normal(0.0, FERR_INI, DIMM)
   for i in range(STEPS):
     x_t0 = timestep(x_t0, DT)
-  m_finite = finite_time_tangent(x_t0, 5)
-  mt_finite = finite_time_tangent(x_t0, 5).T
+  m_finite = finite_time_tangent(x_t0, step_verif)
+  mt_finite = finite_time_tangent(x_t0, step_verif).T
   eig_vals2, eig_vects2 = np.linalg.eig(m_finite * mt_finite)
   eig_vals3, eig_vects3 = np.linalg.eig(m_finite)
   print("SV growth rates:")
@@ -110,4 +96,4 @@ def test_finite_tangent_sv():
   print(mt_finite)
   return 0
 
-test_finite_tangent_sv()
+test_tangent_sv()
