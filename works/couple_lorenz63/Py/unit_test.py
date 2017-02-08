@@ -63,4 +63,27 @@ def test_tangent_model():
   print(np.sqrt(sum_sq_diff))
   return 0
 
-test_tangent_model()
+def test_tanjent_sv():
+  x_t0 = np.random.normal(0.0, FERR_INI, DIMM)
+  for i in range(STEPS):
+    x_t0 = timestep(x_t0)
+  m = tangent_linear(x_t0)
+  eig_vals1, eig_vects1 = np.linalg.eig(m * m.T)
+  eig_vals2, eig_vects2 = np.linalg.eig(m.T * m)
+  eig_vals3, eig_vects3 = np.linalg.eig(m)
+  print("SV growth rates:")
+  print(eig_vals1)
+  print(eig_vals2)
+  print("initial SVs:")
+  print(eig_vects1)
+  print("final SVs:")
+  print(eig_vects2)
+  print("LV growth rates:")
+  print(eig_vals3)
+  print("covariant LVs:")
+  print(eig_vects3)
+  print("M:")
+  print(m)
+  return 0
+
+test_tanjent_sv()

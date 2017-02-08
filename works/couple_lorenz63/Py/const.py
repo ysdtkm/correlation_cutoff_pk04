@@ -3,7 +3,7 @@
 import math
 import numpy as np
 
-DIMM = 9    # dimension of model variable n
+DIMM = 3    # dimension of model variable n
 DIMO = DIMM # dimension of observation variable m
 
 DT = 0.01
