@@ -13,7 +13,7 @@ STEP_FREE = STEPS // 4
 VRFS = int(STEPS * 0.25) # verification period: [VRFS,STEPS)
 FCST_LT = 5
 
-OERR = math.sqrt(2.0)
+OERR = math.sqrt(5.0)
 FERR_INI = 10.0
 
 # name, inf, aint, diag(h), nmem, method
