@@ -13,8 +13,8 @@ def tdvar_2j(anl, fcst, h, r, yo):
   b = 1.2 * tdvar_b()
   anl_tmp = anl
   anl = np.matrix(anl_tmp).T
-  twoj = (anl - fcst).T * np.linalg.inv(b) * (anl - fcst) + \
-       (h * anl - yo).T * np.linalg.inv(r) * (h * anl - yo)
+  twoj = (anl - fcst).T * b.I * (anl - fcst) + \
+       (h * anl - yo).T * r.I * (h * anl - yo)
   return twoj
 
 def tdvar_b():

@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from const import *
 
+## refer to a32p23
+# name <- string
+# nmem <- int
 def plot_rmse_spread(name, nmem):
   hist_true = np.fromfile("data/true.bin", np.float64)
   hist_true = hist_true.reshape((STEPS, DIMM))
@@ -17,29 +20,36 @@ def plot_rmse_spread(name, nmem):
   if (nmem > 1):
     for i in range(nmem):
       hist_fcst_sprd2[:,:] = hist_fcst_sprd2[:,:] + \
-        nmem / (nmem - 1.0) * (hist_fcst[:,i,:]**2 - hist_fcst_mean[:,:]**2)
+        1.0 / (nmem - 1.0) * (hist_fcst[:,i,:]**2 - hist_fcst_mean[:,:]**2)
   hist_err = hist_fcst_mean - hist_true
 
-  # MSE and Spread_square time series (grid average)
-  mse_time   = np.mean(hist_err**2, axis=1)
-  sprd2_time = np.mean(hist_fcst_sprd2, axis=1)
+  for i_component in range(DIMM//3):
+    grid_from = 3 * i_component
+    name_component = ["extro", "trop", "ocn"][i_component]
 
-  # RMSE and Spread time average
-  rmse = np.sqrt(np.mean(mse_time[STEP_FREE:STEPS]))
-  sprd = np.sqrt(np.mean(sprd2_time[STEP_FREE:STEPS]))
+    # MSE and Spread_square time series (grid average)
+    mse_time   = np.mean(hist_err[:,grid_from:grid_from+3]**2,     axis=1)
+    sprd2_time = np.mean(hist_fcst_sprd2[:,grid_from:grid_from+3], axis=1)
 
-  # RMSE-Spread time series
-  plt.rcParams["font.size"] = 16
-  plt.yscale('log')
-  plt.plot(np.sqrt(mse_time), label="RMSE")
-  if (nmem > 1):
-    plt.plot(np.sqrt(sprd2_time), label="Spread")
-  plt.legend()
-  plt.xlabel("timestep")
-  plt.title("[%s] RMSE:%6g Spread:%6g" % (name, rmse, sprd))
-  plt.savefig("./image/%s_%s.png" % (name, 1))
-  plt.clf()
+    # RMSE and Spread time average
+    rmse = np.sqrt(np.mean(mse_time[STEP_FREE:STEPS]))
+    sprd = np.sqrt(np.mean(sprd2_time[STEP_FREE:STEPS]))
 
+    # RMSE-Spread time series
+    plt.rcParams["font.size"] = 16
+    plt.yscale('log')
+    plt.plot(np.sqrt(mse_time), label="RMSE")
+    if (nmem > 1):
+      plt.plot(np.sqrt(sprd2_time), label="Spread")
+    plt.legend()
+    plt.xlabel("timestep")
+    plt.title("[%s %s] RMSE:%6g Spread:%6g" % (name, name_component, rmse, sprd))
+    plt.savefig("./image/%s_%s_%s.png" % (name, name_component, "time"))
+    plt.clf()
+  return 0
+
+# name <- string
+# nmem <- int
 def plot_time_value(name, nmem):
   hist_true = np.fromfile("data/true.bin", np.float64)
   hist_true = hist_true.reshape((STEPS, DIMM))
@@ -74,9 +84,12 @@ def plot_time_value(name, nmem):
       ax3.plot(hist_obs[:,2+i_adjust], label="obs", linestyle='None', marker=".")
     ax3.set_ylabel("z")
     plt.xlabel("timestep")
-    plt.savefig("./image/%s_%s_%s.png" % (name, name_component, 2))
+    plt.savefig("./image/%s_%s_%s.png" % (name, name_component, "val"))
     plt.clf()
+  return 0
 
+# name <- string
+# nmem <- int
 def plot_3d_trajectory(name, nmem):
   hist_true = np.fromfile("data/true.bin", np.float64)
   hist_true = hist_true.reshape((STEPS, DIMM))
@@ -108,8 +121,42 @@ def plot_3d_trajectory(name, nmem):
     plt.savefig("./image/%s_%s_traj.png" % (name, name_component))
     plt.clf()
     plt.close()
+  return 0
+
+# name <- string
+def plot_covariance_matr(name):
+  for sel in ["back", "anl"]:
+    hist_covar = np.fromfile("data/%s_covr_%s.bin" % (name, sel), np.float64)
+    hist_covar = hist_covar.reshape((STEPS, DIMM, DIMM))
+    rms_covar  = np.sqrt(np.nanmean(hist_covar[STEPS//2:STEPS,:,:]**2, axis=0))
+    mean_covar = np.nanmean(hist_covar, axis=0)
+    plot_matrix(rms_covar , "%s_covar_rms_%s"  % (sel, name))
+    plot_matrix(np.log(rms_covar) , "%s_covar_logrms_%s"  % (sel, name), plt.cm.Reds)
+    plot_matrix(mean_covar, "%s_covar_mean_%s" % (sel, name))
+
+# data <- np.array[n,n]
+# name <- string
+def plot_matrix(data, name, color=plt.cm.bwr):
+  fig, ax = plt.subplots(1)
+  fig.subplots_adjust(left=0.12, right=0.95, bottom=0.12, top=0.92)
+  cmax = np.max(np.abs(data))
+  map1 = ax.pcolor(data, cmap=color)
+  if (color == plt.cm.bwr):
+    map1.set_clim(-1.0 * cmax, cmax)
+  x0,x1 = ax.get_xlim()
+  y0,y1 = ax.get_ylim()
+  ax.set_aspect(abs(x1-x0)/abs(y1-y0))
+  ax.set_xlabel("x")
+  cbar = plt.colorbar(map1)
+  plt.title(name)
+  plt.gca().invert_yaxis()
+  plt.savefig("./image/%s.png" % (name,))
+  plt.close()
+  return 0
 
 for exp in EXPLIST:
   plot_rmse_spread(exp["name"], exp["nmem"])
   plot_time_value(exp["name"], exp["nmem"])
   plot_3d_trajectory(exp["name"], exp["nmem"])
+  if (exp["method"] == "etkf"):
+    plot_covariance_matr(exp["name"])
