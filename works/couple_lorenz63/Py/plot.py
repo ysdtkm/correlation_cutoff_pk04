@@ -128,19 +128,21 @@ def plot_covariance_matr(name):
   for sel in ["back", "anl"]:
     hist_covar = np.fromfile("data/%s_covr_%s.bin" % (name, sel), np.float64)
     hist_covar = hist_covar.reshape((STEPS, DIMM, DIMM))
-    rms_covar  = np.sqrt(np.nanmean(hist_covar**2, axis=0))
+    rms_covar  = np.sqrt(np.nanmean(hist_covar[STEPS//2:STEPS,:,:]**2, axis=0))
     mean_covar = np.nanmean(hist_covar, axis=0)
     plot_matrix(rms_covar , "%s_covar_rms_%s"  % (sel, name))
+    plot_matrix(np.log(rms_covar) , "%s_covar_logrms_%s"  % (sel, name), plt.cm.Reds)
     plot_matrix(mean_covar, "%s_covar_mean_%s" % (sel, name))
 
 # data <- np.array[n,n]
 # name <- string
-def plot_matrix(data, name):
+def plot_matrix(data, name, color=plt.cm.bwr):
   fig, ax = plt.subplots(1)
   fig.subplots_adjust(left=0.12, right=0.95, bottom=0.12, top=0.92)
   cmax = np.max(np.abs(data))
-  map1 = ax.pcolor(data, cmap=plt.cm.bwr)
-  map1.set_clim(-1.0 * cmax, cmax)
+  map1 = ax.pcolor(data, cmap=color)
+  if (color == plt.cm.bwr):
+    map1.set_clim(-1.0 * cmax, cmax)
   x0,x1 = ax.get_xlim()
   y0,y1 = ax.get_ylim()
   ax.set_aspect(abs(x1-x0)/abs(y1-y0))
