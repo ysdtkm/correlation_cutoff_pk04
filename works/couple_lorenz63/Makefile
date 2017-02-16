@@ -12,7 +12,8 @@
 
 STEP_ALL = calc plot
 
-src_calc = Py/main.py Py/const.py Py/model.py Py/etkf.py Py/fdvar.py Py/tdvar.py
+src_calc = Py/main.py Py/const.py Py/model.py Py/etkf.py Py/fdvar.py Py/tdvar.py \
+           Py/vectors.py
 dep_calc =
 out_calc = data/*.bin
 cmd_calc = rm -rf data; mkdir -p data; python Py/main.py
