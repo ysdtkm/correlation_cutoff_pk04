@@ -148,14 +148,15 @@ def tangent_linear(x, dt):
   return m
 
 # x0     <- np.array(DIMM)       : state vector at t0
+# dt     <- float                : timestep
 # iw     <- int                  : integration window (time in steps)
 # return -> np.matrix(DIMM,DIMM) : finite time (t0 -> t0 + iw*DT) tangent linear matrix M
-def finite_time_tangent(x0, iw):
+def finite_time_tangent(x0, dt, iw):
   m_finite = np.matrix(np.identity(DIMM))
   x = np.copy(x0)
   for i in range(iw):
-    m_inst = tangent_linear(x, DT)
+    m_inst = tangent_linear(x, dt)
     m_finite = m_inst * m_finite
-    x = timestep(x, DT)
+    x = timestep(x, dt)
   return m_finite
 

@@ -49,7 +49,7 @@ def test_tangent_model():
     x_t1 = timestep(x_t1, DT)
 
   # get tangent linear
-  m = finite_time_tangent(x_t0, step_verif)
+  m = finite_time_tangent(x_t0, DT/1.0, step_verif*1)
 
   sum_sq_diff = 0.0
   for i in range(DIMM):
@@ -80,8 +80,8 @@ def test_tangent_sv():
   x_t0 = np.random.normal(0.0, FERR_INI, DIMM)
   for i in range(STEPS):
     x_t0 = timestep(x_t0, DT)
-  m_finite = finite_time_tangent(x_t0, step_verif)
-  mt_finite = finite_time_tangent(x_t0, step_verif).T
+  m_finite = finite_time_tangent(x_t0, DT/4.0, step_verif*4)
+  mt_finite = finite_time_tangent(x_t0, DT/4.0, step_verif*4).T
   eig_vals2, eig_vects2 = np.linalg.eig(m_finite * mt_finite)
   eig_vals3, eig_vects3 = np.linalg.eig(m_finite)
   print("SV growth rates:")
@@ -96,4 +96,4 @@ def test_tangent_sv():
   print(mt_finite)
   return 0
 
-test_tangent_sv()
+test_tangent_model()
