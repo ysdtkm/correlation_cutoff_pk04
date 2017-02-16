@@ -49,7 +49,7 @@ def test_tangent_model():
     x_t1 = timestep(x_t1, DT)
 
   # get tangent linear
-  m = finite_time_tangent(x_t0, DT/1.0, step_verif*1)
+  m = finite_time_tangent_using_nonlinear(x_t0, DT/1.0, step_verif*1)
 
   sum_sq_diff = 0.0
   for i in range(DIMM):
