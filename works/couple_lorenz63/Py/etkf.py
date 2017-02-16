@@ -7,7 +7,7 @@ from const import *
 def etkf(fcst, h, r, yo, inf, nmem):
   # fcst   <- np.array[nmem, DIMM]
   # h      <- np.matrix[DIMO, DIMM]
-  # r      <- np.matrix[DIMO, DIMM]
+  # r      <- np.matrix[DIMO, DIMO]
   # yo     <- np.matrix[DIMO, 1]
   # inf    <- float
   # nmem   <- int

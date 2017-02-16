@@ -8,11 +8,16 @@ from tdvar import *
 from model import *
 
 def fdvar(fcst_0, h, r, yo, aint):
+  # fcst_0 <- np.array[DIMM]        : first guess at beginning of window
+  # h      <- np.matrix[DIMO, DIMM] : observation operator
+  # r      <- np.matrix[DIMO, DIMO] : observation error covariance
+  # yo     <- np.matrix[DIMO, 1]    : observation
+  # aint   <- int                   : assimilation interval
+  # return -> np.array[DIMM]        : assimilated field
+
   # only assimilate one set of obs at t1 = t0+dt*aint
   # input fcst_0 is [aint] steps former than analysis time
   anl_0 = fcst_0
-  print_ndarray(anl_0, "anl_0")
-  print_ndarray(yo, "yo")
   try:
     anl_0 = fmin_bfgs(fdvar_2j, anl_0, args=(fcst_0, h, r, yo, aint))
   except:
@@ -24,6 +29,14 @@ def fdvar(fcst_0, h, r, yo, aint):
   return anl_1.T
 
 def fdvar_2j(anl_0, fcst_0, h, r, yo, aint):
+  # anl_0  <- np.array[DIMM]        : temporary analysis field
+  # fcst_0 <- np.array[DIMM]        : first guess field
+  # h      <- np.matrix[DIMO, DIMM] : observation operator
+  # r      <- np.matrix[DIMO, DIMO] : observation error covariance
+  # yo     <- np.matrix[DIMO, 1]    : observation
+  # aint   <- int                   : assimilation interval
+  # return -> float                 : cost function 2J
+
   b = 0.6 * 1.2 * tdvar_b()
   anl_tmp = anl_0
   anl_0 = np.matrix(anl_tmp).T
@@ -35,11 +48,3 @@ def fdvar_2j(anl_0, fcst_0, h, r, yo, aint):
        (h * anl_1 - yo).T * r.I * (h * anl_1 - yo)
   return twoj.A
 
-def print_ndarray(nar, name):
-  n = nar.shape[0]
-  m = nar.shape[1]
-  print("%s:" % name)
-  for i in range(n):
-    for j in range(m):
-      print(float(nar[i,j]))
-  print("")
