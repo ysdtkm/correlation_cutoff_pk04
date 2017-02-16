@@ -6,6 +6,7 @@ from model import *
 from etkf import *
 from tdvar import *
 from fdvar import *
+from vectors import *
 
 def main():
   np.random.seed(1)
@@ -18,13 +19,28 @@ def main():
 
 def exec_nature():
   # return   -> np.array[STEPS, DIMM]
+  # file1    -> np.array[STEPS, DIMM]       : nature
+  # file2    -> np.array[STEPS, DIMM, DIMM] : backward LVs
 
   all_true = np.empty((STEPS, DIMM))
   true = np.random.normal(0.0, FERR_INI, DIMM)
+
+  eps = 1.0e-9
+  all_lv = np.empty((STEPS, DIMM, DIMM))
+  lv = np.random.normal(0.0, eps, (DIMM, DIMM))
+  lv = orth_norm_vectors(lv, eps)
+
   for i in range(0, STEPS):
     true[:] = timestep(true[:], DT)
     all_true[i,:] = true[:]
+
+    m = finite_time_tangent_using_nonlinear(true, DT, 1)
+    lv = m * lv
+    lv = orth_norm_vectors(lv, eps)
+    all_lv[i,:,:] = lv[:,:]
+
   all_true.tofile("data/true.bin")
+  all_lv.tofile("data/lv.bin")
   return all_true
 
 def exec_obs(nature):
