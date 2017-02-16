@@ -5,10 +5,11 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from const import *
 
-## refer to a32p23
-# name <- string
-# nmem <- int
 def plot_rmse_spread(name, nmem):
+  ## refer to a32p23
+  # name <- string
+  # nmem <- int
+
   hist_true = np.fromfile("data/true.bin", np.float64)
   hist_true = hist_true.reshape((STEPS, DIMM))
   hist_fcst = np.fromfile("data/%s_cycle.bin" % name, np.float64)
@@ -48,9 +49,10 @@ def plot_rmse_spread(name, nmem):
     plt.clf()
   return 0
 
-# name <- string
-# nmem <- int
 def plot_time_value(name, nmem):
+  # name <- string
+  # nmem <- int
+
   hist_true = np.fromfile("data/true.bin", np.float64)
   hist_true = hist_true.reshape((STEPS, DIMM))
   hist_fcst = np.fromfile("data/%s_cycle.bin" % name, np.float64)
@@ -88,9 +90,10 @@ def plot_time_value(name, nmem):
     plt.clf()
   return 0
 
-# name <- string
-# nmem <- int
 def plot_3d_trajectory(name, nmem):
+  # name <- string
+  # nmem <- int
+
   hist_true = np.fromfile("data/true.bin", np.float64)
   hist_true = hist_true.reshape((STEPS, DIMM))
   hist_fcst = np.fromfile("data/%s_cycle.bin" % name, np.float64)
@@ -123,8 +126,9 @@ def plot_3d_trajectory(name, nmem):
     plt.close()
   return 0
 
-# name <- string
 def plot_covariance_matr(name):
+  # name <- string
+
   for sel in ["back", "anl"]:
     hist_covar = np.fromfile("data/%s_covr_%s.bin" % (name, sel), np.float64)
     hist_covar = hist_covar.reshape((STEPS, DIMM, DIMM))
@@ -134,9 +138,10 @@ def plot_covariance_matr(name):
     plot_matrix(np.log(rms_covar) , "%s_covar_logrms_%s"  % (sel, name), plt.cm.Reds)
     plot_matrix(mean_covar, "%s_covar_mean_%s" % (sel, name))
 
-# data <- np.array[n,n]
-# name <- string
 def plot_matrix(data, name, color=plt.cm.bwr):
+  # data <- np.array[n,n]
+  # name <- string
+
   fig, ax = plt.subplots(1)
   fig.subplots_adjust(left=0.12, right=0.95, bottom=0.12, top=0.92)
   cmax = np.max(np.abs(data))

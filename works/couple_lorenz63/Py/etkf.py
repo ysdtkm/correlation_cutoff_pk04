@@ -4,14 +4,15 @@ import numpy as np
 from scipy.linalg import sqrtm
 from const import *
 
-# fcst   <- np.array[nmem, DIMM]
-# h      <- np.matrix[DIMO, DIMM]
-# r      <- np.matrix[DIMO, DIMM]
-# yo     <- np.matrix[DIMO, 1]
-# inf    <- float
-# nmem   <- int
-# return -> np.array[DIMM, nmem], np.array[DIMM, DIMM]
 def etkf(fcst, h, r, yo, inf, nmem):
+  # fcst   <- np.array[nmem, DIMM]
+  # h      <- np.matrix[DIMO, DIMM]
+  # r      <- np.matrix[DIMO, DIMM]
+  # yo     <- np.matrix[DIMO, 1]
+  # inf    <- float
+  # nmem   <- int
+  # return -> np.array[DIMM, nmem], np.array[DIMM, DIMM]
+
   ### DA variables
   # - model space
   #  xfm[DIMM,nmem] : each member's forecast Xf

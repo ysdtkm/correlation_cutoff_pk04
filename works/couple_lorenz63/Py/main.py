@@ -16,8 +16,9 @@ def main():
     anl  = exec_assim_cycle(exp, free, obs)
     exec_deterministic_fcst(exp, anl)
 
-# return   -> np.array[STEPS, DIMM]
 def exec_nature():
+  # return   -> np.array[STEPS, DIMM]
+
   all_true = np.empty((STEPS, DIMM))
   true = np.random.normal(0.0, FERR_INI, DIMM)
   for i in range(0, STEPS):
@@ -26,18 +27,20 @@ def exec_nature():
   all_true.tofile("data/true.bin")
   return all_true
 
-# nature   <- np.array[STEPS, DIMM]
-# return   -> np.array[STEPS, DIMO]
 def exec_obs(nature):
+  # nature   <- np.array[STEPS, DIMM]
+  # return   -> np.array[STEPS, DIMO]
+
   all_obs = np.empty((STEPS, DIMO))
   for i in range(0, STEPS):
     all_obs[i,:] = nature[i] + np.random.normal(0.0, OERR, DIMO)
   all_obs.tofile("data/obs.bin")
   return all_obs
 
-# exp      <- hash
-# return   -> np.array[STEPS, nmem, DIMM]
 def exec_free_run(exp):
+  # exp      <- hash
+  # return   -> np.array[STEPS, nmem, DIMM]
+
   free_run = np.empty((STEPS, exp["nmem"], DIMM))
   for m in range(0, exp["nmem"]):
     free_run[0,m,:] = np.random.normal(0.0, FERR_INI, DIMM)
@@ -45,11 +48,12 @@ def exec_free_run(exp):
       free_run[i,m,:] = timestep(free_run[i-1,m,:], DT)
   return free_run
 
-# exp      <- hash
-# all_fcst <- np.array[STEPS, nmem, DIMM]
-# all_obs  <- np.array[STEPS, DIMO]
-# return   -> np.array[STEPS, nmem, DIMM]
 def exec_assim_cycle(exp, all_fcst, all_obs):
+  # exp      <- hash
+  # all_fcst <- np.array[STEPS, nmem, DIMM]
+  # all_obs  <- np.array[STEPS, DIMO]
+  # return   -> np.array[STEPS, nmem, DIMM]
+
   # forecast-analysis cycle
   r = getr()
   h = geth(exp["diag"])
@@ -81,10 +85,11 @@ def exec_assim_cycle(exp, all_fcst, all_obs):
   all_ba.tofile("data/%s_covr_anl.bin" % exp["name"])
   return all_fcst
 
-# exp    <- hash
-# anl    <- np.array[STEPS, nmem, DIMM]
-# return -> np.array[STEPS, FCST_LT, DIMM]
 def exec_deterministic_fcst(exp, anl):
+  # exp    <- hash
+  # anl    <- np.array[STEPS, nmem, DIMM]
+  # return -> np.array[STEPS, FCST_LT, DIMM]
+
   fcst_all = np.empty((STEPS, FCST_LT, DIMM))
   for i in range(STEP_FREE, STEPS):
     if (i % exp["aint"] == 0):
