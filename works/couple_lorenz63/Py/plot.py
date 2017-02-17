@@ -145,7 +145,7 @@ def plot_3d_trajectory(name, nmem):
     # ax.set_ylim([-30,30])
     # ax.set_zlim([0,50])
     if (DIMM == 3):
-      for it in range(0, STEPS, 500):
+      for it in range(STEPS//4, STEPS, 500):
         colors = ["r", "g", "y"]
         for k in range(DIMM): # LE index
           vector = [hist_true[it,0], hist_true[it,1], hist_true[it,2],\

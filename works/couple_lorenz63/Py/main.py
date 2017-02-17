@@ -21,6 +21,7 @@ def exec_nature():
   # return   -> np.array[STEPS, DIMM]
   # file1    -> np.array[STEPS, DIMM]       : nature
   # file2    -> np.array[STEPS, DIMM, DIMM] : backward LVs
+  # file3    -> np.array[STEPS, DIMM]       : LEs
 
   all_true = np.empty((STEPS, DIMM))
   true = np.random.normal(0.0, FERR_INI, DIMM)
@@ -29,7 +30,7 @@ def exec_nature():
   all_lv = np.empty((STEPS, DIMM, DIMM))
   lv = np.random.normal(0.0, eps, (DIMM, DIMM))
   lv, le = orth_norm_vectors(lv, eps)
-  all_le = np.empty((STEPS, DIMM))
+  all_le = np.zeros((STEPS, DIMM))
 
   for i in range(0, STEPS):
     true[:] = timestep(true[:], DT)
@@ -37,14 +38,15 @@ def exec_nature():
 
     m = finite_time_tangent_using_nonlinear(true, DT, 1)
     lv = m * lv
-    lv, le = orth_norm_vectors(lv, eps)
+    if (i % 1000 == 0):
+      lv, le = orth_norm_vectors(lv, eps)
+      all_le[i,:] = le[:]
     all_lv[i,:,:] = lv[:,:]
-    all_le[i,:] = le[:]
 
   all_true.tofile("data/true.bin")
   all_lv.tofile("data/lv.bin")
   all_le.tofile("data/le.bin")
-  print(np.sqrt(np.mean(all_le[:,:] ** 2, axis=0)) / eps)
+  print(np.mean(all_le[STEPS//2:,:], axis=0))
   return all_true
 
 def exec_obs(nature):
