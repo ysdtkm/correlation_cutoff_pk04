@@ -5,6 +5,30 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from const import *
 
+def plot_all():
+  plot_lv_time()
+  for exp in EXPLIST:
+    plot_rmse_spread(exp["name"], exp["nmem"])
+    plot_time_value(exp["name"], exp["nmem"])
+    plot_3d_trajectory(exp["name"], exp["nmem"])
+    if (exp["method"] == "etkf"):
+      plot_covariance_matr(exp["name"])
+
+def plot_lv_time():
+  hist_lv = np.fromfile("data/lv.bin", np.float64)
+  hist_lv = hist_lv.reshape((STEPS, DIMM, DIMM))
+
+  plt.rcParams["font.size"] = 12
+  fig, ax1 = plt.subplots(1)
+  ax1.set_title("lv1_1")
+  ax1.plot(hist_lv[:,0,0], label="1")
+  ax1.plot(hist_lv[:,1,0], label="2")
+  ax1.plot(hist_lv[:,2,0], label="3")
+  ax1.set_ylabel("value")
+  ax1.legend()
+  plt.savefig("./image/lv.png")
+  plt.clf()
+
 def plot_rmse_spread(name, nmem):
   ## refer to a32p23
   # name <- string
@@ -159,9 +183,4 @@ def plot_matrix(data, name, color=plt.cm.bwr):
   plt.close()
   return 0
 
-for exp in EXPLIST:
-  plot_rmse_spread(exp["name"], exp["nmem"])
-  plot_time_value(exp["name"], exp["nmem"])
-  plot_3d_trajectory(exp["name"], exp["nmem"])
-  if (exp["method"] == "etkf"):
-    plot_covariance_matr(exp["name"])
+plot_all()
