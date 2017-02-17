@@ -28,7 +28,8 @@ def exec_nature():
   eps = 1.0e-9
   all_lv = np.empty((STEPS, DIMM, DIMM))
   lv = np.random.normal(0.0, eps, (DIMM, DIMM))
-  lv = orth_norm_vectors(lv, eps)
+  lv, le = orth_norm_vectors(lv, eps)
+  all_le = np.empty((STEPS, DIMM))
 
   for i in range(0, STEPS):
     true[:] = timestep(true[:], DT)
@@ -36,11 +37,14 @@ def exec_nature():
 
     m = finite_time_tangent_using_nonlinear(true, DT, 1)
     lv = m * lv
-    lv = orth_norm_vectors(lv, eps)
+    lv, le = orth_norm_vectors(lv, eps)
     all_lv[i,:,:] = lv[:,:]
+    all_le[i,:] = le[:]
 
   all_true.tofile("data/true.bin")
   all_lv.tofile("data/lv.bin")
+  all_le.tofile("data/le.bin")
+  print(np.sqrt(np.mean(all_le[:,:] ** 2, axis=0)) / eps)
   return all_true
 
 def exec_obs(nature):
