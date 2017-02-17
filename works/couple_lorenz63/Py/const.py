@@ -29,7 +29,6 @@ EXPLIST = [ \
   # {"name":"xyz_3dvar", "inf":1.0 , "aint":8,  "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], "nmem":1, "method":"3dvar"},\
   # {"name":"fdvar_strong_int25", "inf":1.0 , "aint":25, "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], "nmem":1, "method":"4dvar"} \
 ]
-EXPLIST = []
 
 def getr():
   r = np.matrix(np.identity(DIMO)) * (OERR * OERR)
