@@ -123,6 +123,8 @@ def plot_3d_trajectory(name, nmem):
   hist_fcst = np.fromfile("data/%s_cycle.bin" % name, np.float64)
   hist_fcst = hist_fcst.reshape((STEPS, nmem, DIMM))
   hist_fcst_mean = np.mean(hist_fcst, axis=1)
+  hist_lv = np.fromfile("data/lv.bin", np.float64)
+  hist_lv = hist_lv.reshape((STEPS, DIMM, DIMM))
 
   for i_component in range(DIMM//3):
     i_adjust = i_component * 3
@@ -136,17 +138,19 @@ def plot_3d_trajectory(name, nmem):
     ax = fig.add_subplot(111, projection='3d')
     ax.plot(hist_true[:,0+i_adjust], hist_true[:,1+i_adjust], \
       hist_true[:,2+i_adjust], label="true")
-    ax.plot(hist_fcst_mean[:,0+i_adjust], hist_fcst_mean[:,1+i_adjust], \
-      hist_fcst_mean[:,2+i_adjust], label="model")
+    # ax.plot(hist_fcst_mean[:,0+i_adjust], hist_fcst_mean[:,1+i_adjust], \
+    #   hist_fcst_mean[:,2+i_adjust], label="model")
     ax.legend()
     # ax.set_xlim([-30,30])
     # ax.set_ylim([-30,30])
     # ax.set_zlim([0,50])
     if (DIMM == 3):
-      vector = np.array([hist_true[0,0],hist_true[0,1],hist_true[0,2],\
-                        10,10,10])
-      print(*vector.tolist())
-      ax.quiver(*vector.tolist(), length=10.0, pivot="tail", color="r")
+      for it in range(0, STEPS, 500):
+        colors = ["r", "g", "y"]
+        for k in range(DIMM): # LE index
+          vector = [hist_true[it,0], hist_true[it,1], hist_true[it,2],\
+                    hist_lv[it,k,0], hist_lv[it,k,1], hist_lv[it,k,2]]
+          ax.quiver(*vector, length=5.0, pivot="tail", color=colors[k])
     ax.set_xlabel("x")
     ax.set_ylabel("y")
     ax.set_zlabel("z")
