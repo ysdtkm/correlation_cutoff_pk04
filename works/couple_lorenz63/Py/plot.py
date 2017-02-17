@@ -6,18 +6,32 @@ from mpl_toolkits.mplot3d import Axes3D
 from const import *
 
 def plot_all():
-  plot_lv_time()
-  for exp in EXPLIST:
-    plot_rmse_spread(exp["name"], exp["nmem"])
-    plot_time_value(exp["name"], exp["nmem"])
-    plot_3d_trajectory(exp["name"], exp["nmem"])
-    if (exp["method"] == "etkf"):
-      plot_covariance_matr(exp["name"])
-
-def plot_lv_time():
+  hist_true = np.fromfile("data/true.bin", np.float64)
+  hist_true = hist_true.reshape((STEPS, DIMM))
   hist_lv = np.fromfile("data/lv.bin", np.float64)
   hist_lv = hist_lv.reshape((STEPS, DIMM, DIMM))
 
+  plot_lv_time(hist_lv)
+
+  for exp in EXPLIST:
+    name = exp["name"]
+    nmem = exp["nmem"]
+
+    hist_fcst = np.fromfile("data/%s_cycle.bin" % name, np.float64)
+    hist_fcst = hist_fcst.reshape((STEPS, nmem, DIMM))
+    hist_obs = np.fromfile("data/%s_obs.bin" % name, np.float64)
+    hist_obs = hist_obs.reshape((STEPS, DIMO))
+
+    plot_rmse_spread(hist_true, hist_fcst, name, nmem)
+    plot_time_value(hist_true, hist_fcst, hist_obs, name, nmem)
+    plot_3d_trajectory(hist_true, hist_fcst, hist_lv, name, nmem)
+    if (exp["method"] == "etkf"):
+      for sel in ["back", "anl"]:
+        hist_covar = np.fromfile("data/%s_covr_%s.bin" % (name, sel), np.float64)
+        hist_covar = hist_covar.reshape((STEPS, DIMM, DIMM))
+        plot_covariance_matr(hist_covar, name, sel)
+
+def plot_lv_time(hist_lv):
   plt.rcParams["font.size"] = 12
   fig, ax1 = plt.subplots(1)
   ax1.set_title("lv1_1")
@@ -29,15 +43,12 @@ def plot_lv_time():
   plt.savefig("./image/lv.png")
   plt.clf()
 
-def plot_rmse_spread(name, nmem):
+def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
   ## refer to a32p23
+  # hist_true <- np.array[STEPS, DIMM]
+  # hist_fcst <- np.array[STEPS, nmem, DIMM]
   # name <- string
   # nmem <- int
-
-  hist_true = np.fromfile("data/true.bin", np.float64)
-  hist_true = hist_true.reshape((STEPS, DIMM))
-  hist_fcst = np.fromfile("data/%s_cycle.bin" % name, np.float64)
-  hist_fcst = hist_fcst.reshape((STEPS, nmem, DIMM))
 
   # Error and Spread_square for each grid and time
   hist_fcst_mean = np.mean(hist_fcst, axis=1)
@@ -73,16 +84,10 @@ def plot_rmse_spread(name, nmem):
     plt.clf()
   return 0
 
-def plot_time_value(name, nmem):
+def plot_time_value(hist_true, hist_fcst, hist_obs, name, nmem):
   # name <- string
   # nmem <- int
 
-  hist_true = np.fromfile("data/true.bin", np.float64)
-  hist_true = hist_true.reshape((STEPS, DIMM))
-  hist_fcst = np.fromfile("data/%s_cycle.bin" % name, np.float64)
-  hist_fcst = hist_fcst.reshape((STEPS, nmem, DIMM))
-  hist_obs = np.fromfile("data/%s_obs.bin" % name, np.float64)
-  hist_obs = hist_obs.reshape((STEPS, DIMO))
   hist_fcst_mean = np.mean(hist_fcst, axis=1)
 
   for i_component in range(DIMM//3):
@@ -114,17 +119,11 @@ def plot_time_value(name, nmem):
     plt.clf()
   return 0
 
-def plot_3d_trajectory(name, nmem):
+def plot_3d_trajectory(hist_true, hist_fcst, hist_lv, name, nmem):
   # name <- string
   # nmem <- int
 
-  hist_true = np.fromfile("data/true.bin", np.float64)
-  hist_true = hist_true.reshape((STEPS, DIMM))
-  hist_fcst = np.fromfile("data/%s_cycle.bin" % name, np.float64)
-  hist_fcst = hist_fcst.reshape((STEPS, nmem, DIMM))
   hist_fcst_mean = np.mean(hist_fcst, axis=1)
-  hist_lv = np.fromfile("data/lv.bin", np.float64)
-  hist_lv = hist_lv.reshape((STEPS, DIMM, DIMM))
 
   for i_component in range(DIMM//3):
     i_adjust = i_component * 3
@@ -159,17 +158,14 @@ def plot_3d_trajectory(name, nmem):
     plt.close()
   return 0
 
-def plot_covariance_matr(name):
+def plot_covariance_matr(hist_covar, name, sel):
   # name <- string
 
-  for sel in ["back", "anl"]:
-    hist_covar = np.fromfile("data/%s_covr_%s.bin" % (name, sel), np.float64)
-    hist_covar = hist_covar.reshape((STEPS, DIMM, DIMM))
-    rms_covar  = np.sqrt(np.nanmean(hist_covar[STEPS//2:STEPS,:,:]**2, axis=0))
-    mean_covar = np.nanmean(hist_covar, axis=0)
-    plot_matrix(rms_covar , "%s_covar_rms_%s"  % (sel, name))
-    plot_matrix(np.log(rms_covar) , "%s_covar_logrms_%s"  % (sel, name), plt.cm.Reds)
-    plot_matrix(mean_covar, "%s_covar_mean_%s" % (sel, name))
+  rms_covar  = np.sqrt(np.nanmean(hist_covar[STEPS//2:STEPS,:,:]**2, axis=0))
+  mean_covar = np.nanmean(hist_covar, axis=0)
+  plot_matrix(rms_covar , "%s_covar_rms_%s"  % (sel, name))
+  plot_matrix(np.log(rms_covar) , "%s_covar_logrms_%s"  % (sel, name), plt.cm.Reds)
+  plot_matrix(mean_covar, "%s_covar_mean_%s" % (sel, name))
 
 def plot_matrix(data, name, color=plt.cm.bwr):
   # data <- np.array[n,n]
