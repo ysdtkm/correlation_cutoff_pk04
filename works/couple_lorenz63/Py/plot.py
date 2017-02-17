@@ -54,6 +54,7 @@ def plot_trajectory_lv(hist_true, hist_lv):
     plt.rcParams["font.size"] = 16
 
     for it in range(0, STEPS, 2):
+      itmin = max(0, it - 50)
       fig = plt.figure()
       fig.subplots_adjust(left=0.02, bottom=0.02, right=0.98, top=0.98, \
         wspace=0.04, hspace=0.04)
@@ -64,8 +65,8 @@ def plot_trajectory_lv(hist_true, hist_lv):
       ax.set_xlabel("x")
       ax.set_ylabel("y")
       ax.set_zlabel("z")
-      ax.scatter3D(hist_true[it,0+i_adjust], hist_true[it,1+i_adjust], \
-                   hist_true[it,2+i_adjust], linewidths=0, c="blue")
+      ax.plot(hist_true[itmin:it+1,0+i_adjust], hist_true[itmin:it+1,1+i_adjust], \
+              hist_true[itmin:it+1,2+i_adjust])
       for k in range(DIMM): # LE index
         vector = [hist_true[it,0+i_component], hist_true[it,1+i_component], \
                   hist_true[it,2+i_component], hist_lv[it,k,0+i_component], \
