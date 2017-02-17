@@ -11,17 +11,18 @@
 #================================
 
 STEP_ALL = calc plot
+time = time --format="spent %E sec"
 
 src_calc = Py/main.py Py/const.py Py/model.py Py/etkf.py Py/fdvar.py Py/tdvar.py \
            Py/vectors.py
 dep_calc =
 out_calc = data/*.bin
-cmd_calc = rm -rf data; mkdir -p data; python Py/main.py
+cmd_calc = rm -rf data; mkdir -p data; $(time) python Py/main.py
 
 src_plot = Py/plot.py Py/const.py
 dep_plot = calc
 out_plot = image/*
-cmd_plot = rm -rf image; mkdir -p image; python Py/plot.py; cp -f ~/repos/any/quick_viewer.html image/
+cmd_plot = rm -rf image; mkdir -p image; $(time) python Py/plot.py; cp -f ~/repos/any/quick_viewer.html image/
 
 # ===============================================
 # end of settings
@@ -32,6 +33,7 @@ all: $(STEP_ALL)
 
 define rule_comm
 $1: $(src_$1) $(dep_$1)
+	@echo ""
 	@echo "STEP $1:"
 	$(cmd_$1)
 	@mkdir -p $(VPATH)

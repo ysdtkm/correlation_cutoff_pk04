@@ -50,12 +50,12 @@ def plot_trajectory_lv(hist_true, hist_lv):
     i_adjust = i_component * 3
     name_component = ["extro", "trop", "ocn"][i_component]
 
-    colors = ["r", "g", "k"]
+    colors = ["red", "green", "black"]
     plt.rcParams["font.size"] = 8
 
     for it in range(0, STEPS, 4):
       itmin = max(0, it - 50)
-      fig = plt.figure(figsize=(6,3))
+      fig = plt.figure(figsize=(5.0, 2.5))
       fig.subplots_adjust(left=0.02, bottom=0.02, right=0.98, top=0.98, \
         wspace=0.04, hspace=0.04)
       ax1 = fig.add_subplot(121, projection='3d')
