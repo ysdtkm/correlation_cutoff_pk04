@@ -51,27 +51,33 @@ def plot_trajectory_lv(hist_true, hist_lv):
     name_component = ["extro", "trop", "ocn"][i_component]
 
     colors = ["r", "g", "k"]
-    plt.rcParams["font.size"] = 16
+    plt.rcParams["font.size"] = 8
 
-    for it in range(0, STEPS, 2):
+    for it in range(0, STEPS, 4):
       itmin = max(0, it - 50)
-      fig = plt.figure()
+      fig = plt.figure(figsize=(6,3))
       fig.subplots_adjust(left=0.02, bottom=0.02, right=0.98, top=0.98, \
         wspace=0.04, hspace=0.04)
-      ax = fig.add_subplot(111, projection='3d')
-      ax.set_xlim([-30,30])
-      ax.set_ylim([-30,30])
-      ax.set_zlim([0,50])
-      ax.set_xlabel("x")
-      ax.set_ylabel("y")
-      ax.set_zlabel("z")
-      ax.plot(hist_true[itmin:it+1,0+i_adjust], hist_true[itmin:it+1,1+i_adjust], \
-              hist_true[itmin:it+1,2+i_adjust])
-      for k in range(DIMM): # LE index
-        vector = [hist_true[it,0+i_component], hist_true[it,1+i_component], \
-                  hist_true[it,2+i_component], hist_lv[it,k,0+i_component], \
-                  hist_lv[it,k,1+i_component], hist_lv[it,k,2+i_component]]
-        ax.quiver(*vector, length=5.0, pivot="tail", color=colors[k])
+      ax1 = fig.add_subplot(121, projection='3d')
+      ax2 = fig.add_subplot(122, projection='3d')
+      for ax in [ax1, ax2]:
+        ax.set_xlim([-30,30])
+        ax.set_ylim([-30,30])
+        ax.set_zlim([0,50])
+        if (ax is ax1):
+          ax.view_init(elev=30, azim=-45)
+        else:
+          ax.view_init(elev=30, azim=-40)
+        ax.set_xlabel("x")
+        ax.set_ylabel("y")
+        ax.set_zlabel("z")
+        ax.plot(hist_true[itmin:it+1,0+i_adjust], hist_true[itmin:it+1,1+i_adjust], \
+                hist_true[itmin:it+1,2+i_adjust])
+        for k in range(DIMM): # LE index
+          vector = [hist_true[it,0+i_component], hist_true[it,1+i_component], \
+                    hist_true[it,2+i_component], hist_lv[it,k,0+i_component], \
+                    hist_lv[it,k,1+i_component], hist_lv[it,k,2+i_component]]
+          ax.quiver(*vector, length=5.0, pivot="tail", color=colors[k])
       plt.savefig("./image/tmp_%s_%s_traj_%04d.png" % ("lv", name_component, it))
       plt.close()
 
