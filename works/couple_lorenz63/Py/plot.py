@@ -2,6 +2,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 from mpl_toolkits.mplot3d import Axes3D
 from const import *
 
@@ -12,6 +13,7 @@ def plot_all():
   hist_lv = hist_lv.reshape((STEPS, DIMM, DIMM))
 
   plot_lv_time(hist_lv)
+  plot_trajectory_lv(hist_true, hist_lv)
 
   for exp in EXPLIST:
     name = exp["name"]
@@ -24,7 +26,7 @@ def plot_all():
 
     plot_rmse_spread(hist_true, hist_fcst, name, nmem)
     plot_time_value(hist_true, hist_fcst, hist_obs, name, nmem)
-    plot_3d_trajectory(hist_true, hist_fcst, hist_lv, name, nmem)
+    plot_3d_trajectory(hist_true, hist_fcst, name, nmem)
     if (exp["method"] == "etkf"):
       for sel in ["back", "anl"]:
         hist_covar = np.fromfile("data/%s_covr_%s.bin" % (name, sel), np.float64)
@@ -42,6 +44,40 @@ def plot_lv_time(hist_lv):
   ax1.legend()
   plt.savefig("./image/lv.png")
   plt.clf()
+
+def plot_trajectory_lv(hist_true, hist_lv):
+  for i_component in range(DIMM//3):
+    i_adjust = i_component * 3
+    name_component = ["extro", "trop", "ocn"][i_component]
+
+    colors = ["r", "g", "k"]
+    plt.rcParams["font.size"] = 16
+
+    for it in range(0, STEPS, 10):
+      fig = plt.figure()
+      fig.subplots_adjust(left=0.02, bottom=0.02, right=0.98, top=0.98, \
+        wspace=0.04, hspace=0.04)
+      ax = fig.add_subplot(111, projection='3d')
+      ax.set_xlim([-30,30])
+      ax.set_ylim([-30,30])
+      ax.set_zlim([0,50])
+      ax.set_xlabel("x")
+      ax.set_ylabel("y")
+      ax.set_zlabel("z")
+      ax.scatter3D(hist_true[it,0+i_adjust], hist_true[it,1+i_adjust], \
+                   hist_true[it,2+i_adjust], linewidths=0, c="blue")
+      for k in range(DIMM): # LE index
+        vector = [hist_true[it,0+i_component], hist_true[it,1+i_component], \
+                  hist_true[it,2+i_component], hist_lv[it,k,0+i_component], \
+                  hist_lv[it,k,1+i_component], hist_lv[it,k,2+i_component]]
+        ax.quiver(*vector, length=5.0, pivot="tail", color=colors[k])
+      plt.savefig("./image/tmp_%s_%s_traj_%04d.png" % ("lv", name_component, it))
+      plt.close()
+
+    os.system("convert -delay 10 -loop 0 ./image/tmp_*.png \
+      ./image/%s_%s_traj.gif" % ("lv", name_component))
+    os.system("rm -f image/tmp_*.png")
+  return 0
 
 def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
   ## refer to a32p23
@@ -119,7 +155,7 @@ def plot_time_value(hist_true, hist_fcst, hist_obs, name, nmem):
     plt.clf()
   return 0
 
-def plot_3d_trajectory(hist_true, hist_fcst, hist_lv, name, nmem):
+def plot_3d_trajectory(hist_true, hist_fcst, name, nmem):
   # name <- string
   # nmem <- int
 
@@ -137,19 +173,12 @@ def plot_3d_trajectory(hist_true, hist_fcst, hist_lv, name, nmem):
     ax = fig.add_subplot(111, projection='3d')
     ax.plot(hist_true[:,0+i_adjust], hist_true[:,1+i_adjust], \
       hist_true[:,2+i_adjust], label="true")
-    # ax.plot(hist_fcst_mean[:,0+i_adjust], hist_fcst_mean[:,1+i_adjust], \
-    #   hist_fcst_mean[:,2+i_adjust], label="model")
+    ax.plot(hist_fcst_mean[:,0+i_adjust], hist_fcst_mean[:,1+i_adjust], \
+      hist_fcst_mean[:,2+i_adjust], label="model")
     ax.legend()
     # ax.set_xlim([-30,30])
     # ax.set_ylim([-30,30])
     # ax.set_zlim([0,50])
-    if (DIMM == 3):
-      for it in range(STEPS//4, STEPS, 500):
-        colors = ["r", "g", "y"]
-        for k in range(DIMM): # LE index
-          vector = [hist_true[it,0], hist_true[it,1], hist_true[it,2],\
-                    hist_lv[it,k,0], hist_lv[it,k,1], hist_lv[it,k,2]]
-          ax.quiver(*vector, length=5.0, pivot="tail", color=colors[k])
     ax.set_xlabel("x")
     ax.set_ylabel("y")
     ax.set_zlabel("z")
