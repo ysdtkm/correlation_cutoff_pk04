@@ -53,7 +53,7 @@ def plot_trajectory_lv(hist_true, hist_lv):
     colors = ["r", "g", "k"]
     plt.rcParams["font.size"] = 16
 
-    for it in range(0, STEPS, 10):
+    for it in range(0, STEPS, 2):
       fig = plt.figure()
       fig.subplots_adjust(left=0.02, bottom=0.02, right=0.98, top=0.98, \
         wspace=0.04, hspace=0.04)
@@ -74,7 +74,7 @@ def plot_trajectory_lv(hist_true, hist_lv):
       plt.savefig("./image/tmp_%s_%s_traj_%04d.png" % ("lv", name_component, it))
       plt.close()
 
-    os.system("convert -delay 10 -loop 0 ./image/tmp_*.png \
+    os.system("convert -delay 5 -loop 0 ./image/tmp_*.png \
       ./image/%s_%s_traj.gif" % ("lv", name_component))
     os.system("rm -f image/tmp_*.png")
   return 0
