@@ -38,7 +38,7 @@ def exec_nature():
 
     m = finite_time_tangent_using_nonlinear(true, DT, 1)
     lv = m * lv
-    if (i % 1000 == 0):
+    if (i % 1 == 0):
       lv, le = orth_norm_vectors(lv, eps)
       all_le[i,:] = le[:]
     all_lv[i,:,:] = lv[:,:]

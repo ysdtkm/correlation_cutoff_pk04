@@ -17,5 +17,5 @@ def orth_norm_vectors(lv, eps):
   for i in range(DIMM):
     lv[:,i] = q[:,order_dsc[i]]
     lv[:,i] *= eps
-    le[i] = eigvals[order_dsc[i]] / eps
+    le[i] = np.log(eigvals[order_dsc[i]] / eps)
   return lv, le
