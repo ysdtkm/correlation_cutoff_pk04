@@ -142,6 +142,11 @@ def plot_3d_trajectory(name, nmem):
     # ax.set_xlim([-30,30])
     # ax.set_ylim([-30,30])
     # ax.set_zlim([0,50])
+    if (DIMM == 3):
+      vector = np.array([hist_true[0,0],hist_true[0,1],hist_true[0,2],\
+                        10,10,10])
+      print(*vector.tolist())
+      ax.quiver(*vector.tolist(), length=10.0, pivot="tail", color="r")
     ax.set_xlabel("x")
     ax.set_ylabel("y")
     ax.set_zlabel("z")
