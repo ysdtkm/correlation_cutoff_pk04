@@ -16,7 +16,7 @@ def orth_norm_vectors(lv, eps):
 
   # for t-continuity, align
   for i in range(DIMM):
-    inner_prod = np.dot(q[:,i], np.array(lv[:,i]))
+    inner_prod = np.dot(q[:,i].T, lv[:,i])
     if (inner_prod < 0):
       q[:,i] *= -1.0
 
