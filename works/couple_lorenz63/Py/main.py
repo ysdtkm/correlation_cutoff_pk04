@@ -97,9 +97,9 @@ def exec_assim_cycle(exp, all_fcst, all_obs):
         fcst[:,:], all_bf[i,:,:], all_ba[i,:,:] = \
           etkf(fcst[:,:], h[:,:], r[:,:], yo[:,:], exp["inf"], exp["nmem"])
       elif (exp["method"] == "3dvar"):
-        fcst[0,:] = tdvar(fcst[:,:].T, h[:,:], r[:,:], yo[:,:])
+        fcst[0,:] = tdvar(fcst[0,:].T, h[:,:], r[:,:], yo[:,:])
       elif (exp["method"] == "4dvar"):
-        fcst[0,:] = fdvar(all_fcst[i-exp["aint"],:,:].T, \
+        fcst[0,:] = fdvar(all_fcst[i-exp["aint"],0,:].T, \
           h[:,:], r[:,:], yo[:,:], exp["aint"])
     all_fcst[i,:,:] = fcst[:,:]
   obs_used.tofile("data/%s_obs.bin" % exp["name"])
