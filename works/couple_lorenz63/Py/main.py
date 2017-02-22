@@ -100,11 +100,10 @@ def exec_assim_cycle(exp, all_fcst, all_obs):
 
     if (i % exp["aint"] == 0):
       obs_used[i,:] = all_obs[i,:]
-      yo = np.dot(h, all_obs[i,:,np.newaxis])
       fcst_pre = all_fcst[i-exp["aint"],:,:]
 
       fcst[:,:], all_bf[i,:,:], all_ba[i,:,:] = \
-        analyze_one_window(fcst, fcst_pre, h, r, yo, exp)
+        analyze_one_window(fcst, fcst_pre, all_obs[i,:], h, r, exp)
 
     all_fcst[i,:,:] = fcst[:,:]
 
@@ -115,12 +114,12 @@ def exec_assim_cycle(exp, all_fcst, all_obs):
   all_ba.tofile("data/%s_covr_anl.bin" % exp["name"])
   return all_fcst
 
-def analyze_one_window(fcst, fcst_pre, h, r, yo, exp):
+def analyze_one_window(fcst, fcst_pre, obs, h, r, exp):
   # fcst     <- np.array[nmem, DIMM]
   # fcst_pre <- np.array[nmem, DIMM]
+  # obs      <- np.array[DIMO]
   # h        <- np.array[DIMO, DIMM]
   # r        <- np.array[DIMO, DIMO]
-  # yo       <- np.array[DIMO]
   # exp      <- hash
   # return1  -> np.array[nmem, DIMM]
   # return2  -> np.array[DIMM, DIMM]
@@ -131,6 +130,8 @@ def analyze_one_window(fcst, fcst_pre, h, r, yo, exp):
   bf[:,:] = np.nan
   ba = np.empty((DIMM, DIMM))
   ba[:,:] = np.nan
+
+  yo = np.dot(h, obs[:,np.newaxis])
 
   if (exp["method"] == "etkf"):
     anl[:,:], bf[:,:], ba[:,:] = \
