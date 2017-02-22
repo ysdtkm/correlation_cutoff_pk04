@@ -10,7 +10,7 @@ def tdvar(fcst, h, r, yo):
   # r      <- np.array[DIMO, DIMO] : observation error covariance
   # yo     <- np.array[DIMO, 1]    : observation
   # return -> np.array[DIMM]        : assimilated field
-  anl = fcst
+  anl = np.copy(fcst)
   anl = fmin_bfgs(tdvar_2j, anl, args=(fcst, h, r, yo))
   return anl.T
 
@@ -27,7 +27,7 @@ def tdvar_2j(anl, fcst, h_nda, r_nda, yo_nda):
   yo = np.asmatrix(yo_nda)
   b  = np.matrix(1.2 * tdvar_b())
 
-  anl_tmp = anl
+  anl_tmp = np.copy(anl)
   anl = np.matrix(anl_tmp).T
   twoj = (anl - fcst).T * b.I * (anl - fcst) + \
        (h * anl - yo).T * r.I * (h * anl - yo)

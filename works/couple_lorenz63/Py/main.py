@@ -75,7 +75,7 @@ def exec_assim_cycle(exp, all_fcst, all_obs):
   # all_fcst <- np.array[STEPS, nmem, DIMM]
   # all_obs  <- np.array[STEPS, DIMO]
   # return   -> np.array[STEPS, nmem, DIMM]
-  ### All array-like objects are np.ndaray in this method
+  ### All array-like objects are np.ndarray in this method
 
   # forecast-analysis cycle
   r = getr()
@@ -92,7 +92,7 @@ def exec_assim_cycle(exp, all_fcst, all_obs):
       fcst[m,:] = timestep(all_fcst[i-1,m,:], DT)
     if (i % exp["aint"] == 0):
       obs_used[i,:] = all_obs[i,:]
-      yo = np.array(np.matrix(h) * np.matrix(all_obs[i,:]).T)
+      yo = np.dot(h, np.expand_dims(all_obs[i,:], axis=1))
       if (exp["method"] == "etkf"):
         fcst[:,:], all_bf[i,:,:], all_ba[i,:,:] = \
           etkf(fcst[:,:], h[:,:], r[:,:], yo[:,:], exp["inf"], exp["nmem"])

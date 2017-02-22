@@ -8,15 +8,15 @@ def timestep(x, dt):
   # dt     <- float
   # return -> np.array(DIMM)
 
-  k1 = tendency(x)
-  x2 = x + k1 * dt / 2.0
+  x0 = np.copy(x)
+  k1 = tendency(x0)
+  x2 = x0 + k1 * dt / 2.0
   k2 = tendency(x2)
-  x3 = x + k2 * dt / 2.0
+  x3 = x0 + k2 * dt / 2.0
   k3 = tendency(x3)
-  x4 = x + k3 * dt
+  x4 = x0 + k3 * dt
   k4 = tendency(x4)
-  x = x + (k1 + 2.0 * k2 + 2.0 * k3 + k4) * dt / 6.0
-  return x
+  return x0 + (k1 + 2.0 * k2 + 2.0 * k3 + k4) * dt / 6.0
 
 def tendency(x):
   # a31p63-64

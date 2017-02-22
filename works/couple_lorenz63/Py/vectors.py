@@ -20,6 +20,6 @@ def orth_norm_vectors(lv, eps):
     if (inner_prod < 0):
       q[:,i] *= -1.0
 
-  lv = q * eps
+  lv_orth = q * eps
   le = np.log(eigvals / eps)
-  return lv, le
+  return lv_orth, le
