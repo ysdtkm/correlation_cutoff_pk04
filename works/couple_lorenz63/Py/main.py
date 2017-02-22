@@ -75,9 +75,9 @@ def exec_assim_cycle(exp, all_fcst, all_obs):
   # all_fcst <- np.array[STEPS, nmem, DIMM]
   # all_obs  <- np.array[STEPS, DIMO]
   # return   -> np.array[STEPS, nmem, DIMM]
-  ### All array-like objects are np.ndarray in this method
+  ### All array-like objects in this method are np.ndarray
 
-  # forecast-analysis cycle
+  # prepare containers
   r = getr()
   h = geth(exp["diag"])
   fcst = np.empty((exp["nmem"], DIMM))
@@ -87,26 +87,60 @@ def exec_assim_cycle(exp, all_fcst, all_obs):
   all_bf[:,:,:] = np.nan
   obs_used = np.empty((STEPS, DIMO))
   obs_used[:,:] = np.nan
+
+  # forecast-analysis cycle
   for i in range(STEP_FREE, STEPS):
+
+    # if (DIMM == 3 or exp["couple"] == "strong"):
+    # elif (exp["couple"] == "weak"):
+    # elif (exp["couple"] == "none"):
+
     for m in range(0, exp["nmem"]):
       fcst[m,:] = timestep(all_fcst[i-1,m,:], DT)
+
     if (i % exp["aint"] == 0):
       obs_used[i,:] = all_obs[i,:]
-      yo = np.dot(h, np.expand_dims(all_obs[i,:], axis=1))
-      if (exp["method"] == "etkf"):
-        fcst[:,:], all_bf[i,:,:], all_ba[i,:,:] = \
-          etkf(fcst[:,:], h[:,:], r[:,:], yo[:,:], exp["inf"], exp["nmem"])
-      elif (exp["method"] == "3dvar"):
-        fcst[0,:] = tdvar(fcst[0,:].T, h[:,:], r[:,:], yo[:,:])
-      elif (exp["method"] == "4dvar"):
-        fcst[0,:] = fdvar(all_fcst[i-exp["aint"],0,:].T, \
-          h[:,:], r[:,:], yo[:,:], exp["aint"])
+      yo = np.dot(h, all_obs[i,:,np.newaxis])
+      fcst_pre = all_fcst[i-exp["aint"],:,:]
+
+      fcst[:,:], all_bf[i,:,:], all_ba[i,:,:] = \
+        analyze_one_window(fcst, fcst_pre, h, r, yo, exp)
+
     all_fcst[i,:,:] = fcst[:,:]
+
+  # save to files
   obs_used.tofile("data/%s_obs.bin" % exp["name"])
   all_fcst.tofile("data/%s_cycle.bin" % exp["name"])
   all_bf.tofile("data/%s_covr_back.bin" % exp["name"])
   all_ba.tofile("data/%s_covr_anl.bin" % exp["name"])
   return all_fcst
+
+def analyze_one_window(fcst, fcst_pre, h, r, yo, exp):
+  # fcst     <- np.array[nmem, DIMM]
+  # fcst_pre <- np.array[nmem, DIMM]
+  # h        <- np.array[DIMO, DIMM]
+  # r        <- np.array[DIMO, DIMO]
+  # yo       <- np.array[DIMO]
+  # exp      <- hash
+  # return1  -> np.array[nmem, DIMM]
+  # return2  -> np.array[DIMM, DIMM]
+  # return3  -> np.array[DIMM, DIMM]
+
+  anl = np.empty((exp["nmem"], DIMM))
+  bf = np.empty((DIMM, DIMM))
+  bf[:,:] = np.nan
+  ba = np.empty((DIMM, DIMM))
+  ba[:,:] = np.nan
+
+  if (exp["method"] == "etkf"):
+    anl[:,:], bf[:,:], ba[:,:] = \
+        etkf(fcst[:,:], h[:,:], r[:,:], yo[:,:], exp["inf"], exp["nmem"])
+  elif (exp["method"] == "3dvar"):
+    anl[0,:] = tdvar(fcst[0,:].T, h[:,:], r[:,:], yo[:,:])
+  elif (exp["method"] == "4dvar"):
+    anl[0,:] = fdvar(fcst_pre[0,:], h[:,:], r[:,:], yo[:,:], exp["aint"])
+
+  return anl, bf, ba
 
 def exec_deterministic_fcst(exp, anl):
   # exp    <- hash
