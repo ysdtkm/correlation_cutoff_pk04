@@ -20,7 +20,7 @@ def test_fdvar_overflow():
     [-92.74048173257268], \
     [81.4746920842174]] \
   )
-  yo = np.matrix(\
+  yo = np.array(\
     [[-2.9312942806408193], \
     [-5.972428159803157], \
     [14.373259247649628], \
@@ -96,4 +96,4 @@ def test_tangent_sv():
   print(mt_finite)
   return 0
 
-test_tangent_model()
+test_fdvar_overflow()

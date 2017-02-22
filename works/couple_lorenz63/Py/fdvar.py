@@ -10,9 +10,9 @@ from model import *
 
 def fdvar(fcst_0, h, r, yo, aint):
   # fcst_0 <- np.array[DIMM]        : first guess at beginning of window
-  # h      <- np.matrix[DIMO, DIMM] : observation operator
-  # r      <- np.matrix[DIMO, DIMO] : observation error covariance
-  # yo     <- np.matrix[DIMO, 1]    : observation
+  # h      <- np.array[DIMO, DIMM] : observation operator
+  # r      <- np.array[DIMO, DIMO] : observation error covariance
+  # yo     <- np.array[DIMO, 1]    : observation
   # aint   <- int                   : assimilation interval
   # return -> np.array[DIMM]        : assimilated field
 
@@ -29,16 +29,20 @@ def fdvar(fcst_0, h, r, yo, aint):
     anl_1 = timestep(anl_1, DT)
   return anl_1.T
 
-def fdvar_2j(anl_0, fcst_0, h, r, yo, aint):
+def fdvar_2j(anl_0, fcst_0, h_nda, r_nda, yo_nda, aint):
   # anl_0  <- np.array[DIMM]        : temporary analysis field
   # fcst_0 <- np.array[DIMM]        : first guess field
-  # h      <- np.matrix[DIMO, DIMM] : observation operator
-  # r      <- np.matrix[DIMO, DIMO] : observation error covariance
-  # yo     <- np.matrix[DIMO, 1]    : observation
+  # h_nda  <- np.array[DIMO, DIMM] : observation operator
+  # r_nda  <- np.array[DIMO, DIMO] : observation error covariance
+  # yo_nda <- np.array[DIMO, 1]    : observation
   # aint   <- int                   : assimilation interval
   # return -> float                 : cost function 2J
 
-  b = 0.6 * 1.2 * tdvar_b()
+  h  = np.asmatrix(h_nda)
+  r  = np.asmatrix(r_nda)
+  yo = np.asmatrix(yo_nda)
+  b = np.matrix(0.6 * 1.2 * tdvar_b())
+
   anl_tmp = anl_0
   anl_0 = np.matrix(anl_tmp).T
   anl_1_ar = anl_0.A.flatten()

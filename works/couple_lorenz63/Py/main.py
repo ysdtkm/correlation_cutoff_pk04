@@ -37,7 +37,7 @@ def exec_nature():
     all_true[i,:] = true[:]
 
     m = finite_time_tangent_using_nonlinear(true, DT, 1)
-    lv = np.dot(m, lv).A
+    lv = np.dot(m, lv)
     if (i % 10 == 0):
       lv, le = orth_norm_vectors(lv, eps)
       all_le[i,:] = le[:]
@@ -46,7 +46,7 @@ def exec_nature():
   all_true.tofile("data/true.bin")
   all_lv.tofile("data/lv.bin")
   all_le.tofile("data/le.bin")
-  print(np.mean(all_le[STEPS//2:,:], axis=0))
+  # print(np.mean(all_le[STEPS//2:,:], axis=0))
   return all_true
 
 def exec_obs(nature):
@@ -75,10 +75,7 @@ def exec_assim_cycle(exp, all_fcst, all_obs):
   # all_fcst <- np.array[STEPS, nmem, DIMM]
   # all_obs  <- np.array[STEPS, DIMO]
   # return   -> np.array[STEPS, nmem, DIMM]
-
-  ### Types of array-like objects
-  # np.matrix : r, h, yo
-  # np.array  : obs_*, fcst_*, all_*
+  ### All array-like objects are np.ndaray in this method
 
   # forecast-analysis cycle
   r = getr()
@@ -95,7 +92,7 @@ def exec_assim_cycle(exp, all_fcst, all_obs):
       fcst[m,:] = timestep(all_fcst[i-1,m,:], DT)
     if (i % exp["aint"] == 0):
       obs_used[i,:] = all_obs[i,:]
-      yo = h * np.matrix(all_obs[i,:]).T
+      yo = np.array(np.matrix(h) * np.matrix(all_obs[i,:]).T)
       if (exp["method"] == "etkf"):
         fcst[:,:], all_bf[i,:,:], all_ba[i,:,:] = \
           etkf(fcst[:,:], h[:,:], r[:,:], yo[:,:], exp["inf"], exp["nmem"])

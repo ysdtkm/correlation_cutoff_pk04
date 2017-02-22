@@ -3,7 +3,7 @@
 import math
 import numpy as np
 
-DIMM = 3    # dimension of model variable n
+DIMM = 9    # dimension of model variable n
 DIMO = DIMM # dimension of observation variable m
 
 DT = 0.01
@@ -27,17 +27,17 @@ EXPLIST = [ \
   # {"name":"y",         "inf":1.05, "aint":8,  "diag":[0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0], "nmem":3, "method":"etkf"}, \
   # {"name":"z",         "inf":1.05, "aint":8,  "diag":[0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0], "nmem":3, "method":"etkf"}, \
   # {"name":"xyz_3dvar", "inf":1.0 , "aint":8,  "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], "nmem":1, "method":"3dvar"},\
-  {"name":"tdvar_strong_int25", "inf":1.0 , "aint":25, "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], "nmem":1, "method":"3dvar"} \
-  # {"name":"fdvar_strong_int25", "inf":1.0 , "aint":25, "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], "nmem":1, "method":"4dvar"} \
+  {"name":"tdvar_strong_int25", "inf":1.0 , "aint":25, "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], "nmem":1, "method":"3dvar"}, \
+  {"name":"fdvar_strong_int25", "inf":1.0 , "aint":25, "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], "nmem":1, "method":"4dvar"} \
 ]
 
 def getr():
-  r = np.matrix(np.identity(DIMO)) * (OERR * OERR)
+  r = np.identity(DIMO) * (OERR * OERR)
   return r
 
 def geth(diag_h):
   # DIMO == DIMM is assumed
-  h = np.matrix(np.zeros((DIMO,DIMM)))
+  h = np.zeros((DIMO,DIMM))
   for i in range(0, DIMM):
     h[i,i] = diag_h[i]
   return h

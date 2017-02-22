@@ -4,16 +4,20 @@ import numpy as np
 from scipy.linalg import sqrtm
 from const import *
 
-def etkf(fcst, h, r, yo, inf, nmem):
+def etkf(fcst, h_nda, r_nda, yo_nda, inf, nmem):
   # fcst   <- np.array[nmem, DIMM]
-  # h      <- np.matrix[DIMO, DIMM]
-  # r      <- np.matrix[DIMO, DIMO]
-  # yo     <- np.matrix[DIMO, 1]
+  # h_nda  <- np.array[DIMO, DIMM]
+  # r_nda  <- np.array[DIMO, DIMO]
+  # yo_nda <- np.array[DIMO, 1]
   # inf    <- float
   # nmem   <- int
-  # return -> np.array[DIMM, nmem], np.array[DIMM, DIMM]
+  # return -> np.array[DIMM, nmem], np.array[DIMM, DIMM], np.array[DIMM, DIMM]
 
-  ### DA variables
+  h  = np.asmatrix(h_nda)
+  r  = np.asmatrix(r_nda)
+  yo = np.asmatrix(yo_nda)
+
+  ### DA variables (np.matrix)
   # - model space
   #  xfm[DIMM,nmem] : each member's forecast Xf
   # xfpt[DIMM,nmem] : forecast perturbation Xbp
@@ -51,5 +55,5 @@ def etkf(fcst, h, r, yo, inf, nmem):
   xapt = (xfm - xf * I_1m) * wam
   xa   = xf + xfm * wa
   xam  = xapt + xa * I_1m
-  return np.real(xam.T.A), xfpt * xfpt.T, xapt * xapt.T
+  return np.real(xam.T.A), (xfpt * xfpt.T).A, (xapt * xapt.T).A
 
