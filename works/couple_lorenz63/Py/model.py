@@ -67,9 +67,9 @@ def tendency(x):
 def tangent_linear(x, dt):
   # x      <- np.array(DIMM)       : state vector at the beginning
   # dt     <- float                : infinitesimal time
-  # return -> np.matrix(DIMM,DIMM) : instantaneous tangent linear matrix M
+  # return -> np.array(DIMM,DIMM) : instantaneous tangent linear matrix M
 
-  dx = np.matrix(np.zeros((DIMM,DIMM)))
+  dx = np.zeros((DIMM,DIMM))
 
   if (DIMM == 3):
     sigma = 10.0
@@ -146,20 +146,20 @@ def tangent_linear(x, dt):
     dx[8,7] = tau * (s * x[6])
     dx[8,8] = tau * (-b)
 
-  m = np.matrix(np.identity(DIMM) + dx * dt)
+  m = np.identity(DIMM) + dx[:,:] * dt
   return m
 
 def finite_time_tangent(x0, dt, iw):
   # x0     <- np.array(DIMM)       : state vector at t0
   # dt     <- float                : timestep
   # iw     <- int                  : integration window (time in steps)
-  # return -> np.matrix(DIMM,DIMM) : finite time (t0 -> t0 + iw*DT) tangent linear matrix M
+  # return -> np.array(DIMM,DIMM) : finite time (t0 -> t0 + iw*DT) tangent linear matrix M
 
-  m_finite = np.matrix(np.identity(DIMM))
+  m_finite = np.identity(DIMM)
   x = np.copy(x0)
   for i in range(iw):
     m_inst = tangent_linear(x, dt)
-    m_finite = m_inst * m_finite
+    m_finite = np.dot(m_inst, m_finite)
     x = timestep(x, dt)
   return m_finite
 
@@ -167,9 +167,9 @@ def finite_time_tangent_using_nonlinear(x0, dt, iw):
   # x0     <- np.array(DIMM)       : state vector at t0
   # dt     <- float                : timestep
   # iw     <- int                  : integration window (time in steps)
-  # return -> np.matrix(DIMM,DIMM) : finite time (t0 -> t0 + iw*DT) tangent linear matrix M
+  # return -> np.array(DIMM,DIMM) : finite time (t0 -> t0 + iw*DT) tangent linear matrix M
 
-  m_finite = np.matrix(np.identity(DIMM))
+  m_finite = np.identity(DIMM)
   eps = 1.0e-9
   for j in range(DIMM):
     xctl = np.copy(x0)
@@ -178,5 +178,5 @@ def finite_time_tangent_using_nonlinear(x0, dt, iw):
     for i in range(iw):
       xctl = timestep(xctl, dt)
       xptb = timestep(xptb, dt)
-    m_finite[:,j] = np.matrix(xptb[:] - xctl[:]).T / eps
+    m_finite[:,j] = (xptb[:] - xctl[:]) / eps
   return m_finite

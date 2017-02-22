@@ -64,9 +64,9 @@ def test_tangent_model():
     print("nonlinear:")
     print((x_t1_ptb - x_t1) / ptb)
     print("tangent linear:")
-    print(m[:,i].A.flatten())
+    print(m[:,i].flatten())
     print("diff (NL - TL):")
-    diff = (x_t1_ptb - x_t1) / ptb - m[:,i].A.flatten()
+    diff = (x_t1_ptb - x_t1) / ptb - m[:,i].flatten()
     print(diff)
     sum_sq_diff = sum_sq_diff + np.sum(diff ** 2)
 
@@ -96,4 +96,4 @@ def test_tangent_sv():
   print(mt_finite)
   return 0
 
-test_fdvar_overflow()
+test_tangent_model()
