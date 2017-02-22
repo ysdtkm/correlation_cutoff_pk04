@@ -13,7 +13,7 @@ def plot_all():
   hist_lv = hist_lv.reshape((STEPS, DIMM, DIMM))
 
   plot_lv_time(hist_lv)
-  plot_trajectory_lv(hist_true, hist_lv)
+  # plot_trajectory_lv(hist_true, hist_lv)
 
   for exp in EXPLIST:
     name = exp["name"]

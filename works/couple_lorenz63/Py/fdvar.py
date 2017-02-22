@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import sys
 import numpy as np
 from scipy.linalg import sqrtm
 from scipy.optimize import fmin, fmin_bfgs
@@ -45,6 +46,6 @@ def fdvar_2j(anl_0, fcst_0, h, r, yo, aint):
     anl_1_ar = timestep(anl_1_ar, DT)
   anl_1 = np.matrix(anl_1_ar).T
   twoj = (anl_0 - fcst_0).T * b.I * (anl_0 - fcst_0) + \
-       (h * anl_1 - yo).T * r.I * (h * anl_1 - yo)
+         (h * anl_1 - yo).T * r.I * (h * anl_1 - yo)
   return twoj.A
 

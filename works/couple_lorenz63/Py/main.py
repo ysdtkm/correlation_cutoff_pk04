@@ -76,6 +76,10 @@ def exec_assim_cycle(exp, all_fcst, all_obs):
   # all_obs  <- np.array[STEPS, DIMO]
   # return   -> np.array[STEPS, nmem, DIMM]
 
+  ### Types of array-like objects
+  # np.matrix : r, h, yo
+  # np.array  : obs_*, fcst_*, all_*
+
   # forecast-analysis cycle
   r = getr()
   h = geth(exp["diag"])
@@ -96,9 +100,9 @@ def exec_assim_cycle(exp, all_fcst, all_obs):
         fcst[:,:], all_bf[i,:,:], all_ba[i,:,:] = \
           etkf(fcst[:,:], h[:,:], r[:,:], yo[:,:], exp["inf"], exp["nmem"])
       elif (exp["method"] == "3dvar"):
-        fcst[0,:] = tdvar(np.matrix(fcst[:,:]).T, h[:,:], r[:,:], yo[:,:])
+        fcst[0,:] = tdvar(fcst[:,:].T, h[:,:], r[:,:], yo[:,:])
       elif (exp["method"] == "4dvar"):
-        fcst[0,:] = fdvar(np.matrix(all_fcst[i-exp["aint"],:,:]).T, \
+        fcst[0,:] = fdvar(all_fcst[i-exp["aint"],:,:].T, \
           h[:,:], r[:,:], yo[:,:], exp["aint"])
     all_fcst[i,:,:] = fcst[:,:]
   obs_used.tofile("data/%s_obs.bin" % exp["name"])
