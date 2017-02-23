@@ -5,6 +5,7 @@ from scipy.linalg import sqrtm
 from const import *
 
 def etkf(fcst, h_nda, r_nda, yo_nda, inf, nmem):
+  ### (DIMM = i_e - i_s) unless strongly coupled
   # fcst   <- np.array[nmem, DIMM]
   # h_nda  <- np.array[DIMO, DIMM]
   # r_nda  <- np.array[DIMO, DIMO]

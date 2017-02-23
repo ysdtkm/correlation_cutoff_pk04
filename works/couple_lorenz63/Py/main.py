@@ -112,13 +112,13 @@ def exec_assim_cycle(exp, all_fcst, all_obs):
           all_bf[i, :dim_atm, :dim_atm], \
           all_ba[i, :dim_atm, :dim_atm]  \
           = analyze_one_window(fcst[:, :dim_atm], fcst_pre[:, :dim_atm], \
-            all_obs[i, :dim_atm], h, r, exp, 0, 6)
+            all_obs[i, :dim_atm], h[:dim_atm, :dim_atm], r[:dim_atm, :dim_atm], exp, 0, 6)
         # oceanic assimilation
         fcst[:, dim_atm:], \
           all_bf[i, dim_atm:, dim_atm:], \
           all_ba[i, dim_atm:, dim_atm:]  \
           = analyze_one_window(fcst[:, dim_atm:], fcst_pre[:, dim_atm:], \
-            all_obs[i, dim_atm:], h, r, exp, 6, 9)
+            all_obs[i, dim_atm:], h[dim_atm:, dim_atm:], r[dim_atm:, dim_atm:], exp, 6, 9)
 
     all_fcst[i,:,:] = fcst[:,:]
 
@@ -142,15 +142,19 @@ def analyze_one_window(fcst, fcst_pre, obs, h, r, exp, i_s=0, i_e=DIMM):
   # return2  -> np.array[DIMM, DIMM]
   # return3  -> np.array[DIMM, DIMM]
 
-  anl = np.empty((exp["nmem"], DIMM))
-  bf = np.empty((DIMM, DIMM))
+  anl = np.empty((exp["nmem"], i_e-i_s))
+  bf = np.empty((i_e-i_s, i_e-i_s))
   bf[:,:] = np.nan
-  ba = np.empty((DIMM, DIMM))
+  ba = np.empty((i_e-i_s, i_e-i_s))
   ba[:,:] = np.nan
 
-  yo = np.dot(h[i_s:i_e, i_s:end], obs[:, np.newaxis])
+  yo = np.dot(h[:,:], obs[:, np.newaxis])
 
   if (exp["method"] == "etkf"):
+    print(fcst[:,:])
+    print(h[:,:])
+    print(r[:,:])
+    print(yo[:,:])
     anl[:,:], bf[:,:], ba[:,:] = \
         etkf(fcst[:,:], h[:,:], r[:,:], yo[:,:], exp["inf"], exp["nmem"])
   elif (exp["method"] == "3dvar"):

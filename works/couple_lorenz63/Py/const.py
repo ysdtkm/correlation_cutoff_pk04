@@ -18,12 +18,12 @@ FERR_INI = 10.0
 
 # name, inf, aint, diag(h), nmem, method
 EXPLIST = [ \
+  {"name":"etkf_weak_int25",  "inf":1.2, "aint":25, \
+        "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], "nmem":4, \
+        "method":"etkf", "couple":"weak"}, \
   {"name":"etkf_strong_int25",  "inf":1.2, "aint":25, \
         "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], "nmem":4, \
         "method":"etkf", "couple":"strong"}, \
-  {"name":"etkf_strong_int25",  "inf":1.2, "aint":25, \
-        "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], "nmem":4, \
-        "method":"etkf", "couple":"weak"}, \
   {"name":"tdvar_strong_int25", "inf":1.0, "aint":25, \
         "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], \
         "nmem":1, "method":"3dvar", "couple":"strong"}, \
