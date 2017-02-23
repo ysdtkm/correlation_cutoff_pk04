@@ -23,3 +23,10 @@ def orth_norm_vectors(lv, eps):
   lv_orth = q * eps
   le = np.log(eigvals / eps)
   return lv_orth, le
+
+def vector_common(blv, flv, k):
+  # blv     <- np.array[DIMM,k]        : backward Lyapunov vectors (column)
+  # flv     <- np.array[DIMM,DIMM-k+1] : forward Lyapunov vectors (column)
+  # k       <- int                     : [1,DIMM)
+  # return  -> np.array[DIMM]          : k+1 th characteristic Lyapunov vectors
+  return blv[:,k]

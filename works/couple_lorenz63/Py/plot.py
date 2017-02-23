@@ -13,12 +13,15 @@ def plot_all():
   hist_blv = hist_blv.reshape((STEPS, DIMM, DIMM))
   hist_flv = np.fromfile("data/flv.bin", np.float64)
   hist_flv = hist_flv.reshape((STEPS, DIMM, DIMM))
+  hist_clv = np.fromfile("data/clv.bin", np.float64)
+  hist_clv = hist_clv.reshape((STEPS, DIMM, DIMM))
 
   os.system("mkdir -p image/true")
   plot_lv_time(hist_blv, "backward")
   plot_lv_time(hist_flv, "forward")
-  plot_trajectory_lv(hist_true, hist_blv, "backward")
-  plot_trajectory_lv(hist_true, hist_flv, "forward")
+  plot_lv_time(hist_clv, "characteristic")
+  # plot_trajectory_lv(hist_true, hist_blv, "backward")
+  # plot_trajectory_lv(hist_true, hist_flv, "forward")
 
   for exp in EXPLIST:
     name = exp["name"]

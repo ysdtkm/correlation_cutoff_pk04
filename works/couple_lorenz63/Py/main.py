@@ -28,6 +28,7 @@ def exec_nature():
   all_true = np.empty((STEPS, DIMM))
   true = np.random.normal(0.0, FERR_INI, DIMM)
   eps = 1.0e-9
+  orth_int = 1
 
   # forward integration i-1 -> i
   all_blv = np.empty((STEPS, DIMM, DIMM))
@@ -39,7 +40,10 @@ def exec_nature():
     all_true[i,:] = true[:]
     m = finite_time_tangent_using_nonlinear(true, DT, 1)
     blv = np.dot(m, blv)
-    if (i % 10 == 0):
+    if (i % orth_int == 0):
+      # (ble[:] / DT) is (orth_int * actual LEs).
+      # For window without orthonormalization, LEs are zero.
+      # Thus long-term mean wil be actual LEs.
       blv, ble = orth_norm_vectors(blv, eps)
       all_ble[i,:] = ble[:] / DT
     all_blv[i,:,:] = blv[:,:]
@@ -53,18 +57,24 @@ def exec_nature():
     true[:] = all_true[i-1,:]
     m = finite_time_tangent_using_nonlinear(true, DT, 1)
     flv = np.dot(m.T, flv)
-    if (i % 10 == 0):
+    if (i % orth_int == 0):
       flv, fle = orth_norm_vectors(flv, eps)
       all_fle[i-1,:] = fle[:] / DT
     all_flv[i-1,:,:] = flv[:,:]
 
-  # todo: calculate LLVs
+  # calculate LLVs
+  all_clv = np.empty((STEPS, DIMM, DIMM))
+  for i in range(0, STEPS):
+    all_clv[i,:,0] = all_blv[i,:,0]
+    for k in range(1, DIMM):
+      all_clv[i,:,k] = vector_common(all_blv[i,:,0:k+1], all_flv[i,:,k:DIMM], k)
 
   all_true.tofile("data/true.bin")
   all_blv.tofile("data/blv.bin")
   all_ble.tofile("data/ble.bin")
   all_flv.tofile("data/flv.bin")
   all_fle.tofile("data/fle.bin")
+  all_clv.tofile("data/clv.bin")
 
   print("backward LEs:")
   print(np.mean(all_ble[STEPS//2:,:], axis=0))
