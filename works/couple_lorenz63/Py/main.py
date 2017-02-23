@@ -91,19 +91,34 @@ def exec_assim_cycle(exp, all_fcst, all_obs):
   # forecast-analysis cycle
   for i in range(STEP_FREE, STEPS):
 
-    # if (DIMM == 3 or exp["couple"] == "strong"):
-    # elif (exp["couple"] == "weak"):
-    # elif (exp["couple"] == "none"):
-
     for m in range(0, exp["nmem"]):
-      fcst[m,:] = timestep(all_fcst[i-1,m,:], DT)
+      if (exp["couple"] == "strong" or exp["couple"] == "weak"):
+        fcst[m,:] = timestep(all_fcst[i-1,m,:], DT)
+      elif (exp["couple"] == "none"):
+        # run uncoupled forecast
+        sys.exit("non-coupled DA not available yet")
 
     if (i % exp["aint"] == 0):
       obs_used[i,:] = all_obs[i,:]
       fcst_pre = all_fcst[i-exp["aint"],:,:]
 
-      fcst[:,:], all_bf[i,:,:], all_ba[i,:,:] = \
-        analyze_one_window(fcst, fcst_pre, all_obs[i,:], h, r, exp)
+      if (exp["couple"] == "strong"):
+        fcst[:,:], all_bf[i,:,:], all_ba[i,:,:] = \
+          analyze_one_window(fcst, fcst_pre, all_obs[i,:], h, r, exp)
+      elif (exp["couple"] == "weak" or exp["couple"] == "none"):
+        dim_atm = 6
+        # atmospheric assimilation
+        fcst[:, :dim_atm], \
+          all_bf[i, :dim_atm, :dim_atm], \
+          all_ba[i, :dim_atm, :dim_atm]  \
+          = analyze_one_window(fcst[:, :dim_atm], fcst_pre[:, :dim_atm], \
+            all_obs[i, :dim_atm], h, r, exp, 0, 6)
+        # oceanic assimilation
+        fcst[:, dim_atm:], \
+          all_bf[i, dim_atm:, dim_atm:], \
+          all_ba[i, dim_atm:, dim_atm:]  \
+          = analyze_one_window(fcst[:, dim_atm:], fcst_pre[:, dim_atm:], \
+            all_obs[i, dim_atm:], h, r, exp, 6, 9)
 
     all_fcst[i,:,:] = fcst[:,:]
 
@@ -114,13 +129,15 @@ def exec_assim_cycle(exp, all_fcst, all_obs):
   all_ba.tofile("data/%s_covr_anl.bin" % exp["name"])
   return all_fcst
 
-def analyze_one_window(fcst, fcst_pre, obs, h, r, exp):
+def analyze_one_window(fcst, fcst_pre, obs, h, r, exp, i_s=0, i_e=DIMM):
   # fcst     <- np.array[nmem, DIMM]
   # fcst_pre <- np.array[nmem, DIMM]
   # obs      <- np.array[DIMO]
   # h        <- np.array[DIMO, DIMM]
   # r        <- np.array[DIMO, DIMO]
   # exp      <- hash
+  # i_s      <- int                  : model grid number, assimilate only [i_s, i_e)
+  # i_e      <- int
   # return1  -> np.array[nmem, DIMM]
   # return2  -> np.array[DIMM, DIMM]
   # return3  -> np.array[DIMM, DIMM]
@@ -131,7 +148,7 @@ def analyze_one_window(fcst, fcst_pre, obs, h, r, exp):
   ba = np.empty((DIMM, DIMM))
   ba[:,:] = np.nan
 
-  yo = np.dot(h, obs[:,np.newaxis])
+  yo = np.dot(h[i_s:i_e, i_s:end], obs[:, np.newaxis])
 
   if (exp["method"] == "etkf"):
     anl[:,:], bf[:,:], ba[:,:] = \
@@ -141,7 +158,7 @@ def analyze_one_window(fcst, fcst_pre, obs, h, r, exp):
   elif (exp["method"] == "4dvar"):
     anl[0,:] = fdvar(fcst_pre[0,:], h[:,:], r[:,:], yo[:,:], exp["aint"])
 
-  return anl, bf, ba
+  return anl[:,:], bf[:,:], ba[:,:]
 
 def exec_deterministic_fcst(exp, anl):
   # exp    <- hash

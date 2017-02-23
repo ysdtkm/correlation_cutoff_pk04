@@ -21,6 +21,9 @@ EXPLIST = [ \
   {"name":"etkf_strong_int25",  "inf":1.2, "aint":25, \
         "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], "nmem":4, \
         "method":"etkf", "couple":"strong"}, \
+  {"name":"etkf_strong_int25",  "inf":1.2, "aint":25, \
+        "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], "nmem":4, \
+        "method":"etkf", "couple":"weak"}, \
   {"name":"tdvar_strong_int25", "inf":1.0, "aint":25, \
         "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], \
         "nmem":1, "method":"3dvar", "couple":"strong"}, \
