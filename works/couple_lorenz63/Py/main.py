@@ -95,8 +95,8 @@ def exec_assim_cycle(exp, all_fcst, all_obs):
       if (exp["couple"] == "strong" or exp["couple"] == "weak"):
         fcst[m,:] = timestep(all_fcst[i-1,m,:], DT)
       elif (exp["couple"] == "none"):
-        # run uncoupled forecast
-        sys.exit("non-coupled DA not available yet")
+        fcst[m,0:6] = timestep(all_fcst[i-1,m,0:6], DT, 0, 6)
+        fcst[m,6:9] = timestep(all_fcst[i-1,m,6:9], DT, 6, 9)
 
     if (i % exp["aint"] == 0):
       obs_used[i,:] = all_obs[i,:]
