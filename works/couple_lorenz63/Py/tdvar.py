@@ -14,7 +14,7 @@ def tdvar(fcst, h, r, yo, i_s, i_e):
   # i_e    <- int
   # return -> np.array[dimm]        : assimilated field
   anl = np.copy(fcst)
-  anl = fmin_bfgs(tdvar_2j, anl, args=(fcst, h, r, yo, i_s, i_e))
+  anl = fmin_bfgs(tdvar_2j, anl, args=(fcst, h, r, yo, i_s, i_e), disp=False)
   return anl.T
 
 def tdvar_2j(anl_nda, fcst_nda, h_nda, r_nda, yo_nda, i_s, i_e):

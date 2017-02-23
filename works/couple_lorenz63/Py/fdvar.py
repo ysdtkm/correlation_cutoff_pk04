@@ -23,10 +23,10 @@ def fdvar(fcst_0, h, r, yo, aint, i_s, i_e):
   # input fcst_0 is [aint] steps former than analysis time
   anl_0 = np.copy(fcst_0)
   try:
-    anl_0 = fmin_bfgs(fdvar_2j, anl_0, args=(fcst_0, h, r, yo, aint, i_s, i_e))
+    anl_0 = fmin_bfgs(fdvar_2j, anl_0, args=(fcst_0, h, r, yo, aint, i_s, i_e), disp=False)
   except:
     print("Method fmin_bfgs failed to converge. Use fmin for this step instead.")
-    anl_0 = fmin(fdvar_2j, anl_0, args=(fcst_0, h, r, yo, aint, i_s, i_e))
+    anl_0 = fmin(fdvar_2j, anl_0, args=(fcst_0, h, r, yo, aint, i_s, i_e), disp=False)
   anl_1 = np.copy(anl_0)
   for i in range(0, aint):
     anl_1 = timestep(anl_1, DT, i_s, i_e)
