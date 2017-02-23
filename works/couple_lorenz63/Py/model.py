@@ -3,22 +3,22 @@
 import numpy as np
 from const import *
 
-def timestep(x, dt):
+def timestep(x, dt, i_s=0, i_e=DIMM):
   # x      <- np.array(DIMM)
   # dt     <- float
   # return -> np.array(DIMM)
 
   x0 = np.copy(x)
-  k1 = tendency(x0)
+  k1 = tendency(x0, i_s, i_e)
   x2 = x0 + k1 * dt / 2.0
-  k2 = tendency(x2)
+  k2 = tendency(x2, i_s, i_e)
   x3 = x0 + k2 * dt / 2.0
-  k3 = tendency(x3)
+  k3 = tendency(x3, i_s, i_e)
   x4 = x0 + k3 * dt
-  k4 = tendency(x4)
+  k4 = tendency(x4, i_s, i_e)
   return x0 + (k1 + 2.0 * k2 + 2.0 * k3 + k4) * dt / 6.0
 
-def tendency(x):
+def tendency(x_in, i_s=0, i_e=DIMM):
   # a31p63-64
   # x      <- np.array(DIMM)
   # return -> np.array(DIMM)
@@ -28,9 +28,9 @@ def tendency(x):
     r = 28.0
     b = 8.0 / 3.0
     k = np.empty((3))
-    k[0] = -sigma * x[0]            + sigma * x[1]
-    k[1] =  -x[0] * x[2] + r * x[0] -         x[1]
-    k[2] =   x[0] * x[1] - b * x[2]
+    k[0] = -sigma    * x_in[0]               + sigma * x_in[1]
+    k[1] =  -x_in[0] * x_in[2] + r * x_in[0] -         x_in[1]
+    k[2] =   x_in[0] * x_in[1] - b * x_in[2]
     return k
 
   elif (DIMM == 9):
@@ -49,6 +49,10 @@ def tendency(x):
     k1    = 10.0
     k2    = -11.0
 
+    # for non-coupled
+    x = np.zeros((DIMM)) # ttk: change it to the climatology
+    x[i_s:i_e] = x_in[:]
+
     dx = np.empty((DIMM))
     # extratropic atm
     dx[0] =           -sigma * x[0] + sigma * x[1] - ce * (s * x[3] + k1)
@@ -62,7 +66,7 @@ def tendency(x):
     dx[6] = tau * (              -sigma * x[6] + sigma * x[7]) - c  * (x[3] + k2)
     dx[7] = tau * (-s * x[6] * x[8] + r * x[6] -         x[7]) + c  * (x[4] + k2)
     dx[8] = tau * ( s * x[6] * x[7] - b * x[8]               ) - cz * x[5]
-    return dx
+    return dx[i_s:i_e]
 
 def tangent_linear(x, dt):
   # x      <- np.array(DIMM)       : state vector at the beginning

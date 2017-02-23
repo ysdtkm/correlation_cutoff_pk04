@@ -30,6 +30,9 @@ EXPLIST = [ \
   {"name":"tdvar_strong_int25", "inf":1.0, "aint":25, \
         "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], \
         "nmem":1, "method":"3dvar", "couple":"strong"}, \
+  {"name":"fdvar_weak_int25", "inf":1.0, "aint":25, \
+        "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], \
+        "nmem":1, "method":"4dvar", "couple":"weak"}, \
   {"name":"fdvar_strong_int25", "inf":1.0, "aint":25, \
         "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], \
         "nmem":1, "method":"4dvar", "couple":"strong"} \
