@@ -130,17 +130,18 @@ def exec_assim_cycle(exp, all_fcst, all_obs):
   return all_fcst
 
 def analyze_one_window(fcst, fcst_pre, obs, h, r, exp, i_s=0, i_e=DIMM):
-  # fcst     <- np.array[nmem, DIMM]
-  # fcst_pre <- np.array[nmem, DIMM]
+  ### here, (dimc = i_e - i_s) unless strongly coupled
+  # fcst     <- np.array[nmem, dimc]
+  # fcst_pre <- np.array[nmem, dimc]
   # obs      <- np.array[DIMO]
-  # h        <- np.array[DIMO, DIMM]
+  # h        <- np.array[DIMO, dimc]
   # r        <- np.array[DIMO, DIMO]
   # exp      <- hash
   # i_s      <- int                  : model grid number, assimilate only [i_s, i_e)
   # i_e      <- int
-  # return1  -> np.array[nmem, DIMM]
-  # return2  -> np.array[DIMM, DIMM]
-  # return3  -> np.array[DIMM, DIMM]
+  # return1  -> np.array[nmem, dimc]
+  # return2  -> np.array[dimc, dimc]
+  # return3  -> np.array[dimc, dimc]
 
   anl = np.empty((exp["nmem"], i_e-i_s))
   bf = np.empty((i_e-i_s, i_e-i_s))

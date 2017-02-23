@@ -16,7 +16,6 @@ FCST_LT = 5
 OERR = math.sqrt(5.0)
 FERR_INI = 10.0
 
-# name, inf, aint, diag(h), nmem, method
 EXPLIST = [ \
   {"name":"etkf_non_int25",  "inf":1.2, "aint":25, \
         "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], "nmem":4, \

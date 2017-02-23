@@ -46,6 +46,7 @@ def plot_lv_time(hist_lv):
   ax1.legend()
   plt.savefig("./image/true/lv.png")
   plt.clf()
+  plt.close()
 
 def plot_trajectory_lv(hist_true, hist_lv):
   for i_component in range(DIMM//3):
@@ -127,6 +128,7 @@ def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
     plt.title("[%s %s] RMSE:%6g Spread:%6g" % (name, name_component, rmse, sprd))
     plt.savefig("./image/%s/%s_%s_%s.png" % (name, name, name_component, "time"))
     plt.clf()
+    plt.close()
   return 0
 
 def plot_time_value(hist_true, hist_fcst, hist_obs, name, nmem):
@@ -162,6 +164,7 @@ def plot_time_value(hist_true, hist_fcst, hist_obs, name, nmem):
     plt.xlabel("timestep")
     plt.savefig("./image/%s/%s_%s_%s.png" % (name, name, name_component, "val"))
     plt.clf()
+    plt.close()
   return 0
 
 def plot_3d_trajectory(hist_true, hist_fcst, name, nmem):

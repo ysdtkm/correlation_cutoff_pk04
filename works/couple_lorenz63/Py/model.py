@@ -4,9 +4,11 @@ import numpy as np
 from const import *
 
 def timestep(x, dt, i_s=0, i_e=DIMM):
-  # x      <- np.array(DIMM)
+  # x      <- np.array(dimm)
   # dt     <- float
-  # return -> np.array(DIMM)
+  # i_s    <- int
+  # i_e    <- int
+  # return -> np.array(dimm)
 
   x0 = np.copy(x)
   k1 = tendency(x0, i_s, i_e)
@@ -19,9 +21,12 @@ def timestep(x, dt, i_s=0, i_e=DIMM):
   return x0 + (k1 + 2.0 * k2 + 2.0 * k3 + k4) * dt / 6.0
 
 def tendency(x_in, i_s=0, i_e=DIMM):
+  ### here, (dimm = i_e - i_s <= DIMM) unless strongly coupled
   # a31p63-64
-  # x      <- np.array(DIMM)
-  # return -> np.array(DIMM)
+  # x      <- np.array(dimm)
+  # i_s    <- int
+  # i_e    <- int
+  # return -> np.array(dimm)
 
   if (DIMM == 3):
     sigma = 10.0
@@ -50,7 +55,7 @@ def tendency(x_in, i_s=0, i_e=DIMM):
     k2    = -11.0
 
     # for non-coupled
-    x = np.zeros((DIMM)) # ttk: change it to the climatology
+    x = np.zeros((DIMM)) # todo: uncoupled component is climatology
     x[i_s:i_e] = x_in[:]
 
     dx = np.empty((DIMM))
