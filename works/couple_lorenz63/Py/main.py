@@ -27,36 +27,38 @@ def exec_nature():
 
   all_true = np.empty((STEPS, DIMM))
   true = np.random.normal(0.0, FERR_INI, DIMM)
-
   eps = 1.0e-9
+
+  # forward integration i-1 -> i
   all_blv = np.empty((STEPS, DIMM, DIMM))
   blv = np.random.normal(0.0, eps, (DIMM, DIMM))
   blv, ble = orth_norm_vectors(blv, eps)
   all_ble = np.zeros((STEPS, DIMM))
-
-  for i in range(0, STEPS): # window i-1 -> i
+  for i in range(0, STEPS):
     true[:] = timestep(true[:], DT)
     all_true[i,:] = true[:]
-
     m = finite_time_tangent_using_nonlinear(true, DT, 1)
     blv = np.dot(m, blv)
     if (i % 10 == 0):
       blv, ble = orth_norm_vectors(blv, eps)
-      all_ble[i,:] = ble[:]
+      all_ble[i,:] = ble[:] / DT
     all_blv[i,:,:] = blv[:,:]
 
+  # backward integration i-1 <- i
   all_flv = np.empty((STEPS, DIMM, DIMM))
   flv = np.random.normal(0.0, eps, (DIMM, DIMM))
   flv, fle = orth_norm_vectors(flv, eps)
   all_fle = np.zeros((STEPS, DIMM))
-  for i in range(STEPS, 0, -1): # window i-1 <- i
+  for i in range(STEPS, 0, -1):
     true[:] = all_true[i-1,:]
     m = finite_time_tangent_using_nonlinear(true, DT, 1)
     flv = np.dot(m.T, flv)
     if (i % 10 == 0):
       flv, fle = orth_norm_vectors(flv, eps)
-      all_fle[i-1,:] = fle[:]
+      all_fle[i-1,:] = fle[:] / DT
     all_flv[i-1,:,:] = flv[:,:]
+
+  # todo: calculate LLVs
 
   all_true.tofile("data/true.bin")
   all_blv.tofile("data/blv.bin")
