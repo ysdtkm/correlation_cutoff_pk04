@@ -3,11 +3,11 @@
 import math
 import numpy as np
 
-DIMM = 9    # dimension of model variable n
+DIMM = 3    # dimension of model variable n
 DIMO = DIMM # dimension of observation variable m
 
 DT = 0.01
-TMAX = 200
+TMAX = 2
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 VRFS = int(STEPS * 0.25) # verification period: [VRFS,STEPS)
@@ -45,6 +45,7 @@ EXPLIST = [ \
         "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], \
         "nmem":1, "method":"4dvar", "couple":"strong"} \
 ]
+EXPLIST=[]
 
 def getr():
   r = np.identity(DIMO) * (OERR * OERR)

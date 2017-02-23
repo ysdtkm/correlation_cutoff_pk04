@@ -9,12 +9,16 @@ from const import *
 def plot_all():
   hist_true = np.fromfile("data/true.bin", np.float64)
   hist_true = hist_true.reshape((STEPS, DIMM))
-  hist_lv = np.fromfile("data/lv.bin", np.float64)
-  hist_lv = hist_lv.reshape((STEPS, DIMM, DIMM))
+  hist_blv = np.fromfile("data/blv.bin", np.float64)
+  hist_blv = hist_blv.reshape((STEPS, DIMM, DIMM))
+  hist_flv = np.fromfile("data/flv.bin", np.float64)
+  hist_flv = hist_flv.reshape((STEPS, DIMM, DIMM))
 
   os.system("mkdir -p image/true")
-  plot_lv_time(hist_lv)
-  # plot_trajectory_lv(hist_true, hist_lv)
+  plot_lv_time(hist_blv, "backward")
+  plot_lv_time(hist_flv, "forward")
+  plot_trajectory_lv(hist_true, hist_blv, "backward")
+  plot_trajectory_lv(hist_true, hist_flv, "forward")
 
   for exp in EXPLIST:
     name = exp["name"]
@@ -35,7 +39,7 @@ def plot_all():
         hist_covar = hist_covar.reshape((STEPS, DIMM, DIMM))
         plot_covariance_matr(hist_covar, name, sel)
 
-def plot_lv_time(hist_lv):
+def plot_lv_time(hist_lv, name):
   plt.rcParams["font.size"] = 12
   fig, ax1 = plt.subplots(1)
   ax1.set_title("lv1_1")
@@ -44,11 +48,11 @@ def plot_lv_time(hist_lv):
   ax1.plot(hist_lv[:,2,0], label="3")
   ax1.set_ylabel("value")
   ax1.legend()
-  plt.savefig("./image/true/lv.png")
+  plt.savefig("./image/true/lv_%s.png" % name)
   plt.clf()
   plt.close()
 
-def plot_trajectory_lv(hist_true, hist_lv):
+def plot_trajectory_lv(hist_true, hist_lv, name):
   for i_component in range(DIMM//3):
     i_adjust = i_component * 3
     name_component = ["extro", "trop", "ocn"][i_component]
@@ -81,11 +85,11 @@ def plot_trajectory_lv(hist_true, hist_lv):
                     hist_true[it,2+i_component], hist_lv[it,k,0+i_component], \
                     hist_lv[it,k,1+i_component], hist_lv[it,k,2+i_component]]
           ax.quiver(*vector, length=5.0, pivot="tail", color=colors[k])
-      plt.savefig("./image/true/tmp_%s_%s_traj_%04d.png" % ("lv", name_component, it))
+      plt.savefig("./image/true/tmp_%s_%s_traj_%04d.png" % (name, name_component, it))
       plt.close()
 
     os.system("convert -delay 5 -loop 0 ./image/true/tmp_*.png \
-      ./image/true/%s_%s_traj.gif" % ("lv", name_component))
+      ./image/true/%s_lv_%s_traj.gif" % (name, name_component))
     os.system("rm -f image/true/tmp_*.png")
   return 0
 

@@ -21,32 +21,53 @@ def exec_nature():
   # return   -> np.array[STEPS, DIMM]
   # file1    -> np.array[STEPS, DIMM]       : nature
   # file2    -> np.array[STEPS, DIMM, DIMM] : backward LVs
-  # file3    -> np.array[STEPS, DIMM]       : LEs
+  # file3    -> np.array[STEPS, DIMM]       : BLEs
+  # file4    -> np.array[STEPS, DIMM, DIMM] : forward LVs
+  # file5    -> np.array[STEPS, DIMM]       : FLEs
 
   all_true = np.empty((STEPS, DIMM))
   true = np.random.normal(0.0, FERR_INI, DIMM)
 
   eps = 1.0e-9
-  all_lv = np.empty((STEPS, DIMM, DIMM))
-  lv = np.random.normal(0.0, eps, (DIMM, DIMM))
-  lv, le = orth_norm_vectors(lv, eps)
-  all_le = np.zeros((STEPS, DIMM))
+  all_blv = np.empty((STEPS, DIMM, DIMM))
+  blv = np.random.normal(0.0, eps, (DIMM, DIMM))
+  blv, ble = orth_norm_vectors(blv, eps)
+  all_ble = np.zeros((STEPS, DIMM))
 
-  for i in range(0, STEPS):
+  for i in range(0, STEPS): # window i-1 -> i
     true[:] = timestep(true[:], DT)
     all_true[i,:] = true[:]
 
     m = finite_time_tangent_using_nonlinear(true, DT, 1)
-    lv = np.dot(m, lv)
+    blv = np.dot(m, blv)
     if (i % 10 == 0):
-      lv, le = orth_norm_vectors(lv, eps)
-      all_le[i,:] = le[:]
-    all_lv[i,:,:] = lv[:,:]
+      blv, ble = orth_norm_vectors(blv, eps)
+      all_ble[i,:] = ble[:]
+    all_blv[i,:,:] = blv[:,:]
+
+  all_flv = np.empty((STEPS, DIMM, DIMM))
+  flv = np.random.normal(0.0, eps, (DIMM, DIMM))
+  flv, fle = orth_norm_vectors(flv, eps)
+  all_fle = np.zeros((STEPS, DIMM))
+  for i in range(STEPS, 0, -1): # window i-1 <- i
+    true[:] = all_true[i-1,:]
+    m = finite_time_tangent_using_nonlinear(true, DT, 1)
+    flv = np.dot(m.T, flv)
+    if (i % 10 == 0):
+      flv, fle = orth_norm_vectors(flv, eps)
+      all_fle[i-1,:] = fle[:]
+    all_flv[i-1,:,:] = flv[:,:]
 
   all_true.tofile("data/true.bin")
-  all_lv.tofile("data/lv.bin")
-  all_le.tofile("data/le.bin")
-  # print(np.mean(all_le[STEPS//2:,:], axis=0))
+  all_blv.tofile("data/blv.bin")
+  all_ble.tofile("data/ble.bin")
+  all_flv.tofile("data/flv.bin")
+  all_fle.tofile("data/fle.bin")
+
+  print("backward LEs:")
+  print(np.mean(all_ble[STEPS//2:,:], axis=0))
+  print("forward LEs:")
+  print(np.mean(all_fle[STEPS//2:,:], axis=0))
   return all_true
 
 def exec_obs(nature):
