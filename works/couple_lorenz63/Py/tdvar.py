@@ -4,17 +4,17 @@ import numpy as np
 from scipy.optimize import fmin_bfgs
 from const import *
 
-def tdvar(fcst, h, r, yo):
+def tdvar(fcst, h, r, yo, i_s, i_e):
   # fcst   <- np.array[DIMM]        : first guess
   # h      <- np.array[DIMO, DIMM]  : observation operator
   # r      <- np.array[DIMO, DIMO]  : observation error covariance
   # yo     <- np.array[DIMO, 1]     : observation
   # return -> np.array[DIMM]        : assimilated field
   anl = np.copy(fcst)
-  anl = fmin_bfgs(tdvar_2j, anl, args=(fcst, h, r, yo))
+  anl = fmin_bfgs(tdvar_2j, anl, args=(fcst, h, r, yo, i_s, i_e))
   return anl.T
 
-def tdvar_2j(anl_nda, fcst_nda, h_nda, r_nda, yo_nda):
+def tdvar_2j(anl_nda, fcst_nda, h_nda, r_nda, yo_nda, i_s, i_e):
   # anl_nda   <- np.array[DIMM]        : temporary analysis field
   # fcst_nda  <- np.array[DIMM]        : first guess field
   # h_nda     <- np.array[DIMO, DIMM]  : observation operator
@@ -25,7 +25,7 @@ def tdvar_2j(anl_nda, fcst_nda, h_nda, r_nda, yo_nda):
   h  = np.asmatrix(h_nda)
   r  = np.asmatrix(r_nda)
   yo = np.asmatrix(yo_nda)
-  b  = np.matrix(1.2 * tdvar_b())
+  b  = np.matrix(1.2 * tdvar_b()[i_s:i_e, i_s:i_e])
 
   anl  = np.asmatrix(anl_nda).T
   fcst = np.asmatrix(fcst_nda).T

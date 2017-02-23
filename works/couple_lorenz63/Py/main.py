@@ -151,14 +151,10 @@ def analyze_one_window(fcst, fcst_pre, obs, h, r, exp, i_s=0, i_e=DIMM):
   yo = np.dot(h[:,:], obs[:, np.newaxis])
 
   if (exp["method"] == "etkf"):
-    print(fcst[:,:])
-    print(h[:,:])
-    print(r[:,:])
-    print(yo[:,:])
     anl[:,:], bf[:,:], ba[:,:] = \
         etkf(fcst[:,:], h[:,:], r[:,:], yo[:,:], exp["inf"], exp["nmem"])
   elif (exp["method"] == "3dvar"):
-    anl[0,:] = tdvar(fcst[0,:].T, h[:,:], r[:,:], yo[:,:])
+    anl[0,:] = tdvar(fcst[0,:].T, h[:,:], r[:,:], yo[:,:], i_s, i_e)
   elif (exp["method"] == "4dvar"):
     anl[0,:] = fdvar(fcst_pre[0,:], h[:,:], r[:,:], yo[:,:], exp["aint"])
 
