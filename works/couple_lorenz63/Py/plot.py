@@ -22,7 +22,7 @@ def plot_all():
   plot_lv_time(hist_clv, "characteristic")
   # plot_trajectory_lv(hist_true, hist_blv, "backward")
   # plot_trajectory_lv(hist_true, hist_flv, "forward")
-  plot_trajectory_lv(hist_true, hist_clv, "characteristic")
+  # plot_trajectory_lv(hist_true, hist_clv, "characteristic")
 
   for exp in EXPLIST:
     name = exp["name"]
@@ -61,9 +61,13 @@ def plot_trajectory_lv(hist_true, hist_lv, name):
     i_adjust = i_component * 3
     name_component = ["extro", "trop", "ocn"][i_component]
 
-    colors = ["#ff0000", "#008000", "#0000ff", \
-              "#ff8080", "#80bb80", "#8080ff", \
-              "#ffbbbb", "#bbddbb", "#bbbbff"]
+    if (DIMM == 9):
+      colors = ["#008000", "#0000ff", "#8080ff", \
+                "#80bb80", "#ff0000", "#ff8080", \
+                "#000080", "#800000", "#004000"]
+    else:
+      colors = ["#ff0000", "#008000", "#0000ff"]
+
     plt.rcParams["font.size"] = 8
 
     for it in range(0, STEPS, 4):
