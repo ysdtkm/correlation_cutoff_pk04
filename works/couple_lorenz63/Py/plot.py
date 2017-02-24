@@ -20,9 +20,9 @@ def plot_all():
   plot_lv_time(hist_blv, "backward")
   plot_lv_time(hist_flv, "forward")
   plot_lv_time(hist_clv, "characteristic")
-  plot_trajectory_lv(hist_true, hist_blv, "backward")
-  plot_trajectory_lv(hist_true, hist_flv, "forward")
-  plot_trajectory_lv(hist_true, hist_clv, "characteristic")
+  # plot_trajectory_lv(hist_true, hist_blv, "backward")
+  # plot_trajectory_lv(hist_true, hist_flv, "forward")
+  # plot_trajectory_lv(hist_true, hist_clv, "characteristic")
 
   for exp in EXPLIST:
     name = exp["name"]

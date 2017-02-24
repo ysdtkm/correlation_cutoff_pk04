@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import os
 import numpy as np
 from const import *
 from model import *
@@ -66,7 +67,7 @@ def exec_nature():
   all_clv = np.empty((STEPS, DIMM, DIMM))
   for i in range(0, STEPS):
     for k in range(0, DIMM):
-      all_clv[i,:,k] = vector_common(all_blv[i,:,:k+1], all_flv[i,:,k:], k)
+      all_clv[i,:,k] = vector_common(all_blv[i,:,:k+1], all_flv[i,:,k:], k, eps)
     # directional continuity
     if (i >= 1):
       m = finite_time_tangent_using_nonlinear(all_true[i-1,:], DT, 1)
@@ -82,10 +83,16 @@ def exec_nature():
   all_fle.tofile("data/fle.bin")
   all_clv.tofile("data/clv.bin")
 
-  print("backward LEs:")
-  print(np.mean(all_ble[STEPS//2:,:], axis=0))
-  print("forward LEs:")
-  print(np.mean(all_fle[STEPS//2:,:], axis=0))
+  f = open("data/lyapunov.txt", "w")
+  f.write("backward LEs:\n")
+  f.write(str_vector(np.mean(all_ble[STEPS//2:,:], axis=0)) + "\n")
+  f.write("forward LEs:\n")
+  f.write(str_vector(np.mean(all_fle[STEPS//2:,:], axis=0)) + "\n")
+  f.write("characteristic LV components:\n")
+  for i in range (DIMM):
+    f.write(str_vector(np.mean(all_clv[STEPS//2:,i,:]**2 / eps**2, axis=0)) + "\n")
+  f.close()
+  os.system("cat data/lyapunov.txt")
   return all_true
 
 def exec_obs(nature):
@@ -213,6 +220,13 @@ def exec_deterministic_fcst(exp, anl):
         fcst_all[i,lt,:] = timestep(fcst_all[i-1,lt,:], DT)
   fcst_all.tofile("data/%s_fcst.bin" % exp["name"])
   return 0
+
+def str_vector(arr):
+  n = len(arr)
+  st = ""
+  for i in range(n):
+    st += "%11g, " % arr[i]
+  return st[:-2]
 
 main()
 
