@@ -36,9 +36,9 @@ def exec_nature():
   blv, ble = orth_norm_vectors(blv, eps)
   all_ble = np.zeros((STEPS, DIMM))
   for i in range(0, STEPS):
+    m = finite_time_tangent_using_nonlinear(true, DT, 1)
     true[:] = timestep(true[:], DT)
     all_true[i,:] = true[:]
-    m = finite_time_tangent_using_nonlinear(true, DT, 1)
     blv = np.dot(m, blv)
     if (i % orth_int == 0):
       # (ble[:] / DT) is (orth_int * actual LEs).
@@ -62,12 +62,18 @@ def exec_nature():
       all_fle[i-1,:] = fle[:] / DT
     all_flv[i-1,:,:] = flv[:,:]
 
-  # calculate LLVs
+  # calculate LLVs i-1 -> i
   all_clv = np.empty((STEPS, DIMM, DIMM))
   for i in range(0, STEPS):
-    all_clv[i,:,0] = all_blv[i,:,0]
-    for k in range(1, DIMM):
-      all_clv[i,:,k] = vector_common(all_blv[i,:,0:k+1], all_flv[i,:,k:DIMM], k)
+    for k in range(0, DIMM):
+      all_clv[i,:,k] = vector_common(all_blv[i,:,:k+1], all_flv[i,:,k:], k)
+    # direction continuity
+    if (i >= 1):
+      m = finite_time_tangent_using_nonlinear(all_true[i-1,:], DT, 1)
+      for k in range(0, DIMM):
+        clv_approx = np.dot(m, all_clv[i-1,:,k,np.newaxis])
+        if (np.dot(clv_approx.flatten(), all_clv[i,:,k]) < 0):
+          all_clv[i,:,k] *= -1
 
   all_true.tofile("data/true.bin")
   all_blv.tofile("data/blv.bin")

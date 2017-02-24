@@ -29,4 +29,14 @@ def vector_common(blv, flv, k):
   # flv     <- np.array[DIMM,DIMM-k+1] : forward Lyapunov vectors (column)
   # k       <- int                     : [1,DIMM)
   # return  -> np.array[DIMM]          : k+1 th characteristic Lyapunov vectors
-  return blv[:,k]
+  ab = np.empty((DIMM,DIMM+1))
+  ab[:,:k+1] = blv[:,:]
+  ab[:,k+1:] = - flv[:,:]
+  coefs = nullspace(ab)
+  clv = np.dot(ab[:,:k+1], coefs[:k+1,np.newaxis])
+  return clv[:,0]
+
+def nullspace(a):
+  # refer to 658Ep19
+  u, s, vh = np.linalg.svd(a)
+  return vh.T[:,-1]
