@@ -22,7 +22,7 @@ def plot_all():
   plot_lv_time(hist_clv, "characteristic")
   # plot_trajectory_lv(hist_true, hist_blv, "backward")
   # plot_trajectory_lv(hist_true, hist_flv, "forward")
-  # plot_trajectory_lv(hist_true, hist_clv, "characteristic")
+  plot_trajectory_lv(hist_true, hist_clv, "characteristic")
 
   for exp in EXPLIST:
     name = exp["name"]
@@ -61,7 +61,9 @@ def plot_trajectory_lv(hist_true, hist_lv, name):
     i_adjust = i_component * 3
     name_component = ["extro", "trop", "ocn"][i_component]
 
-    colors = ["red", "green", "black"]
+    colors = ["#ff0000", "#008000", "#0000ff", \
+              "#ff8080", "#80bb80", "#8080ff", \
+              "#ffbbbb", "#bbddbb", "#bbbbff"]
     plt.rcParams["font.size"] = 8
 
     for it in range(0, STEPS, 4):
@@ -85,10 +87,11 @@ def plot_trajectory_lv(hist_true, hist_lv, name):
         ax.plot(hist_true[itmin:it+1,0+i_adjust], hist_true[itmin:it+1,1+i_adjust], \
                 hist_true[itmin:it+1,2+i_adjust])
         for k in range(DIMM): # LE index
-          vector = [hist_true[it,0+i_component], hist_true[it,1+i_component], \
-                    hist_true[it,2+i_component], hist_lv[it,k,0+i_component], \
-                    hist_lv[it,k,1+i_component], hist_lv[it,k,2+i_component]]
-          ax.quiver(*vector, length=10.0, pivot="tail", color=colors[k])
+          vector = [hist_true[it,0+i_adjust], hist_true[it,1+i_adjust], \
+                    hist_true[it,2+i_adjust], hist_lv[it,k,0+i_adjust], \
+                    hist_lv[it,k,1+i_adjust], hist_lv[it,k,2+i_adjust]]
+          vec_len = np.sqrt(np.sum(hist_lv[it,k,0+i_adjust:3+i_adjust]**2))
+          ax.quiver(*vector, length=(10.0/1.0e-9*vec_len), pivot="tail", color=colors[k])
       plt.savefig("./image/true/tmp_%s_%s_traj_%04d.png" % (name, name_component, it))
       plt.close()
 

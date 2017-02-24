@@ -72,8 +72,8 @@ def exec_nature():
     if (i >= 1):
       m = finite_time_tangent_using_nonlinear(all_true[i-1,:], DT, 1)
       for k in range(0, DIMM):
-        clv_approx = np.dot(m, all_clv[i-1,:,k,np.newaxis])
-        if (np.dot(clv_approx.flatten(), all_clv[i,:,k]) < 0):
+        clv_approx = np.dot(m, all_clv[i-1,:,k,np.newaxis]).flatten()
+        if (np.dot(clv_approx, all_clv[i,:,k]) < 0):
           all_clv[i,:,k] *= -1
 
   all_true.tofile("data/true.bin")
