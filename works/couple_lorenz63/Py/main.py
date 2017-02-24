@@ -88,7 +88,7 @@ def exec_nature():
   f.write(str_vector(np.mean(all_ble[STEPS//2:,:], axis=0)) + "\n")
   f.write("forward LEs:\n")
   f.write(str_vector(np.mean(all_fle[STEPS//2:,:], axis=0)) + "\n")
-  f.write("characteristic LV components:\n")
+  f.write("CLV RMS (column: LVs, row: model grid):\n")
   for i in range (DIMM):
     f.write(str_vector(np.mean(all_clv[STEPS//2:,i,:]**2 / eps**2, axis=0)) + "\n")
   f.close()
