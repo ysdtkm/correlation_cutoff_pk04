@@ -88,7 +88,7 @@ def plot_trajectory_lv(hist_true, hist_lv, name):
           vector = [hist_true[it,0+i_component], hist_true[it,1+i_component], \
                     hist_true[it,2+i_component], hist_lv[it,k,0+i_component], \
                     hist_lv[it,k,1+i_component], hist_lv[it,k,2+i_component]]
-          ax.quiver(*vector, length=5.0, pivot="tail", color=colors[k])
+          ax.quiver(*vector, length=10.0, pivot="tail", color=colors[k])
       plt.savefig("./image/true/tmp_%s_%s_traj_%04d.png" % (name, name_component, it))
       plt.close()
 
