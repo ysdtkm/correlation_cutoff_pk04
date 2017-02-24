@@ -22,7 +22,7 @@ cmd_calc = rm -rf data; mkdir -p data; $(time) python Py/main.py
 src_plot = Py/plot.py Py/const.py
 dep_plot = calc
 out_plot = image/*
-cmd_plot = rm -rf image; mkdir -p image; $(time) python Py/plot.py; cp -f ~/repos/any/quick_viewer.html image/
+cmd_plot = rm -rf image; mkdir -p image; $(time) python Py/plot.py
 
 # ===============================================
 # end of settings

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import os
 import numpy as np
 from const import *
 from model import *
@@ -21,32 +22,77 @@ def exec_nature():
   # return   -> np.array[STEPS, DIMM]
   # file1    -> np.array[STEPS, DIMM]       : nature
   # file2    -> np.array[STEPS, DIMM, DIMM] : backward LVs
-  # file3    -> np.array[STEPS, DIMM]       : LEs
+  # file3    -> np.array[STEPS, DIMM]       : BLEs
+  # file4    -> np.array[STEPS, DIMM, DIMM] : forward LVs
+  # file5    -> np.array[STEPS, DIMM]       : FLEs
 
   all_true = np.empty((STEPS, DIMM))
   true = np.random.normal(0.0, FERR_INI, DIMM)
-
   eps = 1.0e-9
-  all_lv = np.empty((STEPS, DIMM, DIMM))
-  lv = np.random.normal(0.0, eps, (DIMM, DIMM))
-  lv, le = orth_norm_vectors(lv, eps)
-  all_le = np.zeros((STEPS, DIMM))
+  orth_int = 1
 
+  # forward integration i-1 -> i
+  all_blv = np.empty((STEPS, DIMM, DIMM))
+  blv = np.random.normal(0.0, eps, (DIMM, DIMM))
+  blv, ble = orth_norm_vectors(blv, eps)
+  all_ble = np.zeros((STEPS, DIMM))
   for i in range(0, STEPS):
+    m = finite_time_tangent_using_nonlinear(true, DT, 1)
     true[:] = timestep(true[:], DT)
     all_true[i,:] = true[:]
+    blv = np.dot(m, blv)
+    if (i % orth_int == 0):
+      # (ble[:] / DT) is (orth_int * actual LEs).
+      # For window without orthonormalization, LEs are zero.
+      # Thus long-term mean wil be actual LEs.
+      blv, ble = orth_norm_vectors(blv, eps)
+      all_ble[i,:] = ble[:] / DT
+    all_blv[i,:,:] = blv[:,:]
 
+  # backward integration i-1 <- i
+  all_flv = np.empty((STEPS, DIMM, DIMM))
+  flv = np.random.normal(0.0, eps, (DIMM, DIMM))
+  flv, fle = orth_norm_vectors(flv, eps)
+  all_fle = np.zeros((STEPS, DIMM))
+  for i in range(STEPS, 0, -1):
+    true[:] = all_true[i-1,:]
     m = finite_time_tangent_using_nonlinear(true, DT, 1)
-    lv = np.dot(m, lv)
-    if (i % 10 == 0):
-      lv, le = orth_norm_vectors(lv, eps)
-      all_le[i,:] = le[:]
-    all_lv[i,:,:] = lv[:,:]
+    flv = np.dot(m.T, flv)
+    if (i % orth_int == 0):
+      flv, fle = orth_norm_vectors(flv, eps)
+      all_fle[i-1,:] = fle[:] / DT
+    all_flv[i-1,:,:] = flv[:,:]
+
+  # calculate LLVs i-1 -> i
+  all_clv = np.empty((STEPS, DIMM, DIMM))
+  for i in range(0, STEPS):
+    for k in range(0, DIMM):
+      all_clv[i,:,k] = vector_common(all_blv[i,:,:k+1], all_flv[i,:,k:], k, eps)
+    # directional continuity
+    if (i >= 1):
+      m = finite_time_tangent_using_nonlinear(all_true[i-1,:], DT, 1)
+      for k in range(0, DIMM):
+        clv_approx = np.dot(m, all_clv[i-1,:,k,np.newaxis]).flatten()
+        if (np.dot(clv_approx, all_clv[i,:,k]) < 0):
+          all_clv[i,:,k] *= -1
 
   all_true.tofile("data/true.bin")
-  all_lv.tofile("data/lv.bin")
-  all_le.tofile("data/le.bin")
-  # print(np.mean(all_le[STEPS//2:,:], axis=0))
+  all_blv.tofile("data/blv.bin")
+  all_ble.tofile("data/ble.bin")
+  all_flv.tofile("data/flv.bin")
+  all_fle.tofile("data/fle.bin")
+  all_clv.tofile("data/clv.bin")
+
+  f = open("data/lyapunov.txt", "w")
+  f.write("backward LEs:\n")
+  f.write(str_vector(np.mean(all_ble[STEPS//2:,:], axis=0)) + "\n")
+  f.write("forward LEs:\n")
+  f.write(str_vector(np.mean(all_fle[STEPS//2:,:], axis=0)) + "\n")
+  f.write("CLV RMS (column: LVs, row: model grid):\n")
+  for i in range (DIMM):
+    f.write(str_vector(np.mean(all_clv[STEPS//2:,i,:]**2 / eps**2, axis=0)) + "\n")
+  f.close()
+  os.system("cat data/lyapunov.txt")
   return all_true
 
 def exec_obs(nature):
@@ -91,19 +137,34 @@ def exec_assim_cycle(exp, all_fcst, all_obs):
   # forecast-analysis cycle
   for i in range(STEP_FREE, STEPS):
 
-    # if (DIMM == 3 or exp["couple"] == "strong"):
-    # elif (exp["couple"] == "weak"):
-    # elif (exp["couple"] == "none"):
-
     for m in range(0, exp["nmem"]):
-      fcst[m,:] = timestep(all_fcst[i-1,m,:], DT)
+      if (exp["couple"] == "strong" or exp["couple"] == "weak"):
+        fcst[m,:] = timestep(all_fcst[i-1,m,:], DT)
+      elif (exp["couple"] == "none"):
+        fcst[m,0:6] = timestep(all_fcst[i-1,m,0:6], DT, 0, 6)
+        fcst[m,6:9] = timestep(all_fcst[i-1,m,6:9], DT, 6, 9)
 
     if (i % exp["aint"] == 0):
       obs_used[i,:] = all_obs[i,:]
       fcst_pre = all_fcst[i-exp["aint"],:,:]
 
-      fcst[:,:], all_bf[i,:,:], all_ba[i,:,:] = \
-        analyze_one_window(fcst, fcst_pre, all_obs[i,:], h, r, exp)
+      if (exp["couple"] == "strong"):
+        fcst[:,:], all_bf[i,:,:], all_ba[i,:,:] = \
+          analyze_one_window(fcst, fcst_pre, all_obs[i,:], h, r, exp)
+      elif (exp["couple"] == "weak" or exp["couple"] == "none"):
+        dim_atm = 6
+        # atmospheric assimilation
+        fcst[:, :dim_atm], \
+          all_bf[i, :dim_atm, :dim_atm], \
+          all_ba[i, :dim_atm, :dim_atm]  \
+          = analyze_one_window(fcst[:, :dim_atm], fcst_pre[:, :dim_atm], \
+            all_obs[i, :dim_atm], h[:dim_atm, :dim_atm], r[:dim_atm, :dim_atm], exp, 0, 6)
+        # oceanic assimilation
+        fcst[:, dim_atm:], \
+          all_bf[i, dim_atm:, dim_atm:], \
+          all_ba[i, dim_atm:, dim_atm:]  \
+          = analyze_one_window(fcst[:, dim_atm:], fcst_pre[:, dim_atm:], \
+            all_obs[i, dim_atm:], h[dim_atm:, dim_atm:], r[dim_atm:, dim_atm:], exp, 6, 9)
 
     all_fcst[i,:,:] = fcst[:,:]
 
@@ -114,34 +175,37 @@ def exec_assim_cycle(exp, all_fcst, all_obs):
   all_ba.tofile("data/%s_covr_anl.bin" % exp["name"])
   return all_fcst
 
-def analyze_one_window(fcst, fcst_pre, obs, h, r, exp):
-  # fcst     <- np.array[nmem, DIMM]
-  # fcst_pre <- np.array[nmem, DIMM]
+def analyze_one_window(fcst, fcst_pre, obs, h, r, exp, i_s=0, i_e=DIMM):
+  ### here, (dimc = i_e - i_s) unless strongly coupled
+  # fcst     <- np.array[nmem, dimc]
+  # fcst_pre <- np.array[nmem, dimc]
   # obs      <- np.array[DIMO]
-  # h        <- np.array[DIMO, DIMM]
+  # h        <- np.array[DIMO, dimc]
   # r        <- np.array[DIMO, DIMO]
   # exp      <- hash
-  # return1  -> np.array[nmem, DIMM]
-  # return2  -> np.array[DIMM, DIMM]
-  # return3  -> np.array[DIMM, DIMM]
+  # i_s      <- int                  : model grid number, assimilate only [i_s, i_e)
+  # i_e      <- int
+  # return1  -> np.array[nmem, dimc]
+  # return2  -> np.array[dimc, dimc]
+  # return3  -> np.array[dimc, dimc]
 
-  anl = np.empty((exp["nmem"], DIMM))
-  bf = np.empty((DIMM, DIMM))
+  anl = np.empty((exp["nmem"], i_e-i_s))
+  bf = np.empty((i_e-i_s, i_e-i_s))
   bf[:,:] = np.nan
-  ba = np.empty((DIMM, DIMM))
+  ba = np.empty((i_e-i_s, i_e-i_s))
   ba[:,:] = np.nan
 
-  yo = np.dot(h, obs[:,np.newaxis])
+  yo = np.dot(h[:,:], obs[:, np.newaxis])
 
   if (exp["method"] == "etkf"):
     anl[:,:], bf[:,:], ba[:,:] = \
         etkf(fcst[:,:], h[:,:], r[:,:], yo[:,:], exp["inf"], exp["nmem"])
   elif (exp["method"] == "3dvar"):
-    anl[0,:] = tdvar(fcst[0,:].T, h[:,:], r[:,:], yo[:,:])
+    anl[0,:] = tdvar(fcst[0,:].T, h[:,:], r[:,:], yo[:,:], i_s, i_e)
   elif (exp["method"] == "4dvar"):
-    anl[0,:] = fdvar(fcst_pre[0,:], h[:,:], r[:,:], yo[:,:], exp["aint"])
+    anl[0,:] = fdvar(fcst_pre[0,:], h[:,:], r[:,:], yo[:,:], exp["aint"], i_s, i_e)
 
-  return anl, bf, ba
+  return anl[:,:], bf[:,:], ba[:,:]
 
 def exec_deterministic_fcst(exp, anl):
   # exp    <- hash
@@ -156,6 +220,13 @@ def exec_deterministic_fcst(exp, anl):
         fcst_all[i,lt,:] = timestep(fcst_all[i-1,lt,:], DT)
   fcst_all.tofile("data/%s_fcst.bin" % exp["name"])
   return 0
+
+def str_vector(arr):
+  n = len(arr)
+  st = ""
+  for i in range(n):
+    st += "%11g, " % arr[i]
+  return st[:-2]
 
 main()
 

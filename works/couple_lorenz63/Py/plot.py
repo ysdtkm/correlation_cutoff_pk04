@@ -2,22 +2,32 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-import os
+import os, warnings
 from mpl_toolkits.mplot3d import Axes3D
 from const import *
 
 def plot_all():
   hist_true = np.fromfile("data/true.bin", np.float64)
   hist_true = hist_true.reshape((STEPS, DIMM))
-  hist_lv = np.fromfile("data/lv.bin", np.float64)
-  hist_lv = hist_lv.reshape((STEPS, DIMM, DIMM))
+  hist_blv = np.fromfile("data/blv.bin", np.float64)
+  hist_blv = hist_blv.reshape((STEPS, DIMM, DIMM))
+  hist_flv = np.fromfile("data/flv.bin", np.float64)
+  hist_flv = hist_flv.reshape((STEPS, DIMM, DIMM))
+  hist_clv = np.fromfile("data/clv.bin", np.float64)
+  hist_clv = hist_clv.reshape((STEPS, DIMM, DIMM))
 
-  plot_lv_time(hist_lv)
-  # plot_trajectory_lv(hist_true, hist_lv)
+  os.system("mkdir -p image/true")
+  plot_lv_time(hist_blv, "backward")
+  plot_lv_time(hist_flv, "forward")
+  plot_lv_time(hist_clv, "characteristic")
+  # plot_trajectory_lv(hist_true, hist_blv, "backward")
+  # plot_trajectory_lv(hist_true, hist_flv, "forward")
+  # plot_trajectory_lv(hist_true, hist_clv, "characteristic")
 
   for exp in EXPLIST:
     name = exp["name"]
     nmem = exp["nmem"]
+    os.system("mkdir -p image/%s" % name)
 
     hist_fcst = np.fromfile("data/%s_cycle.bin" % name, np.float64)
     hist_fcst = hist_fcst.reshape((STEPS, nmem, DIMM))
@@ -33,7 +43,7 @@ def plot_all():
         hist_covar = hist_covar.reshape((STEPS, DIMM, DIMM))
         plot_covariance_matr(hist_covar, name, sel)
 
-def plot_lv_time(hist_lv):
+def plot_lv_time(hist_lv, name):
   plt.rcParams["font.size"] = 12
   fig, ax1 = plt.subplots(1)
   ax1.set_title("lv1_1")
@@ -42,15 +52,22 @@ def plot_lv_time(hist_lv):
   ax1.plot(hist_lv[:,2,0], label="3")
   ax1.set_ylabel("value")
   ax1.legend()
-  plt.savefig("./image/lv.png")
+  plt.savefig("./image/true/lv_%s.png" % name)
   plt.clf()
+  plt.close()
 
-def plot_trajectory_lv(hist_true, hist_lv):
+def plot_trajectory_lv(hist_true, hist_lv, name):
   for i_component in range(DIMM//3):
     i_adjust = i_component * 3
     name_component = ["extro", "trop", "ocn"][i_component]
 
-    colors = ["red", "green", "black"]
+    if (DIMM == 9):
+      colors = ["#008000", "#0000ff", "#8080ff", \
+                "#80bb80", "#ff0000", "#ff8080", \
+                "#000080", "#800000", "#004000"]
+    else:
+      colors = ["#ff0000", "#008000", "#0000ff"]
+
     plt.rcParams["font.size"] = 8
 
     for it in range(0, STEPS, 4):
@@ -74,16 +91,17 @@ def plot_trajectory_lv(hist_true, hist_lv):
         ax.plot(hist_true[itmin:it+1,0+i_adjust], hist_true[itmin:it+1,1+i_adjust], \
                 hist_true[itmin:it+1,2+i_adjust])
         for k in range(DIMM): # LE index
-          vector = [hist_true[it,0+i_component], hist_true[it,1+i_component], \
-                    hist_true[it,2+i_component], hist_lv[it,k,0+i_component], \
-                    hist_lv[it,k,1+i_component], hist_lv[it,k,2+i_component]]
-          ax.quiver(*vector, length=5.0, pivot="tail", color=colors[k])
-      plt.savefig("./image/tmp_%s_%s_traj_%04d.png" % ("lv", name_component, it))
+          vector = [hist_true[it,0+i_adjust], hist_true[it,1+i_adjust], \
+                    hist_true[it,2+i_adjust], hist_lv[it,k,0+i_adjust], \
+                    hist_lv[it,k,1+i_adjust], hist_lv[it,k,2+i_adjust]]
+          vec_len = np.sqrt(np.sum(hist_lv[it,k,0+i_adjust:3+i_adjust]**2))
+          ax.quiver(*vector, length=(10.0/1.0e-9*vec_len), pivot="tail", color=colors[k])
+      plt.savefig("./image/true/tmp_%s_%s_traj_%04d.png" % (name, name_component, it))
       plt.close()
 
-    os.system("convert -delay 5 -loop 0 ./image/tmp_*.png \
-      ./image/%s_%s_traj.gif" % ("lv", name_component))
-    os.system("rm -f image/tmp_*.png")
+    os.system("convert -delay 5 -loop 0 ./image/true/tmp_*.png \
+      ./image/true/%s_lv_%s_traj.gif" % (name, name_component))
+    os.system("rm -f image/true/tmp_*.png")
   return 0
 
 def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
@@ -123,8 +141,9 @@ def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
     plt.legend()
     plt.xlabel("timestep")
     plt.title("[%s %s] RMSE:%6g Spread:%6g" % (name, name_component, rmse, sprd))
-    plt.savefig("./image/%s_%s_%s.png" % (name, name_component, "time"))
+    plt.savefig("./image/%s/%s_%s_%s.png" % (name, name, name_component, "time"))
     plt.clf()
+    plt.close()
   return 0
 
 def plot_time_value(hist_true, hist_fcst, hist_obs, name, nmem):
@@ -158,8 +177,9 @@ def plot_time_value(hist_true, hist_fcst, hist_obs, name, nmem):
       ax3.plot(hist_obs[:,2+i_adjust], label="obs", linestyle='None', marker=".")
     ax3.set_ylabel("z")
     plt.xlabel("timestep")
-    plt.savefig("./image/%s_%s_%s.png" % (name, name_component, "val"))
+    plt.savefig("./image/%s/%s_%s_%s.png" % (name, name, name_component, "val"))
     plt.clf()
+    plt.close()
   return 0
 
 def plot_3d_trajectory(hist_true, hist_fcst, name, nmem):
@@ -189,7 +209,7 @@ def plot_3d_trajectory(hist_true, hist_fcst, name, nmem):
     ax.set_xlabel("x")
     ax.set_ylabel("y")
     ax.set_zlabel("z")
-    plt.savefig("./image/%s_%s_traj.png" % (name, name_component))
+    plt.savefig("./image/%s/%s_%s_traj.png" % (name, name, name_component))
     plt.clf()
     plt.close()
   return 0
@@ -197,13 +217,17 @@ def plot_3d_trajectory(hist_true, hist_fcst, name, nmem):
 def plot_covariance_matr(hist_covar, name, sel):
   # name <- string
 
-  rms_covar  = np.sqrt(np.nanmean(hist_covar[STEPS//2:STEPS,:,:]**2, axis=0))
-  mean_covar = np.nanmean(hist_covar, axis=0)
-  plot_matrix(rms_covar , "%s_covar_rms_%s"  % (sel, name))
-  plot_matrix(np.log(rms_covar) , "%s_covar_logrms_%s"  % (sel, name), plt.cm.Reds)
-  plot_matrix(mean_covar, "%s_covar_mean_%s" % (sel, name))
+  with warnings.catch_warnings():
+    warnings.simplefilter("ignore", category=RuntimeWarning)
+    rms_covar  = np.sqrt(np.nan_to_num(np.nanmean(hist_covar[STEPS//2:STEPS,:,:]**2, axis=0)))
+    mean_covar = np.nan_to_num(np.nanmean(hist_covar, axis=0))
+    rms_log = np.log(rms_covar)
+  rms_log[np.isneginf(rms_log)] = 0
+  plot_matrix(rms_covar , name, "%s_covar_rms_%s"  % (sel, name))
+  plot_matrix(rms_log , name, "%s_covar_logrms_%s"  % (sel, name), plt.cm.Reds)
+  plot_matrix(mean_covar, name, "%s_covar_mean_%s" % (sel, name))
 
-def plot_matrix(data, name, color=plt.cm.bwr):
+def plot_matrix(data, name, title, color=plt.cm.bwr):
   # data <- np.array[n,n]
   # name <- string
 
@@ -218,9 +242,9 @@ def plot_matrix(data, name, color=plt.cm.bwr):
   ax.set_aspect(abs(x1-x0)/abs(y1-y0))
   ax.set_xlabel("x")
   cbar = plt.colorbar(map1)
-  plt.title(name)
+  plt.title(title)
   plt.gca().invert_yaxis()
-  plt.savefig("./image/%s.png" % (name,))
+  plt.savefig("./image/%s/%s.png" % (name, title))
   plt.close()
   return 0
 
