@@ -67,7 +67,7 @@ def exec_nature():
   for i in range(0, STEPS):
     for k in range(0, DIMM):
       all_clv[i,:,k] = vector_common(all_blv[i,:,:k+1], all_flv[i,:,k:], k)
-    # direction continuity
+    # directional continuity
     if (i >= 1):
       m = finite_time_tangent_using_nonlinear(all_true[i-1,:], DT, 1)
       for k in range(0, DIMM):
