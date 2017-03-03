@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import numpy as np
+import sys
 from scipy.optimize import fmin_bfgs
 from const import *
 
@@ -24,8 +25,8 @@ def tdvar_2j(anl_nda, fcst_nda, h_nda, r_nda, yo_nda, i_s, i_e):
   # h_nda    <- np.array[DIMO, dimm]  : observation operator
   # r_nda    <- np.array[DIMO, DIMO]  : observation error covariance
   # yo_nda   <- np.array[DIMO, 1]     : observation
-  # i_s      <- int
-  # i_e      <- int
+  # i_s      <- int                   : first model grid to assimilate
+  # i_e      <- int                   : last model grid to assimilate
   # return   -> float                 : cost function 2J
 
   h  = np.asmatrix(h_nda)
@@ -38,6 +39,28 @@ def tdvar_2j(anl_nda, fcst_nda, h_nda, r_nda, yo_nda, i_s, i_e):
   twoj = (anl - fcst).T * b.I * (anl - fcst) + \
        (h * anl - yo).T * r.I * (h * anl - yo)
   return twoj
+
+def tdvar_interpol(fcst, h_nda, r_nda, yo_nda, i_s, i_e):
+  ### here, (dimm = i_e - i_s <= DIMM) unless strongly coupled
+  # fcst   <- np.array[dimm]        : first guess
+  # h_nda  <- np.array[DIMO, dimm]  : observation operator
+  # r_nda  <- np.array[DIMO, DIMO]  : observation error covariance
+  # yo_nda <- np.array[DIMO, 1]     : observation
+  # i_s    <- int
+  # i_e    <- int
+  # return -> np.array[dimm]        : assimilated field
+
+  xb = np.asmatrix(fcst).T
+  h  = np.asmatrix(h_nda)
+  r  = np.asmatrix(r_nda)
+  yo = np.asmatrix(yo_nda)
+  b  = np.matrix(1.2 * tdvar_b()[i_s:i_e, i_s:i_e])
+
+  d = yo - h * xb
+
+  inc_model = (b.I + h.T * r.I * h).I * h.T * r.I * d
+  anl = (xb + inc_model).A.flatten()
+  return anl
 
 def tdvar_b():
   # return -> np.array[DIMM,DIMM] : background error covariance
