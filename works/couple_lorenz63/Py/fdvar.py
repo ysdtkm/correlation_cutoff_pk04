@@ -82,7 +82,7 @@ def fdvar_2j_deriv(anl_0_nda, fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e):
   fcst_0 = np.asmatrix(fcst_0_nda).T
 
   # todo: the method below does not handle weak/non coupled DA
-  m = finite_time_tangent_using_nonlinear(fcst_0_nda, DT, aint)
+  m = finite_time_tangent(fcst_0_nda, DT, aint)
   inc = anl_0 - fcst_0
   fcst_1_nda = np.copy(fcst_0_nda)
   for i in range(aint):
