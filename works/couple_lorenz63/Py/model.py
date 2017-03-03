@@ -10,13 +10,7 @@ def timestep(x, dt, i_s=0, i_e=DIMM):
   # i_e    <- int
   # return -> np.array(dimm)
 
-  # todo: In fdvar with gradient, a 2d-array is inputted as x.
-  #       Remove this if-clause.
-  if x.shape != (i_e - i_s,):
-    x0 = np.copy(x.flatten())
-  else:
-    x0 = np.copy(x)
-
+  x0 = np.copy(x)
   k1 = tendency(x0, i_s, i_e)
   x2 = x0 + k1 * dt / 2.0
   k2 = tendency(x2, i_s, i_e)

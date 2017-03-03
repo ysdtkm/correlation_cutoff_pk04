@@ -22,12 +22,12 @@ def fdvar(fcst_0, h, r, yo, aint, i_s, i_e):
   # only assimilate one set of obs at t1 = t0+dt*aint
   # input fcst_0 is [aint] steps former than analysis time
   anl_0 = np.copy(fcst_0)
-  try:
-    anl_0 = fmin_bfgs(fdvar_2j, anl_0, args=(fcst_0, h, r, yo, aint, i_s, i_e))
-    # anl_0 = fmin_bfgs(fdvar_2j, anl_0, fprime=fdvar_2j_deriv, args=(fcst_0, h, r, yo, aint, i_s, i_e))
-  except:
-    print("Method fmin_bfgs failed to converge. Use fmin for this step instead.")
-    anl_0 = fmin(fdvar_2j, anl_0, args=(fcst_0, h, r, yo, aint, i_s, i_e), disp=False)
+  anl_0 = fmin_bfgs(fdvar_2j, anl_0, fprime=fdvar_2j_deriv, args=(fcst_0, h, r, yo, aint, i_s, i_e))
+  # try:
+  #   # anl_0 = fmin_bfgs(fdvar_2j, anl_0, args=(fcst_0, h, r, yo, aint, i_s, i_e))
+  # except:
+  #   print("Method fmin_bfgs failed to converge. Use fmin for this step instead.")
+  #   anl_0 = fmin(fdvar_2j, anl_0, args=(fcst_0, h, r, yo, aint, i_s, i_e), disp=False)
   anl_1 = np.copy(anl_0)
   for i in range(0, aint):
     anl_1 = timestep(anl_1, DT, i_s, i_e)
@@ -60,7 +60,7 @@ def fdvar_2j(anl_0_nda, fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e):
   anl_1 = np.matrix(anl_1_nda).T
   twoj = (anl_0 - fcst_0).T * b.I * (anl_0 - fcst_0) + \
          (h * anl_1 - yo).T * r.I * (h * anl_1 - yo)
-  return twoj.A
+  return twoj[0,0]
 
 def fdvar_2j_deriv(anl_0_nda, fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e):
   ### here, (dimm = i_e - i_s <= DIMM) unless strongly coupled
@@ -81,9 +81,10 @@ def fdvar_2j_deriv(anl_0_nda, fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e):
   anl_0  = np.asmatrix(anl_0_nda).T
   fcst_0 = np.asmatrix(fcst_0_nda).T
 
+  # todo: the method below does not handle weak/non coupled DA
   m = finite_time_tangent_using_nonlinear(fcst_0_nda, DT, aint)
   inc = anl_0 - fcst_0
-  d = yo - h * fcst_0
+  d = yo - h * anl_0
 
   j_deriv = b.T * inc + (m.T * h.T * r.I * h * m * inc - m.T * h.T * r.I * d)
 

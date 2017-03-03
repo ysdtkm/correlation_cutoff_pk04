@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import sys
 import numpy as np
 from const import *
 from model import *
@@ -96,4 +97,19 @@ def test_tangent_sv():
   print(mt_finite)
   return 0
 
-test_tangent_model()
+def test_cost_function_grad():
+  if DIMM != 3:
+    sys.exit("Set DIMM = 3 for test_cost_function_grad")
+
+  aint = 25
+  fcst = np.array([-5.83559367, -6.1021729, 23.42678068])
+  anl = np.copy(fcst)
+  h = geth([1,1,1])
+  r = getr()
+  yo = np.array([[-8.27064106], [-1.06064404], [34.80718227]])
+
+  twoj = fdvar_2j(anl, fcst, h, r, yo, aint, 0, DIMM)
+  print(twoj)
+  return 0
+
+test_cost_function_grad()

@@ -16,7 +16,7 @@ def tdvar(fcst, h, r, yo, i_s, i_e):
   # return -> np.array[dimm]        : assimilated field
   anl = np.copy(fcst)
   anl = fmin_bfgs(tdvar_2j, anl, args=(fcst, h, r, yo, i_s, i_e), disp=False)
-  return anl.T
+  return anl.flatten()
 
 def tdvar_2j(anl_nda, fcst_nda, h_nda, r_nda, yo_nda, i_s, i_e):
   ### here, (dimm = i_e - i_s <= DIMM) unless strongly coupled
@@ -38,7 +38,7 @@ def tdvar_2j(anl_nda, fcst_nda, h_nda, r_nda, yo_nda, i_s, i_e):
   fcst = np.asmatrix(fcst_nda).T
   twoj = (anl - fcst).T * b.I * (anl - fcst) + \
        (h * anl - yo).T * r.I * (h * anl - yo)
-  return twoj
+  return twoj[0,0]
 
 def tdvar_interpol(fcst, h_nda, r_nda, yo_nda, i_s, i_e):
   ### here, (dimm = i_e - i_s <= DIMM) unless strongly coupled
