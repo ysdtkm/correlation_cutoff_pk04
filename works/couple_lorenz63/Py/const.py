@@ -3,7 +3,7 @@
 import math
 import numpy as np
 
-DIMM = 9    # dimension of model variable n
+DIMM = 3    # dimension of model variable n
 DIMO = DIMM # dimension of observation variable m
 
 DT = 0.01
@@ -32,18 +32,18 @@ EXPLIST = [ \
   # {"name":"tdvar_weak_int25", "inf":1.0, "aint":25, \
   #       "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], \
   #       "nmem":1, "method":"3dvar", "couple":"weak"}, \
-  {"name":"tdvar_strong_int25", "inf":1.0, "aint":25, \
-        "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], \
-        "nmem":1, "method":"3dvar", "couple":"strong"}, \
+  # {"name":"tdvar_strong_int25", "inf":1.0, "aint":25, \
+  #       "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], \
+  #       "nmem":1, "method":"3dvar", "couple":"strong"}, \
   # {"name":"fdvar_non_int25", "inf":1.0, "aint":25, \
   #       "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], \
   #       "nmem":1, "method":"4dvar", "couple":"none"}, \
   # {"name":"fdvar_weak_int25", "inf":1.0, "aint":25, \
   #       "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], \
   #       "nmem":1, "method":"4dvar", "couple":"weak"}, \
-  # {"name":"fdvar_strong_int25", "inf":1.0, "aint":25, \
-  #       "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], \
-  #       "nmem":1, "method":"4dvar", "couple":"strong"} \
+  {"name":"fdvar_strong_int25", "inf":1.0, "aint":25, \
+        "diag":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0], \
+        "nmem":1, "method":"4dvar", "couple":"strong"} \
 ]
 
 def getr():

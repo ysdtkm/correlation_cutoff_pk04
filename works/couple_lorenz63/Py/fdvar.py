@@ -23,7 +23,8 @@ def fdvar(fcst_0, h, r, yo, aint, i_s, i_e):
   # input fcst_0 is [aint] steps former than analysis time
   anl_0 = np.copy(fcst_0)
   try:
-    anl_0 = fmin_bfgs(fdvar_2j, anl_0, args=(fcst_0, h, r, yo, aint, i_s, i_e), disp=False)
+    anl_0 = fmin_bfgs(fdvar_2j, anl_0, args=(fcst_0, h, r, yo, aint, i_s, i_e))
+    # anl_0 = fmin_bfgs(fdvar_2j, anl_0, fprime=fdvar_2j_deriv, args=(fcst_0, h, r, yo, aint, i_s, i_e))
   except:
     print("Method fmin_bfgs failed to converge. Use fmin for this step instead.")
     anl_0 = fmin(fdvar_2j, anl_0, args=(fcst_0, h, r, yo, aint, i_s, i_e), disp=False)
@@ -47,7 +48,7 @@ def fdvar_2j(anl_0_nda, fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e):
   h  = np.asmatrix(h_nda)
   r  = np.asmatrix(r_nda)
   yo = np.asmatrix(yo_nda)
-  b  = np.matrix(0.6 * 1.2 * tdvar_b()[i_s:i_e, i_s:i_e])
+  b  = np.matrix(0.7 * 1.2 * tdvar_b()[i_s:i_e, i_s:i_e])
   anl_0  = np.asmatrix(anl_0_nda).T
   fcst_0 = np.asmatrix(fcst_0_nda).T
 
@@ -60,4 +61,31 @@ def fdvar_2j(anl_0_nda, fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e):
   twoj = (anl_0 - fcst_0).T * b.I * (anl_0 - fcst_0) + \
          (h * anl_1 - yo).T * r.I * (h * anl_1 - yo)
   return twoj.A
+
+def fdvar_2j_deriv(anl_0_nda, fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e):
+  ### here, (dimm = i_e - i_s <= DIMM) unless strongly coupled
+  # anl_0_nda  <- np.array[dimm]       : temporary analysis field
+  # fcst_0_nda <- np.array[dimm]       : first guess field
+  # h_nda      <- np.array[DIMO, dimm] : observation operator
+  # r_nda      <- np.array[DIMO, DIMO] : observation error covariance
+  # yo_nda     <- np.array[DIMO, 1]    : observation
+  # aint       <- int                  : assimilation interval
+  # i_s        <- int                  : model grid number, assimilate only [i_s, i_e)
+  # i_e        <- int
+  # return     -> np.array[dimm]       : gradient of cost function 2J
+
+  h  = np.asmatrix(h_nda)
+  r  = np.asmatrix(r_nda)
+  yo = np.asmatrix(yo_nda)
+  b  = np.matrix(0.6 * 1.2 * tdvar_b()[i_s:i_e, i_s:i_e])
+  anl_0  = np.asmatrix(anl_0_nda).T
+  fcst_0 = np.asmatrix(fcst_0_nda).T
+
+  m = finite_time_tangent_using_nonlinear(fcst_0_nda, DT, aint)
+  inc = anl_0 - fcst_0
+  d = yo - h * fcst_0
+
+  j_deriv = b.T * inc + (m.T * h.T * r.I * h * m * inc - m.T * h.T * r.I * d)
+
+  return j_deriv.A.flatten() * 2.0
 
