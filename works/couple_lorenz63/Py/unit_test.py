@@ -107,9 +107,19 @@ def test_cost_function_grad():
   h = geth([1,1,1])
   r = getr()
   yo = np.array([[-8.27064106], [-1.06064404], [34.80718227]])
+  eps = 1.0
 
   twoj = fdvar_2j(anl, fcst, h, r, yo, aint, 0, DIMM)
-  print(twoj)
+  twoj_grad = np.zeros(DIMM)
+  for i in range(DIMM):
+    anl = np.copy(fcst)
+    anl[i] += eps
+    twoj_grad[i] = (fdvar_2j(anl, fcst, h, r, yo, aint, 0, DIMM) - twoj) / eps
+  print(twoj_grad)
+
+  twoj_grad_anl = fdvar_2j_deriv(anl, fcst, h, r, yo, aint, 0, DIMM)
+  print(twoj_grad_anl)
+
   return 0
 
 test_cost_function_grad()

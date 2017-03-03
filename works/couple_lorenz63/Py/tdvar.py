@@ -66,6 +66,6 @@ def tdvar_b():
   # return -> np.array[DIMM,DIMM] : background error covariance
 
   # todo: use realistic B
-  b = np.diag(np.ones(DIMM))
+  b = np.diag(np.ones(DIMM)) * 1.5
   return b
 
