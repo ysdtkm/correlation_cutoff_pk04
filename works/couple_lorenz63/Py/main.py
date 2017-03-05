@@ -30,9 +30,11 @@ def exec_nature():
     all_true[i,:] = true[:]
   all_true.tofile("data/true.bin")
 
-  all_blv, all_ble = calc_blv_fsv(all_true)
-  all_flv, all_fle = calc_flv_isv(all_true)
+  all_blv, all_ble = calc_blv(all_true)
+  all_flv, all_fle = calc_flv(all_true)
   all_clv          = calc_clv(all_true, all_blv, all_flv)
+  calc_fsv(all_true)
+  calc_isv(all_true)
   write_lyapunov_exponents(all_ble, all_fle, all_clv)
 
   return all_true

@@ -7,7 +7,7 @@ DIMM = 40   # dimension of model variable n
 DIMO = DIMM # dimension of observation variable m
 
 DT = 0.01
-TMAX = 2
+TMAX = 20
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 VRFS = int(STEPS * 0.25) # verification period: [VRFS,STEPS)
@@ -18,7 +18,7 @@ FERR_INI = 10.0
 
 EXPLIST = [ \
   {"name":"etkf_no_infl",  "inf":1.0, "aint":10, \
-        "diag":np.ones(DIMM), "nmem":41, \
+        "diag":np.ones(DIMM), "nmem":DIMM+1, \
         "method":"etkf", "couple":"strong"}, \
   # {"name":"etkf_non_int25",  "inf":1.2, "aint":25, \
   #       "diag":np.ones(DIMM), "nmem":4, \

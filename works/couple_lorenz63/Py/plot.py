@@ -13,15 +13,15 @@ def plot_all():
   vector_name = {"blv": "Backward_LV", "flv": "Forward_LV", "clv": "Characteristic_LV", \
                  "fsv": "Final_SV", "isv": "Initial_SV"}
   hist_vector = {}
-  for vector in vectors:
-    hist_vector[vector] = np.fromfile("data/%s.bin" % vector, np.float64)
-    hist_vector[vector] = hist_vector[vector].reshape((STEPS, DIMM, DIMM))
+  for vec in vectors:
+    hist_vector[vec] = np.fromfile("data/%s.bin" % vec, np.float64)
+    hist_vector[vec] = hist_vector[vec].reshape((STEPS, DIMM, DIMM))
 
   os.system("mkdir -p image/true")
 
-  for vector in vectors:
-    plot_lv_time(hist_vector[vector], vector_name[vector])
-    # plot_trajectory_lv(hist_true, hist_vector[vector], vector_name[vector])
+  for vec in vectors:
+    plot_lv_time(hist_vector[vec], vector_name[vec])
+    # plot_trajectory_lv(hist_true, hist_vector[vec], vector_name[vec])
 
   for exp in EXPLIST:
     name = exp["name"]
@@ -38,8 +38,8 @@ def plot_all():
     plot_3d_trajectory(hist_true, hist_fcst, name, nmem)
 
     if (exp["method"] == "etkf"):
-      for vector in vectors:
-        plot_lv_projection(hist_vector[vector], hist_fcst, name, vector_name[vector], nmem)
+      for vec in vectors:
+        plot_lv_projection(hist_vector[vec], hist_fcst, name, vector_name[vec], nmem)
 
       for sel in ["back", "anl"]:
         hist_covar = np.fromfile("data/%s_covr_%s.bin" % (name, sel), np.float64)
