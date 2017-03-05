@@ -319,6 +319,8 @@ def plot_covariance_matr(hist_covar, name, sel):
   with warnings.catch_warnings():
     warnings.simplefilter("ignore", category=RuntimeWarning)
     rms_covar  = np.sqrt(np.nan_to_num(np.nanmean(hist_covar[STEPS//2:STEPS,:,:]**2, axis=0)))
+    print(name)
+    print(rms_covar)
     mean_covar = np.nan_to_num(np.nanmean(hist_covar, axis=0))
     rms_log = np.log(rms_covar)
   rms_log[np.isneginf(rms_log)] = 0
