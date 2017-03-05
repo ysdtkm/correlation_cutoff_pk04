@@ -63,7 +63,7 @@ def exec_nature():
       all_fle[i-1,:] = fle[:] / DT
     all_flv[i-1,:,:] = flv[:,:]
 
-  # calculate LLVs i-1 -> i
+  # calculate CLVs i-1 -> i
   all_clv = np.empty((STEPS, DIMM, DIMM))
   for i in range(0, STEPS):
     for k in range(0, DIMM):
