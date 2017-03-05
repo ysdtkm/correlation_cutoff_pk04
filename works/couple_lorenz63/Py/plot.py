@@ -15,6 +15,10 @@ def plot_all():
   hist_flv = hist_flv.reshape((STEPS, DIMM, DIMM))
   hist_clv = np.fromfile("data/clv.bin", np.float64)
   hist_clv = hist_clv.reshape((STEPS, DIMM, DIMM))
+  # hist_fsv = np.fromfile("data/fsv.bin", np.float64)
+  # hist_fsv = hist_fsv.reshape((STEPS, DIMM, DIMM))
+  # hist_isv = np.fromfile("data/isv.bin", np.float64)
+  # hist_isv = hist_isv.reshape((STEPS, DIMM, DIMM))
 
   os.system("mkdir -p image/true")
   plot_lv_time(hist_blv, "backward")
@@ -33,6 +37,12 @@ def plot_all():
     hist_fcst = hist_fcst.reshape((STEPS, nmem, DIMM))
     hist_obs = np.fromfile("data/%s_obs.bin" % name, np.float64)
     hist_obs = hist_obs.reshape((STEPS, DIMO))
+
+    plot_lv_projection(hist_clv, hist_fcst, name, "clv", nmem)
+    plot_lv_projection(hist_flv, hist_fcst, name, "flv", nmem)
+    plot_lv_projection(hist_blv, hist_fcst, name, "blv", nmem)
+    # plot_lv_projection(hist_fsv, hist_fcst, name, "fsv", nmem)
+    # plot_lv_projection(hist_isv, hist_fcst, name, "isv", nmem)
 
     plot_rmse_spread(hist_true, hist_fcst, name, nmem)
     plot_time_value(hist_true, hist_fcst, hist_obs, name, nmem)
@@ -56,7 +66,43 @@ def plot_lv_time(hist_lv, name):
   plt.clf()
   plt.close()
 
+def plot_lv_projection(hist_lv, hist_fcst, name, title, nmem):
+  # hist_lv   <- np.array[STEPS, DIMM, DIMM]
+  # hist_fcst <- np.array[STEPS, nmem, DIMM]
+  # name      <- string
+  # title     <- string
+  # nmem      <- int
+
+  projection = np.zeros((DIMM, nmem))
+  hist_fcst_mean = np.mean(hist_fcst, axis=1)
+
+  for i in range(STEPS//2, STEPS):
+    for j in range(DIMM):
+      for k in range(nmem):
+        projection[j,k] += np.abs(np.dot(hist_lv[i,:,j], \
+            hist_fcst[i,k,:] - hist_fcst_mean[i,:]))
+  projection /= OERR * DIMM * (STEPS / 2.0)
+
+  data = np.log(projection)
+  fig, ax = plt.subplots(1)
+  fig.subplots_adjust(left=0.12, right=0.95, bottom=0.12, top=0.92)
+  cmax = np.max(np.abs(data))
+  map1 = ax.pcolor(data, cmap=plt.cm.gist_rainbow_r)
+  map1.set_clim(-8, -4)
+  ax.set_xlim(xmax=nmem)
+  # ax.set_aspect(abs(x1-x0)/abs(y1-y0))
+  ax.set_xlabel("member")
+  ax.set_ylabel("index of vectors")
+  cbar = plt.colorbar(map1)
+  plt.title(title)
+  plt.gca().invert_yaxis()
+  plt.savefig("./image/%s/%s.png" % (name, title))
+  plt.close()
+  return 0
+
 def plot_trajectory_lv(hist_true, hist_lv, name):
+  if not (DIMM == 3 or DIMM == 9):
+    return 0
   for i_component in range(DIMM//3):
     i_adjust = i_component * 3
     name_component = ["extro", "trop", "ocn"][i_component]
@@ -120,13 +166,36 @@ def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
         1.0 / (nmem - 1.0) * (hist_fcst[:,i,:]**2 - hist_fcst_mean[:,:]**2)
   hist_err = hist_fcst_mean - hist_true
 
-  for i_component in range(DIMM//3):
-    grid_from = 3 * i_component
-    name_component = ["extro", "trop", "ocn"][i_component]
+  if (DIMM == 3 or DIMM == 9):
+    for i_component in range(DIMM//3):
+      grid_from = 3 * i_component
+      name_component = ["extro", "trop", "ocn"][i_component]
 
+      # MSE and Spread_square time series (grid average)
+      mse_time   = np.mean(hist_err[:,grid_from:grid_from+3]**2,     axis=1)
+      sprd2_time = np.mean(hist_fcst_sprd2[:,grid_from:grid_from+3], axis=1)
+
+      # RMSE and Spread time average
+      rmse = np.sqrt(np.mean(mse_time[STEP_FREE:STEPS]))
+      sprd = np.sqrt(np.mean(sprd2_time[STEP_FREE:STEPS]))
+
+      # RMSE-Spread time series
+      plt.rcParams["font.size"] = 16
+      plt.yscale('log')
+      plt.plot(np.sqrt(mse_time), label="RMSE")
+      if (nmem > 1):
+        plt.plot(np.sqrt(sprd2_time), label="Spread")
+      plt.legend()
+      plt.xlabel("timestep")
+      plt.title("[%s %s] RMSE:%6g Spread:%6g" % (name, name_component, rmse, sprd))
+      plt.savefig("./image/%s/%s_%s_%s.png" % (name, name, name_component, "time"))
+      plt.clf()
+      plt.close()
+
+  else: # lorenz96
     # MSE and Spread_square time series (grid average)
-    mse_time   = np.mean(hist_err[:,grid_from:grid_from+3]**2,     axis=1)
-    sprd2_time = np.mean(hist_fcst_sprd2[:,grid_from:grid_from+3], axis=1)
+    mse_time   = np.mean(hist_err[:,:]**2,     axis=1)
+    sprd2_time = np.mean(hist_fcst_sprd2[:,:], axis=1)
 
     # RMSE and Spread time average
     rmse = np.sqrt(np.mean(mse_time[STEP_FREE:STEPS]))
@@ -140,8 +209,8 @@ def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
       plt.plot(np.sqrt(sprd2_time), label="Spread")
     plt.legend()
     plt.xlabel("timestep")
-    plt.title("[%s %s] RMSE:%6g Spread:%6g" % (name, name_component, rmse, sprd))
-    plt.savefig("./image/%s/%s_%s_%s.png" % (name, name, name_component, "time"))
+    plt.title("[%s] RMSE:%6g Spread:%6g" % (name, rmse, sprd))
+    plt.savefig("./image/%s/%s_%s.png" % (name, name, "time"))
     plt.clf()
     plt.close()
   return 0
@@ -152,32 +221,46 @@ def plot_time_value(hist_true, hist_fcst, hist_obs, name, nmem):
 
   hist_fcst_mean = np.mean(hist_fcst, axis=1)
 
-  for i_component in range(DIMM//3):
-    i_adjust = i_component * 3
-    name_component = ["extro", "trop", "ocn"][i_component]
+  if (DIMM == 3 or DIMM == 9):
+    for i_component in range(DIMM//3):
+      i_adjust = i_component * 3
+      name_component = ["extro", "trop", "ocn"][i_component]
 
-    # xyz time series
+      # xyz time series
+      plt.rcParams["font.size"] = 12
+      fig, (ax1, ax2, ax3) = plt.subplots(3, sharex=True)
+      ax1.set_title("%s %s" % (name, name_component))
+      ax1.plot(hist_true[:,0+i_adjust], label="true")
+      ax1.plot(hist_fcst_mean[:,0+i_adjust], label="model")
+      if "x" in name:
+        ax1.plot(hist_obs[:,0+i_adjust], label="obs", linestyle='None', marker=".")
+      ax1.set_ylabel("x")
+      ax1.legend(loc="upper right")
+      ax2.plot(hist_true[:,1+i_adjust], label="true")
+      ax2.plot(hist_fcst_mean[:,1+i_adjust], label="model")
+      if "y" in name:
+        ax2.plot(hist_obs[:,1+i_adjust], label="obs", linestyle='None', marker=".")
+      ax2.set_ylabel("y")
+      ax3.plot(hist_true[:,2+i_adjust], label="true")
+      ax3.plot(hist_fcst_mean[:,2+i_adjust], label="model")
+      if "z" in name:
+        ax3.plot(hist_obs[:,2+i_adjust], label="obs", linestyle='None', marker=".")
+      ax3.set_ylabel("z")
+      plt.xlabel("timestep")
+      plt.savefig("./image/%s/%s_%s_%s.png" % (name, name, name_component, "val"))
+      plt.clf()
+      plt.close()
+  else:
     plt.rcParams["font.size"] = 12
-    fig, (ax1, ax2, ax3) = plt.subplots(3, sharex=True)
-    ax1.set_title("%s %s" % (name, name_component))
-    ax1.plot(hist_true[:,0+i_adjust], label="true")
-    ax1.plot(hist_fcst_mean[:,0+i_adjust], label="model")
-    if "x" in name:
-      ax1.plot(hist_obs[:,0+i_adjust], label="obs", linestyle='None', marker=".")
-    ax1.set_ylabel("x")
+    fig, ax1 = plt.subplots(1)
+    ax1.set_title(name)
+    ax1.plot(hist_true[:,0], label="true")
+    ax1.plot(hist_fcst_mean[:,0], label="model")
+    ax1.plot(hist_obs[:,0], label="obs", linestyle='None', marker=".")
+    ax1.set_ylabel("0th element")
     ax1.legend(loc="upper right")
-    ax2.plot(hist_true[:,1+i_adjust], label="true")
-    ax2.plot(hist_fcst_mean[:,1+i_adjust], label="model")
-    if "y" in name:
-      ax2.plot(hist_obs[:,1+i_adjust], label="obs", linestyle='None', marker=".")
-    ax2.set_ylabel("y")
-    ax3.plot(hist_true[:,2+i_adjust], label="true")
-    ax3.plot(hist_fcst_mean[:,2+i_adjust], label="model")
-    if "z" in name:
-      ax3.plot(hist_obs[:,2+i_adjust], label="obs", linestyle='None', marker=".")
-    ax3.set_ylabel("z")
     plt.xlabel("timestep")
-    plt.savefig("./image/%s/%s_%s_%s.png" % (name, name, name_component, "val"))
+    plt.savefig("./image/%s/%s_%s.png" % (name, name, "val"))
     plt.clf()
     plt.close()
   return 0
@@ -188,6 +271,8 @@ def plot_3d_trajectory(hist_true, hist_fcst, name, nmem):
 
   hist_fcst_mean = np.mean(hist_fcst, axis=1)
 
+  if not (DIMM == 3 or DIMM == 9):
+    return 0
   for i_component in range(DIMM//3):
     i_adjust = i_component * 3
     name_component = ["extro", "trop", "ocn"][i_component]

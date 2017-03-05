@@ -73,6 +73,11 @@ def tendency(x_in, i_s=0, i_e=DIMM):
     dx[8] = tau * ( s * x[6] * x[7] - b * x[8]               ) - cz * x[5]
     return dx[i_s:i_e]
 
+  else:
+    f = 8.0
+    k = (np.roll(x_in,-1)-np.roll(x_in,2)) * np.roll(x_in,1) - x_in + f
+    return k
+
 def tangent_linear(x, dt):
   # x      <- np.array(DIMM)       : state vector at the beginning
   # dt     <- float                : infinitesimal time
