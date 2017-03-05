@@ -9,24 +9,19 @@ from const import *
 def plot_all():
   hist_true = np.fromfile("data/true.bin", np.float64)
   hist_true = hist_true.reshape((STEPS, DIMM))
-  hist_blv = np.fromfile("data/blv.bin", np.float64)
-  hist_blv = hist_blv.reshape((STEPS, DIMM, DIMM))
-  hist_flv = np.fromfile("data/flv.bin", np.float64)
-  hist_flv = hist_flv.reshape((STEPS, DIMM, DIMM))
-  hist_clv = np.fromfile("data/clv.bin", np.float64)
-  hist_clv = hist_clv.reshape((STEPS, DIMM, DIMM))
-  # hist_fsv = np.fromfile("data/fsv.bin", np.float64)
-  # hist_fsv = hist_fsv.reshape((STEPS, DIMM, DIMM))
-  # hist_isv = np.fromfile("data/isv.bin", np.float64)
-  # hist_isv = hist_isv.reshape((STEPS, DIMM, DIMM))
+  vectors = ["blv", "flv", "clv", "fsv", "isv"]
+  vector_name = {"blv": "Backward_LV", "flv": "Forward_LV", "clv": "Characteristic_LV", \
+                 "fsv": "Final_SV", "isv": "Initial_SV"}
+  hist_vector = {}
+  for vector in vectors:
+    hist_vector[vector] = np.fromfile("data/%s.bin" % vector, np.float64)
+    hist_vector[vector] = hist_vector[vector].reshape((STEPS, DIMM, DIMM))
 
   os.system("mkdir -p image/true")
-  plot_lv_time(hist_blv, "backward")
-  plot_lv_time(hist_flv, "forward")
-  plot_lv_time(hist_clv, "characteristic")
-  # plot_trajectory_lv(hist_true, hist_blv, "backward")
-  # plot_trajectory_lv(hist_true, hist_flv, "forward")
-  # plot_trajectory_lv(hist_true, hist_clv, "characteristic")
+
+  for vector in vectors:
+    plot_lv_time(hist_vector[vector], vector_name[vector])
+    # plot_trajectory_lv(hist_true, hist_vector[vector], vector_name[vector])
 
   for exp in EXPLIST:
     name = exp["name"]
@@ -38,16 +33,14 @@ def plot_all():
     hist_obs = np.fromfile("data/%s_obs.bin" % name, np.float64)
     hist_obs = hist_obs.reshape((STEPS, DIMO))
 
-    plot_lv_projection(hist_clv, hist_fcst, name, "clv", nmem)
-    plot_lv_projection(hist_flv, hist_fcst, name, "flv", nmem)
-    plot_lv_projection(hist_blv, hist_fcst, name, "blv", nmem)
-    # plot_lv_projection(hist_fsv, hist_fcst, name, "fsv", nmem)
-    # plot_lv_projection(hist_isv, hist_fcst, name, "isv", nmem)
-
     plot_rmse_spread(hist_true, hist_fcst, name, nmem)
     plot_time_value(hist_true, hist_fcst, hist_obs, name, nmem)
     plot_3d_trajectory(hist_true, hist_fcst, name, nmem)
+
     if (exp["method"] == "etkf"):
+      for vector in vectors:
+        plot_lv_projection(hist_vector[vector], hist_fcst, name, vector_name[vector], nmem)
+
       for sel in ["back", "anl"]:
         hist_covar = np.fromfile("data/%s_covr_%s.bin" % (name, sel), np.float64)
         hist_covar = hist_covar.reshape((STEPS, DIMM, DIMM))

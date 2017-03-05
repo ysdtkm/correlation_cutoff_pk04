@@ -20,11 +20,6 @@ def main():
 
 def exec_nature():
   # return   -> np.array[STEPS, DIMM]
-  # file1    -> np.array[STEPS, DIMM]       : nature
-  # file2    -> np.array[STEPS, DIMM, DIMM] : backward LVs
-  # file3    -> np.array[STEPS, DIMM]       : BLEs
-  # file4    -> np.array[STEPS, DIMM, DIMM] : forward LVs
-  # file5    -> np.array[STEPS, DIMM]       : FLEs
 
   all_true = np.empty((STEPS, DIMM))
   true = np.random.normal(0.0, FERR_INI, DIMM)

@@ -6,6 +6,10 @@ from const import *
 from model import *
 
 def calc_blv_fsv(all_true):
+  # all_true <- np.array[STEPS, DIMM]
+  # all_blv  -> np.array[STEPS, DIMM, DIMM] : column backward lvs
+  # all_ble  -> np.array[STEPS, DIMM]       : backward lyapunov exponents
+
   eps = 1.0e-9
   orth_int = 1
 
@@ -13,24 +17,30 @@ def calc_blv_fsv(all_true):
   blv, ble = orth_norm_vectors(blv, eps)
   all_blv = np.zeros((STEPS, DIMM, DIMM))
   all_ble = np.zeros((STEPS, DIMM))
+  all_fsv = np.empty((STEPS, DIMM, DIMM))
 
   for i in range(1, STEPS):
     true = all_true[i-1,:]
     m = finite_time_tangent_using_nonlinear(true, DT, 1)
     blv = np.dot(m, blv)
     if (i % orth_int == 0):
-      # (ble[:] / DT) is (orth_int * actual LEs).
-      # For window without orthonormalization, LEs are zero.
-      # Thus long-term mean wil be actual LEs.
       blv, ble = orth_norm_vectors(blv, eps)
       all_ble[i,:] = ble[:] / DT
     all_blv[i,:,:] = blv[:,:] / eps
 
+    u, s, vh = np.linalg.svd(m - np.diag(np.ones(DIMM)))
+    all_fsv[i,:,:] = u[:,:]
+
   all_blv.tofile("data/blv.bin")
   all_ble.tofile("data/ble.bin")
+  all_fsv.tofile("data/fsv.bin")
   return all_blv, all_ble
 
 def calc_flv_isv(all_true):
+  # all_true <- np.array[STEPS, DIMM]
+  # all_flv  -> np.array[STEPS, DIMM, DIMM] : column forward lvs
+  # all_fle  -> np.array[STEPS, DIMM]       : forward lyapunov exponents
+
   eps = 1.0e-9
   orth_int = 1
 
@@ -38,6 +48,7 @@ def calc_flv_isv(all_true):
   flv, fle = orth_norm_vectors(flv, eps)
   all_flv = np.empty((STEPS, DIMM, DIMM))
   all_fle = np.zeros((STEPS, DIMM))
+  all_isv = np.empty((STEPS, DIMM, DIMM))
 
   for i in range(STEPS, 0, -1):
     true = all_true[i-1,:]
@@ -47,11 +58,21 @@ def calc_flv_isv(all_true):
       flv, fle = orth_norm_vectors(flv, eps)
       all_fle[i-1,:] = fle[:] / DT
     all_flv[i-1,:,:] = flv[:,:] / eps
+    u, s, vh = np.linalg.svd(m - np.diag(np.ones(DIMM)))
+    all_isv[i-1,:,:] = vh.T[:,:]
+
   all_flv.tofile("data/flv.bin")
   all_fle.tofile("data/fle.bin")
+  all_isv.tofile("data/isv.bin")
+
   return all_flv, all_fle
 
 def calc_clv(all_true, all_blv, all_flv):
+  # all_true <- np.array[STEPS, DIMM]
+  # all_blv  <- np.array[STEPS, DIMM, DIMM] : column backward lvs
+  # all_flv  <- np.array[STEPS, DIMM, DIMM] : column forward lvs
+  # all_clv  -> np.array[STEPS, DIMM, DIMM] : column charactetistic lvs
+
   all_clv = np.empty((STEPS, DIMM, DIMM))
 
   for i in range(1, STEPS):
