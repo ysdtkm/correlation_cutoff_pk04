@@ -19,6 +19,7 @@ def plot_all():
 
   os.system("mkdir -p image/true")
 
+  plot_le()
   for vec in vectors:
     plot_lv_time(hist_vector[vec], vector_name[vec])
     # plot_trajectory_lv(hist_true, hist_vector[vec], vector_name[vec])
@@ -45,6 +46,26 @@ def plot_all():
         hist_covar = np.fromfile("data/%s_covr_%s.bin" % (name, sel), np.float64)
         hist_covar = hist_covar.reshape((STEPS, DIMM, DIMM))
         plot_covariance_matr(hist_covar, name, sel)
+
+def plot_le():
+  hist_ble = np.fromfile("data/ble.bin", np.float64)
+  hist_fle = np.fromfile("data/fle.bin", np.float64)
+  hist_ble = hist_ble.reshape((STEPS, DIMM))
+  hist_fle = hist_fle.reshape((STEPS, DIMM))
+  mean_ble = np.mean(hist_ble[STEPS//2:,:], axis=0)
+  mean_fle = np.mean(hist_fle[STEPS//2:,:], axis=0)
+
+  plt.rcParams["font.size"] = 12
+  fig, ax1 = plt.subplots(1)
+  ax1.set_title("Lyapunov exponents")
+  ax1.plot(mean_ble, label="Back-Lyap exponents")
+  ax1.plot(mean_fle, label="Fore-Lyap exponents")
+  ax1.set_ylabel("1 / Time")
+  ax1.set_xlabel("LE index")
+  ax1.legend()
+  plt.savefig("./image/true/le.png")
+  plt.clf()
+  plt.close()
 
 def plot_lv_time(hist_lv, name):
   plt.rcParams["font.size"] = 12
