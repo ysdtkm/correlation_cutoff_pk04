@@ -83,7 +83,7 @@ def calc_fsv(all_true):
   # all_true <- np.array[STEPS, DIMM]
   # all_fsv  -> np.array[STEPS, DIMM, DIMM] : column final SVs
   all_fsv = np.empty((STEPS, DIMM, DIMM))
-  window = 10
+  window = 1
   for i in range(window, STEPS):
     true = all_true[i-window,:]
     m = finite_time_tangent_using_nonlinear(true, DT, window)
@@ -97,7 +97,7 @@ def calc_isv(all_true):
   # all_isv  -> np.array[STEPS, DIMM, DIMM] : column initial SVs
 
   all_isv = np.empty((STEPS, DIMM, DIMM))
-  window = 10
+  window = 1
   for i in range(STEPS, window-1, -1):
     true = all_true[i-window,:]
     m = finite_time_tangent_using_nonlinear(true, DT, window)
