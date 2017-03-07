@@ -40,7 +40,8 @@ def plot_all():
 
     if (exp["method"] == "etkf"):
       for vec in vectors:
-        plot_lv_projection(hist_vector[vec], hist_fcst, name, vector_name[vec], nmem)
+        is_oblique = (vec == "clv")
+        plot_lv_projection(hist_vector[vec], hist_fcst, name, vector_name[vec], nmem, is_oblique)
 
       for sel in ["back", "anl"]:
         hist_covar = np.fromfile("data/%s_covr_%s.bin" % (name, sel), np.float64)
@@ -80,21 +81,26 @@ def plot_lv_time(hist_lv, name):
   plt.clf()
   plt.close()
 
-def plot_lv_projection(hist_lv, hist_fcst, name, title, nmem):
-  # hist_lv   <- np.array[STEPS, DIMM, DIMM]
-  # hist_fcst <- np.array[STEPS, nmem, DIMM]
-  # name      <- string
-  # title     <- string
-  # nmem      <- int
+def plot_lv_projection(hist_lv, hist_fcst, name, title, nmem, is_oblique=False):
+  # hist_lv    <- np.array[STEPS, DIMM, DIMM]
+  # hist_fcst  <- np.array[STEPS, nmem, DIMM]
+  # name       <- string
+  # title      <- string
+  # nmem       <- int
+  # is_oblique <- bool
 
   projection = np.zeros((DIMM, nmem))
   hist_fcst_mean = np.mean(hist_fcst, axis=1)
 
   for i in range(STEPS//2, STEPS):
-    for j in range(DIMM):
+    if is_oblique:
       for k in range(nmem):
-        projection[j,k] += np.abs(np.dot(hist_lv[i,:,j], \
-            hist_fcst[i,k,:] - hist_fcst_mean[i,:]))
+        projection[:,k] += np.abs(oblique_projection(hist_fcst[i,k,:] - hist_fcst_mean[i,:], hist_lv[i,:,:]))
+    else:
+      for j in range(DIMM):
+        for k in range(nmem):
+          projection[j,k] += np.abs(np.dot(hist_lv[i,:,j], \
+              hist_fcst[i,k,:] - hist_fcst_mean[i,:]))
   projection /= OERR * DIMM * (STEPS / 2.0)
 
   data = np.log(projection)
@@ -102,9 +108,9 @@ def plot_lv_projection(hist_lv, hist_fcst, name, title, nmem):
   fig.subplots_adjust(left=0.12, right=0.95, bottom=0.12, top=0.92)
   cmax = np.max(np.abs(data))
   map1 = ax.pcolor(data, cmap=plt.cm.gist_rainbow_r)
-  map1.set_clim(-8, -4)
+  if not is_oblique:
+    map1.set_clim(-8, -4)
   ax.set_xlim(xmax=nmem)
-  # ax.set_aspect(abs(x1-x0)/abs(y1-y0))
   ax.set_xlabel("member")
   ax.set_ylabel("index of vectors")
   cbar = plt.colorbar(map1)
@@ -348,5 +354,17 @@ def plot_matrix(data, name, title, color=plt.cm.bwr):
   plt.savefig("./image/%s/%s.png" % (name, title))
   plt.close()
   return 0
+
+def oblique_projection(vector, obl_basis):
+  if not (obl_basis.shape[0] == obl_basis.shape[1]) and (obl_basis.shape[0] == vector.shape[0]):
+    print(vector.shape)
+    print(obl_basis.shape)
+    sys.exit("oblique projection: only square matrix is arrowed as obl_basis")
+
+  q, r = np.linalg.qr(obl_basis)
+
+  orth_coefs = np.dot(q.T, vector)
+  coefs = np.dot(np.linalg.inv(r), orth_coefs)
+  return coefs
 
 plot_all()
