@@ -111,7 +111,7 @@ def plot_lv_projection(hist_lv, hist_fcst, name, title, nmem, is_oblique=False):
   cmax = np.max(np.abs(data))
   map1 = ax.pcolor(data, cmap=plt.cm.gist_rainbow_r)
   if not is_oblique:
-    map1.set_clim(-8, -4)
+    map1.set_clim(-10, -4)
   ax.set_xlim(xmax=nmem)
   ax.set_xlabel("member")
   ax.set_ylabel("index of vectors")
