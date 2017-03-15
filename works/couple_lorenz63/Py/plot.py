@@ -374,6 +374,7 @@ def plot_matrix(data, name, title, color=plt.cm.bwr):
 def oblique_projection(vector, obl_basis):
   # vector    <- np.array[DIMM]
   # obl_basis <- np.array[DIMM, DIMM]
+  # return    -> np.array[DIMM]
 
   if not (obl_basis.shape[0] == obl_basis.shape[1]) and (obl_basis.shape[0] == vector.shape[0]):
     print(vector.shape)
@@ -383,7 +384,11 @@ def oblique_projection(vector, obl_basis):
   q, r = np.linalg.qr(obl_basis)
 
   orth_coefs = np.dot(q.T, vector)
-  coefs = np.dot(np.linalg.inv(r), orth_coefs)
+  try:
+    coefs = np.dot(np.linalg.inv(r), orth_coefs)
+  except np.linalg.linalg.LinAlgError:
+    coefs = np.zeros(DIMM)
+
   return coefs
 
 plot_all()

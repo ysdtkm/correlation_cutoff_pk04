@@ -39,7 +39,7 @@ def calc_flv(all_true):
 
   flv = np.random.normal(0.0, 1.0, (DIMM, DIMM))
   flv, fle = orth_norm_vectors(flv)
-  all_flv = np.empty((STEPS, DIMM, DIMM))
+  all_flv = np.zeros((STEPS, DIMM, DIMM))
   all_fle = np.zeros((STEPS, DIMM))
 
   for i in range(STEPS, 0, -1):
@@ -62,9 +62,9 @@ def calc_clv(all_true, all_blv, all_flv):
   # all_flv  <- np.array[STEPS, DIMM, DIMM] : column forward lvs
   # all_clv  -> np.array[STEPS, DIMM, DIMM] : column charactetistic lvs, zero for the first and last step
 
-  all_clv = np.empty((STEPS, DIMM, DIMM))
+  all_clv = np.zeros((STEPS, DIMM, DIMM))
 
-  for i in range(1, STEPS):
+  for i in range(1, STEPS-1):
     for k in range(0, DIMM):
       all_clv[i,:,k] = vector_common(all_blv[i,:,:k+1], all_flv[i,:,k:], k)
 
@@ -82,7 +82,7 @@ def calc_clv(all_true, all_blv, all_flv):
 def calc_fsv(all_true):
   # all_true <- np.array[STEPS, DIMM]
   # all_fsv  -> np.array[STEPS, DIMM, DIMM] : column final SVs, zero for the first (window) steps
-  all_fsv = np.empty((STEPS, DIMM, DIMM))
+  all_fsv = np.zeros((STEPS, DIMM, DIMM))
   window = 10
   for i in range(window, STEPS):
     true = all_true[i-window,:]
@@ -96,7 +96,7 @@ def calc_isv(all_true):
   # all_true <- np.array[STEPS, DIMM]
   # all_isv  -> np.array[STEPS, DIMM, DIMM] : column initial SVs, zero for the last (window) steps
 
-  all_isv = np.empty((STEPS, DIMM, DIMM))
+  all_isv = np.zeros((STEPS, DIMM, DIMM))
   window = 10
   for i in range(STEPS, window-1, -1):
     true = all_true[i-window,:]
