@@ -8,7 +8,7 @@ from model import *
 def calc_blv(all_true):
   # all_true <- np.array[STEPS, DIMM]
   # all_blv  -> np.array[STEPS, DIMM, DIMM] : column backward lvs
-  # all_ble  -> np.array[STEPS, DIMM]       : backward lyapunov exponents
+  # all_ble  -> np.array[STEPS, DIMM]       : backward lyapunov exponents, zero for the first step
 
   orth_int = 1
 
@@ -33,7 +33,7 @@ def calc_blv(all_true):
 def calc_flv(all_true):
   # all_true <- np.array[STEPS, DIMM]
   # all_flv  -> np.array[STEPS, DIMM, DIMM] : column forward lvs
-  # all_fle  -> np.array[STEPS, DIMM]       : forward lyapunov exponents
+  # all_fle  -> np.array[STEPS, DIMM]       : forward lyapunov exponents, zero for the last step
 
   orth_int = 1
 
@@ -60,7 +60,7 @@ def calc_clv(all_true, all_blv, all_flv):
   # all_true <- np.array[STEPS, DIMM]
   # all_blv  <- np.array[STEPS, DIMM, DIMM] : column backward lvs
   # all_flv  <- np.array[STEPS, DIMM, DIMM] : column forward lvs
-  # all_clv  -> np.array[STEPS, DIMM, DIMM] : column charactetistic lvs
+  # all_clv  -> np.array[STEPS, DIMM, DIMM] : column charactetistic lvs, zero for the first and last step
 
   all_clv = np.empty((STEPS, DIMM, DIMM))
 
@@ -81,7 +81,7 @@ def calc_clv(all_true, all_blv, all_flv):
 
 def calc_fsv(all_true):
   # all_true <- np.array[STEPS, DIMM]
-  # all_fsv  -> np.array[STEPS, DIMM, DIMM] : column final SVs
+  # all_fsv  -> np.array[STEPS, DIMM, DIMM] : column final SVs, zero for the first (window) steps
   all_fsv = np.empty((STEPS, DIMM, DIMM))
   window = 10
   for i in range(window, STEPS):
@@ -94,7 +94,7 @@ def calc_fsv(all_true):
 
 def calc_isv(all_true):
   # all_true <- np.array[STEPS, DIMM]
-  # all_isv  -> np.array[STEPS, DIMM, DIMM] : column initial SVs
+  # all_isv  -> np.array[STEPS, DIMM, DIMM] : column initial SVs, zero for the last (window) steps
 
   all_isv = np.empty((STEPS, DIMM, DIMM))
   window = 10
@@ -107,6 +107,10 @@ def calc_isv(all_true):
   return all_isv
 
 def write_lyapunov_exponents(all_ble, all_fle, all_clv):
+  # all_ble <- np.array[STEPS, DIMM]
+  # all_fle <- np.array[STEPS, DIMM]
+  # all_clv <- np.array[STEPS, DIMM, DIMM]
+
   f = open("data/lyapunov.txt", "w")
   f.write("backward LEs:\n")
   f.write(str_vector(np.mean(all_ble[STEPS//2:,:], axis=0)) + "\n")
@@ -155,10 +159,14 @@ def vector_common(blv, flv, k):
 
 def nullspace(a):
   # refer to 658Ep19
+  # a      <- np.array[DIMM,DIMM]
+  # return <- np.array[DIMM]
   u, s, vh = np.linalg.svd(a)
   return vh.T[:,-1]
 
 def str_vector(arr):
+  # arr    <- np.array[n]
+  # return -> string
   n = len(arr)
   st = ""
   for i in range(n):

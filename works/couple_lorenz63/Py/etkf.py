@@ -5,14 +5,13 @@ from scipy.linalg import sqrtm
 from const import *
 
 def etkf(fcst, h_nda, r_nda, yo_nda, inf, nmem):
-  ### here, (dimm = i_e - i_s <= DIMM) unless strongly coupled
-  # fcst   <- np.array[nmem, dimm]
-  # h_nda  <- np.array[DIMO, dimm]
+  # fcst   <- np.array[nmem, dimc]
+  # h_nda  <- np.array[DIMO, dimc]
   # r_nda  <- np.array[DIMO, DIMO]
   # yo_nda <- np.array[DIMO, 1]
   # inf    <- float
   # nmem   <- int
-  # return -> np.array[dimm, nmem], np.array[dimm, dimm], np.array[dimm, dimm]
+  # return -> np.array[dimc, nmem], np.array[dimc, dimc], np.array[dimc, dimc]
 
   h  = np.asmatrix(h_nda)
   r  = np.asmatrix(r_nda)
@@ -20,16 +19,16 @@ def etkf(fcst, h_nda, r_nda, yo_nda, inf, nmem):
 
   ### DA variables (np.matrix)
   # - model space
-  #  xfm[dimm,nmem] : each member's forecast Xf
-  # xfpt[dimm,nmem] : forecast perturbation Xbp
-  #  xam[dimm,nmem] : each member's analysis Xa
-  # xapt[dimm,nmem] : analysis perturbation Xap
-  #   xf[dimm,1   ] : ensemble mean forecast xf_bar
-  #   xa[dimm,1   ] : ensemble mean analysis xa_bar
+  #  xfm[dimc,nmem] : each member's forecast Xf
+  # xfpt[dimc,nmem] : forecast perturbation Xbp
+  #  xam[dimc,nmem] : each member's analysis Xa
+  # xapt[dimc,nmem] : analysis perturbation Xap
+  #   xf[dimc,1   ] : ensemble mean forecast xf_bar
+  #   xa[dimc,1   ] : ensemble mean analysis xa_bar
   #
   # - obs space
   #    r[DIMO,DIMO] : obs error covariance matrix R
-  #    h[DIMO,dimm] : linearized observation operator H
+  #    h[DIMO,dimc] : linearized observation operator H
   #   yo[DIMO,1   ] : observed state yo
   #   yb[DIMO,1   ] : mean simulated observation vector yb
   #  ybm[DIMO,nmem] : ensemble model simulated observation matrix Yb
