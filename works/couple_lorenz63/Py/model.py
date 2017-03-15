@@ -54,8 +54,9 @@ def tendency(x_in, i_s=0, i_e=DIMM):
     k1    = 10.0
     k2    = -11.0
 
+    # todo: refine B.C. for uncoupled component
     # for non-coupled
-    x = np.zeros((DIMM)) # todo: uncoupled component is climatology
+    x = np.zeros((DIMM))
     x[i_s:i_e] = x_in[:]
 
     dx = np.empty((DIMM))
@@ -79,9 +80,10 @@ def tendency(x_in, i_s=0, i_e=DIMM):
     return k
 
 def tangent_linear(x, dt):
+  # Return one-timestep tangent linear matrix, currently not for non/weakly coupled
   # x      <- np.array(DIMM)       : state vector at the beginning
   # dt     <- float                : infinitesimal time
-  # return -> np.array(DIMM,DIMM) : instantaneous tangent linear matrix M
+  # return -> np.array(DIMM,DIMM)  : instantaneous tangent linear matrix M
 
   dx = np.zeros((DIMM,DIMM))
 
@@ -164,10 +166,11 @@ def tangent_linear(x, dt):
   return m
 
 def finite_time_tangent(x0, dt, iw):
-  # x0     <- np.array(DIMM)       : state vector at t0
+  # Return finite time tangent linear matrix (t0 -> t0 + dt * iw)
+  # x0     <- np.array(DIMM)       : state vector at the beginning of the window
   # dt     <- float                : timestep
   # iw     <- int                  : integration window (time in steps)
-  # return -> np.array(DIMM,DIMM) : finite time (t0 -> t0 + iw*DT) tangent linear matrix M
+  # return -> np.array(DIMM,DIMM)  : finite time tangent linear matrix M
 
   m_finite = np.identity(DIMM)
   x = np.copy(x0)
@@ -178,10 +181,11 @@ def finite_time_tangent(x0, dt, iw):
   return m_finite
 
 def finite_time_tangent_using_nonlinear(x0, dt, iw):
+  # Return tangent linear matrix, calculated numerically using the NL model
   # x0     <- np.array(DIMM)       : state vector at t0
   # dt     <- float                : timestep
   # iw     <- int                  : integration window (time in steps)
-  # return -> np.array(DIMM,DIMM) : finite time (t0 -> t0 + iw*DT) tangent linear matrix M
+  # return -> np.array(DIMM,DIMM)  : finite time (t0 -> t0 + iw*DT) tangent linear matrix M
 
   m_finite = np.identity(DIMM)
   eps = 1.0e-9
