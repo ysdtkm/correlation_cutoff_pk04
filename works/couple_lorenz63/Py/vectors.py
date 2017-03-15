@@ -80,30 +80,41 @@ def calc_clv(all_true, all_blv, all_flv):
   return all_clv
 
 def calc_fsv(all_true):
+  ### refer to 658Ep15 about exponents
   # all_true <- np.array[STEPS, DIMM]
   # all_fsv  -> np.array[STEPS, DIMM, DIMM] : column final SVs, zero for the first (window) steps
+  # all_fse  -> np.array[STEPS, DIMM]       : Singular exponents (1/window) * ln(sigma)
+
   all_fsv = np.zeros((STEPS, DIMM, DIMM))
+  all_fse = np.zeros((STEPS, DIMM))
   window = 10
   for i in range(window, STEPS):
     true = all_true[i-window,:]
     m = finite_time_tangent_using_nonlinear(true, DT, window)
     u, s, vh = np.linalg.svd(m)
     all_fsv[i,:,:] = u[:,:]
+    all_fse[i,:] = np.log(np.abs(s)) / (DT * window)
   all_fsv.tofile("data/fsv.bin")
+  all_fse.tofile("data/fse.bin")
   return all_fsv
 
 def calc_isv(all_true):
+  ### refer to 658Ep15 about exponents
   # all_true <- np.array[STEPS, DIMM]
   # all_isv  -> np.array[STEPS, DIMM, DIMM] : column initial SVs, zero for the last (window) steps
+  # all_ise  -> np.array[STEPS, DIMM]       : Singular exponents (1/window) * ln(sigma)
 
   all_isv = np.zeros((STEPS, DIMM, DIMM))
+  all_ise = np.zeros((STEPS, DIMM))
   window = 10
   for i in range(STEPS, window-1, -1):
     true = all_true[i-window,:]
     m = finite_time_tangent_using_nonlinear(true, DT, window)
     u, s, vh = np.linalg.svd(m)
     all_isv[i-window,:,:] = vh.T[:,:]
+    all_ise[i-window,:] = np.log(np.abs(s)) / (DT * window)
   all_isv.tofile("data/isv.bin")
+  all_ise.tofile("data/ise.bin")
   return all_isv
 
 def write_lyapunov_exponents(all_ble, all_fle, all_clv):
