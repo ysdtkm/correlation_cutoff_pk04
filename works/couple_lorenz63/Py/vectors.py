@@ -8,7 +8,7 @@ from model import *
 def calc_blv(all_true):
   # all_true <- np.array[STEPS, DIMM]
   # all_blv  -> np.array[STEPS, DIMM, DIMM] : column backward lvs
-  # all_ble  -> np.array[STEPS, DIMM]       : backward lyapunov exponents
+  # all_ble  -> np.array[STEPS, DIMM]       : backward lyapunov exponents, zero for the first step
 
   orth_int = 1
 
@@ -33,13 +33,13 @@ def calc_blv(all_true):
 def calc_flv(all_true):
   # all_true <- np.array[STEPS, DIMM]
   # all_flv  -> np.array[STEPS, DIMM, DIMM] : column forward lvs
-  # all_fle  -> np.array[STEPS, DIMM]       : forward lyapunov exponents
+  # all_fle  -> np.array[STEPS, DIMM]       : forward lyapunov exponents, zero for the last step
 
   orth_int = 1
 
   flv = np.random.normal(0.0, 1.0, (DIMM, DIMM))
   flv, fle = orth_norm_vectors(flv)
-  all_flv = np.empty((STEPS, DIMM, DIMM))
+  all_flv = np.zeros((STEPS, DIMM, DIMM))
   all_fle = np.zeros((STEPS, DIMM))
 
   for i in range(STEPS, 0, -1):
@@ -60,11 +60,11 @@ def calc_clv(all_true, all_blv, all_flv):
   # all_true <- np.array[STEPS, DIMM]
   # all_blv  <- np.array[STEPS, DIMM, DIMM] : column backward lvs
   # all_flv  <- np.array[STEPS, DIMM, DIMM] : column forward lvs
-  # all_clv  -> np.array[STEPS, DIMM, DIMM] : column charactetistic lvs
+  # all_clv  -> np.array[STEPS, DIMM, DIMM] : column charactetistic lvs, zero for the first and last step
 
-  all_clv = np.empty((STEPS, DIMM, DIMM))
+  all_clv = np.zeros((STEPS, DIMM, DIMM))
 
-  for i in range(1, STEPS):
+  for i in range(1, STEPS-1):
     for k in range(0, DIMM):
       all_clv[i,:,k] = vector_common(all_blv[i,:,:k+1], all_flv[i,:,k:], k)
 
@@ -80,33 +80,48 @@ def calc_clv(all_true, all_blv, all_flv):
   return all_clv
 
 def calc_fsv(all_true):
+  ### refer to 658Ep15 about exponents
   # all_true <- np.array[STEPS, DIMM]
-  # all_fsv  -> np.array[STEPS, DIMM, DIMM] : column final SVs
-  all_fsv = np.empty((STEPS, DIMM, DIMM))
-  window = 1
+  # all_fsv  -> np.array[STEPS, DIMM, DIMM] : column final SVs, zero for the first (window) steps
+  # all_fse  -> np.array[STEPS, DIMM]       : Singular exponents (1/window) * ln(sigma)
+
+  all_fsv = np.zeros((STEPS, DIMM, DIMM))
+  all_fse = np.zeros((STEPS, DIMM))
+  window = 10
   for i in range(window, STEPS):
     true = all_true[i-window,:]
     m = finite_time_tangent_using_nonlinear(true, DT, window)
     u, s, vh = np.linalg.svd(m)
     all_fsv[i,:,:] = u[:,:]
+    all_fse[i,:] = np.log(np.abs(s)) / (DT * window)
   all_fsv.tofile("data/fsv.bin")
+  all_fse.tofile("data/fse.bin")
   return all_fsv
 
 def calc_isv(all_true):
+  ### refer to 658Ep15 about exponents
   # all_true <- np.array[STEPS, DIMM]
-  # all_isv  -> np.array[STEPS, DIMM, DIMM] : column initial SVs
+  # all_isv  -> np.array[STEPS, DIMM, DIMM] : column initial SVs, zero for the last (window) steps
+  # all_ise  -> np.array[STEPS, DIMM]       : Singular exponents (1/window) * ln(sigma)
 
-  all_isv = np.empty((STEPS, DIMM, DIMM))
-  window = 1
+  all_isv = np.zeros((STEPS, DIMM, DIMM))
+  all_ise = np.zeros((STEPS, DIMM))
+  window = 10
   for i in range(STEPS, window-1, -1):
     true = all_true[i-window,:]
     m = finite_time_tangent_using_nonlinear(true, DT, window)
     u, s, vh = np.linalg.svd(m)
     all_isv[i-window,:,:] = vh.T[:,:]
+    all_ise[i-window,:] = np.log(np.abs(s)) / (DT * window)
   all_isv.tofile("data/isv.bin")
+  all_ise.tofile("data/ise.bin")
   return all_isv
 
 def write_lyapunov_exponents(all_ble, all_fle, all_clv):
+  # all_ble <- np.array[STEPS, DIMM]
+  # all_fle <- np.array[STEPS, DIMM]
+  # all_clv <- np.array[STEPS, DIMM, DIMM]
+
   f = open("data/lyapunov.txt", "w")
   f.write("backward LEs:\n")
   f.write(str_vector(np.mean(all_ble[STEPS//2:,:], axis=0)) + "\n")
@@ -155,10 +170,14 @@ def vector_common(blv, flv, k):
 
 def nullspace(a):
   # refer to 658Ep19
+  # a      <- np.array[DIMM,DIMM]
+  # return <- np.array[DIMM]
   u, s, vh = np.linalg.svd(a)
   return vh.T[:,-1]
 
 def str_vector(arr):
+  # arr    <- np.array[n]
+  # return -> string
   n = len(arr)
   st = ""
   for i in range(n):
