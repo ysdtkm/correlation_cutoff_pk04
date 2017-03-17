@@ -9,15 +9,14 @@ from tdvar import *
 from model import *
 
 def fdvar(fcst_0, h, r, yo, aint, i_s, i_e):
-  ### here, (dimm = i_e - i_s <= DIMM) unless strongly coupled
-  # fcst_0 <- np.array[dimm]       : first guess at beginning of window
-  # h      <- np.array[DIMO, dimm] : observation operator
+  # fcst_0 <- np.array[dimc]       : first guess at beginning of window
+  # h      <- np.array[DIMO, dimc] : observation operator
   # r      <- np.array[DIMO, DIMO] : observation error covariance
   # yo     <- np.array[DIMO, 1]    : observation
   # aint   <- int                  : assimilation interval
   # i_s    <- int                  : model grid number, assimilate only [i_s, i_e)
   # i_e    <- int
-  # return -> np.array[dimm]       : assimilated field
+  # return -> np.array[dimc]       : assimilated field
 
   # only assimilate one set of obs at t1 = t0+dt*aint
   # input fcst_0 is [aint] steps former than analysis time
@@ -34,10 +33,9 @@ def fdvar(fcst_0, h, r, yo, aint, i_s, i_e):
   return anl_1.T
 
 def fdvar_2j(anl_0_nda, fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e):
-  ### here, (dimm = i_e - i_s <= DIMM) unless strongly coupled
-  # anl_0_nda  <- np.array[dimm]       : temporary analysis field
-  # fcst_0_nda <- np.array[dimm]       : first guess field
-  # h_nda      <- np.array[DIMO, dimm] : observation operator
+  # anl_0_nda  <- np.array[dimc]       : temporary analysis field
+  # fcst_0_nda <- np.array[dimc]       : first guess field
+  # h_nda      <- np.array[DIMO, dimc] : observation operator
   # r_nda      <- np.array[DIMO, DIMO] : observation error covariance
   # yo_nda     <- np.array[DIMO, 1]    : observation
   # aint       <- int                  : assimilation interval
@@ -63,16 +61,18 @@ def fdvar_2j(anl_0_nda, fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e):
   return twoj[0,0]
 
 def fdvar_2j_deriv(anl_0_nda, fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e):
-  ### here, (dimm = i_e - i_s <= DIMM) unless strongly coupled
-  # anl_0_nda  <- np.array[dimm]       : temporary analysis field
-  # fcst_0_nda <- np.array[dimm]       : first guess field
-  # h_nda      <- np.array[DIMO, dimm] : observation operator
+  # anl_0_nda  <- np.array[dimc]       : temporary analysis field
+  # fcst_0_nda <- np.array[dimc]       : first guess field
+  # h_nda      <- np.array[DIMO, dimc] : observation operator
   # r_nda      <- np.array[DIMO, DIMO] : observation error covariance
   # yo_nda     <- np.array[DIMO, 1]    : observation
   # aint       <- int                  : assimilation interval
   # i_s        <- int                  : model grid number, assimilate only [i_s, i_e)
   # i_e        <- int
-  # return     -> np.array[dimm]       : gradient of cost function 2J
+  # return     -> np.array[dimc]       : gradient of cost function 2J
+
+  if i_s != 0 or i_e != DIMM:
+    raise Exception("method fdvar_2j_deriv does not support non/weakly coupled DA")
 
   h  = np.asmatrix(h_nda)
   r  = np.asmatrix(r_nda)
@@ -81,7 +81,6 @@ def fdvar_2j_deriv(anl_0_nda, fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e):
   anl_0  = np.asmatrix(anl_0_nda).T
   fcst_0 = np.asmatrix(fcst_0_nda).T
 
-  # todo: the method below does not handle weak/non coupled DA
   m = finite_time_tangent(fcst_0_nda, DT, aint)
   inc = anl_0 - fcst_0
   fcst_1_nda = np.copy(fcst_0_nda)

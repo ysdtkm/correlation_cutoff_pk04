@@ -13,10 +13,10 @@ def main():
   np.random.seed(1)
   nature = exec_nature()
   obs = exec_obs(nature)
-  for exp in EXPLIST:
-    free = exec_free_run(exp)
-    anl  = exec_assim_cycle(exp, free, obs)
-    exec_deterministic_fcst(exp, anl)
+  for settings in EXPLIST:
+    free = exec_free_run(settings)
+    anl  = exec_assim_cycle(settings, free, obs)
+    exec_deterministic_fcst(settings, anl)
 
 def exec_nature():
   # return   -> np.array[STEPS, DIMM]
@@ -49,28 +49,27 @@ def exec_obs(nature):
   all_obs.tofile("data/obs.bin")
   return all_obs
 
-def exec_free_run(exp):
-  # exp      <- hash
+def exec_free_run(settings):
+  # settings <- hash
   # return   -> np.array[STEPS, nmem, DIMM]
 
-  free_run = np.empty((STEPS, exp["nmem"], DIMM))
-  for m in range(0, exp["nmem"]):
+  free_run = np.empty((STEPS, settings["nmem"], DIMM))
+  for m in range(0, settings["nmem"]):
     free_run[0,m,:] = np.random.normal(0.0, FERR_INI, DIMM)
     for i in range(1, STEP_FREE):
       free_run[i,m,:] = timestep(free_run[i-1,m,:], DT)
   return free_run
 
-def exec_assim_cycle(exp, all_fcst, all_obs):
-  # exp      <- hash
+def exec_assim_cycle(settings, all_fcst, all_obs):
+  # settings <- hash
   # all_fcst <- np.array[STEPS, nmem, DIMM]
   # all_obs  <- np.array[STEPS, DIMO]
   # return   -> np.array[STEPS, nmem, DIMM]
-  ### All array-like objects in this method are np.ndarray
 
   # prepare containers
   r = getr()
-  h = geth(exp["diag"])
-  fcst = np.empty((exp["nmem"], DIMM))
+  h = geth(settings["diag"])
+  fcst = np.empty((settings["nmem"], DIMM))
   all_ba = np.empty((STEPS, DIMM, DIMM))
   all_ba[:,:,:] = np.nan
   all_bf = np.empty((STEPS, DIMM, DIMM))
@@ -81,88 +80,87 @@ def exec_assim_cycle(exp, all_fcst, all_obs):
   # forecast-analysis cycle
   for i in range(STEP_FREE, STEPS):
 
-    for m in range(0, exp["nmem"]):
-      if (exp["couple"] == "strong" or exp["couple"] == "weak"):
+    for m in range(0, settings["nmem"]):
+      if (settings["couple"] == "strong" or settings["couple"] == "weak"):
         fcst[m,:] = timestep(all_fcst[i-1,m,:], DT)
-      elif (exp["couple"] == "none"):
+      elif (settings["couple"] == "none"):
         fcst[m,0:6] = timestep(all_fcst[i-1,m,0:6], DT, 0, 6)
         fcst[m,6:9] = timestep(all_fcst[i-1,m,6:9], DT, 6, 9)
 
-    if (i % exp["aint"] == 0):
+    if (i % settings["aint"] == 0):
       obs_used[i,:] = all_obs[i,:]
-      fcst_pre = all_fcst[i-exp["aint"],:,:]
+      fcst_pre = all_fcst[i-settings["aint"],:,:]
 
-      if (exp["couple"] == "strong"):
+      if (settings["couple"] == "strong"):
         fcst[:,:], all_bf[i,:,:], all_ba[i,:,:] = \
-          analyze_one_window(fcst, fcst_pre, all_obs[i,:], h, r, exp)
-      elif (exp["couple"] == "weak" or exp["couple"] == "none"):
+          analyze_one_window(fcst, fcst_pre, all_obs[i,:], h, r, settings)
+      elif (settings["couple"] == "weak" or settings["couple"] == "none"):
         dim_atm = 6
         # atmospheric assimilation
         fcst[:, :dim_atm], \
           all_bf[i, :dim_atm, :dim_atm], \
           all_ba[i, :dim_atm, :dim_atm]  \
           = analyze_one_window(fcst[:, :dim_atm], fcst_pre[:, :dim_atm], \
-            all_obs[i, :dim_atm], h[:dim_atm, :dim_atm], r[:dim_atm, :dim_atm], exp, 0, 6)
+            all_obs[i, :dim_atm], h[:dim_atm, :dim_atm], r[:dim_atm, :dim_atm], settings, 0, 6)
         # oceanic assimilation
         fcst[:, dim_atm:], \
           all_bf[i, dim_atm:, dim_atm:], \
           all_ba[i, dim_atm:, dim_atm:]  \
           = analyze_one_window(fcst[:, dim_atm:], fcst_pre[:, dim_atm:], \
-            all_obs[i, dim_atm:], h[dim_atm:, dim_atm:], r[dim_atm:, dim_atm:], exp, 6, 9)
+            all_obs[i, dim_atm:], h[dim_atm:, dim_atm:], r[dim_atm:, dim_atm:], settings, 6, 9)
 
     all_fcst[i,:,:] = fcst[:,:]
 
   # save to files
-  obs_used.tofile("data/%s_obs.bin" % exp["name"])
-  all_fcst.tofile("data/%s_cycle.bin" % exp["name"])
-  all_bf.tofile("data/%s_covr_back.bin" % exp["name"])
-  all_ba.tofile("data/%s_covr_anl.bin" % exp["name"])
+  obs_used.tofile("data/%s_obs.bin" % settings["name"])
+  all_fcst.tofile("data/%s_cycle.bin" % settings["name"])
+  all_bf.tofile("data/%s_covr_back.bin" % settings["name"])
+  all_ba.tofile("data/%s_covr_anl.bin" % settings["name"])
   return all_fcst
 
-def analyze_one_window(fcst, fcst_pre, obs, h, r, exp, i_s=0, i_e=DIMM):
-  ### here, (dimc = i_e - i_s) unless strongly coupled
+def analyze_one_window(fcst, fcst_pre, obs, h, r, settings, i_s=0, i_e=DIMM):
   # fcst     <- np.array[nmem, dimc]
   # fcst_pre <- np.array[nmem, dimc]
   # obs      <- np.array[DIMO]
   # h        <- np.array[DIMO, dimc]
   # r        <- np.array[DIMO, DIMO]
-  # exp      <- hash
+  # settings <- hash
   # i_s      <- int                  : model grid number, assimilate only [i_s, i_e)
   # i_e      <- int
   # return1  -> np.array[nmem, dimc]
   # return2  -> np.array[dimc, dimc]
   # return3  -> np.array[dimc, dimc]
 
-  anl = np.empty((exp["nmem"], i_e-i_s))
+  anl = np.empty((settings["nmem"], i_e-i_s))
   bf = np.empty((i_e-i_s, i_e-i_s))
-  bf[:,:] = np.nan
   ba = np.empty((i_e-i_s, i_e-i_s))
+  bf[:,:] = np.nan
   ba[:,:] = np.nan
 
   yo = np.dot(h[:,:], obs[:, np.newaxis])
 
-  if (exp["method"] == "etkf"):
+  if (settings["method"] == "etkf"):
     anl[:,:], bf[:,:], ba[:,:] = \
-        etkf(fcst[:,:], h[:,:], r[:,:], yo[:,:], exp["inf"], exp["nmem"])
-  elif (exp["method"] == "3dvar"):
+        etkf(fcst[:,:], h[:,:], r[:,:], yo[:,:], settings["inf"], settings["nmem"])
+  elif (settings["method"] == "3dvar"):
     anl[0,:] = tdvar(fcst[0,:].T, h[:,:], r[:,:], yo[:,:], i_s, i_e)
-  elif (exp["method"] == "4dvar"):
-    anl[0,:] = fdvar(fcst_pre[0,:], h[:,:], r[:,:], yo[:,:], exp["aint"], i_s, i_e)
+  elif (settings["method"] == "4dvar"):
+    anl[0,:] = fdvar(fcst_pre[0,:], h[:,:], r[:,:], yo[:,:], settings["aint"], i_s, i_e)
 
   return anl[:,:], bf[:,:], ba[:,:]
 
-def exec_deterministic_fcst(exp, anl):
-  # exp    <- hash
-  # anl    <- np.array[STEPS, nmem, DIMM]
-  # return -> np.array[STEPS, FCST_LT, DIMM]
+def exec_deterministic_fcst(settings, anl):
+  # settings <- hash
+  # anl      <- np.array[STEPS, nmem, DIMM]
+  # return   -> np.array[STEPS, FCST_LT, DIMM]
 
   fcst_all = np.empty((STEPS, FCST_LT, DIMM))
   for i in range(STEP_FREE, STEPS):
-    if (i % exp["aint"] == 0):
+    if (i % settings["aint"] == 0):
       fcst_all[i,0,:] = np.mean(anl[i,:,:], axis=0)
       for lt in range(1, FCST_LT):
         fcst_all[i,lt,:] = timestep(fcst_all[i-1,lt,:], DT)
-  fcst_all.tofile("data/%s_fcst.bin" % exp["name"])
+  fcst_all.tofile("data/%s_fcst.bin" % settings["name"])
   return 0
 
 main()

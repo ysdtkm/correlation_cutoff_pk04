@@ -3,11 +3,12 @@
 import math
 import numpy as np
 
-DIMM = 40  # dimension of model variable n
+# note: "dimc" in comments is dimension of component (for non/weakly coupled)
+DIMM = 40   # dimension of model variable n
 DIMO = DIMM # dimension of observation variable m
 
 DT = 0.01
-TMAX = 120
+TMAX = 10
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 VRFS = int(STEPS * 0.25) # verification period: [VRFS,STEPS)

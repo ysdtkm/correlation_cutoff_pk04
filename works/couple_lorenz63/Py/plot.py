@@ -51,18 +51,29 @@ def plot_all():
         plot_covariance_matr(hist_covar, name, sel)
 
 def plot_le():
+  # plot lyapunov exponents
   hist_ble = np.fromfile("data/ble.bin", np.float64)
   hist_fle = np.fromfile("data/fle.bin", np.float64)
+  hist_fse = np.fromfile("data/fse.bin", np.float64)
+  hist_ise = np.fromfile("data/ise.bin", np.float64)
+
   hist_ble = hist_ble.reshape((STEPS, DIMM))
   hist_fle = hist_fle.reshape((STEPS, DIMM))
+  hist_fse = hist_fse.reshape((STEPS, DIMM))
+  hist_ise = hist_ise.reshape((STEPS, DIMM))
+
   mean_ble = np.mean(hist_ble[STEPS//2:,:], axis=0)
   mean_fle = np.mean(hist_fle[STEPS//2:,:], axis=0)
+  mean_fse = np.mean(hist_fse[STEPS//2:,:], axis=0)
+  mean_ise = np.mean(hist_ise[STEPS//2:,:], axis=0)
 
   plt.rcParams["font.size"] = 12
   fig, ax1 = plt.subplots(1)
   ax1.set_title("Lyapunov exponents")
-  ax1.plot(mean_ble, label="Back-Lyap exponents")
-  ax1.plot(mean_fle, label="Fore-Lyap exponents")
+  ax1.plot(mean_ble, label="Backward Lyap.")
+  ax1.plot(mean_fle, label="Forward Lyap.")
+  ax1.plot(mean_fse, label="Final Singular")
+  ax1.plot(mean_ise, label="Initial Singular")
   ax1.set_ylabel("1 / Time")
   ax1.set_xlabel("LE index")
   ax1.legend()
@@ -71,6 +82,8 @@ def plot_le():
   plt.close()
 
 def plot_lv_time(hist_lv, name):
+  # hist_lv <- np.array[STEPS, DIMM, DIMM]
+  # name    <- string
   plt.rcParams["font.size"] = 12
   fig, ax1 = plt.subplots(1)
   ax1.set_title("lv1_1")
@@ -83,7 +96,7 @@ def plot_lv_time(hist_lv, name):
   plt.clf()
   plt.close()
 
-def plot_lv_projection(hist_lv, hist_fcst, name, title, nmem, is_oblique=False):
+def plot_lv_projection(hist_lv, hist_fcst, name, title, nmem, is_oblique):
   # hist_lv    <- np.array[STEPS, DIMM, DIMM]
   # hist_fcst  <- np.array[STEPS, nmem, DIMM]
   # name       <- string
@@ -123,6 +136,10 @@ def plot_lv_projection(hist_lv, hist_fcst, name, title, nmem, is_oblique=False):
   return 0
 
 def plot_trajectory_lv(hist_true, hist_lv, name):
+  # hist_true <- np.array[STEPS, DIMM]
+  # hist_lv   <- np.array[STEPS, DIMM, DIMM]
+  # name      <- string
+
   if not (DIMM == 3 or DIMM == 9):
     return 0
   for i_component in range(DIMM//3):
@@ -238,8 +255,11 @@ def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
   return 0
 
 def plot_time_value(hist_true, hist_fcst, hist_obs, name, nmem):
-  # name <- string
-  # nmem <- int
+  # hist_true  <- np.array[STEPS, DIMM]
+  # hist_fcst  <- np.array[STEPS, nmem, DIMM]
+  # hist_obs   <- np.array[STEPS, DIMO]
+  # name       <- string
+  # nmem       <- int
 
   hist_fcst_mean = np.mean(hist_fcst, axis=1)
 
@@ -288,6 +308,8 @@ def plot_time_value(hist_true, hist_fcst, hist_obs, name, nmem):
   return 0
 
 def plot_3d_trajectory(hist_true, hist_fcst, name, nmem):
+  # hist_true  <- np.array[STEPS, DIMM]
+  # hist_fcst  <- np.array[STEPS, nmem, DIMM]
   # name <- string
   # nmem <- int
 
@@ -322,13 +344,13 @@ def plot_3d_trajectory(hist_true, hist_fcst, name, nmem):
   return 0
 
 def plot_covariance_matr(hist_covar, name, sel):
-  # name <- string
+  # hist_covar <- np.array[STEPS, DIMM, DIMM]
+  # name       <- string
+  # sel        <- string
 
   with warnings.catch_warnings():
     warnings.simplefilter("ignore", category=RuntimeWarning)
     rms_covar  = np.sqrt(np.nan_to_num(np.nanmean(hist_covar[STEPS//2:STEPS,:,:]**2, axis=0)))
-    print(name)
-    print(rms_covar)
     mean_covar = np.nan_to_num(np.nanmean(hist_covar, axis=0))
     rms_log = np.log(rms_covar)
   rms_log[np.isneginf(rms_log)] = 0
@@ -337,8 +359,10 @@ def plot_covariance_matr(hist_covar, name, sel):
   plot_matrix(mean_covar, name, "%s_covar_mean_%s" % (sel, name))
 
 def plot_matrix(data, name, title, color=plt.cm.bwr):
-  # data <- np.array[n,n]
-  # name <- string
+  # data  <- np.array[n,n]
+  # name  <- string
+  # title <- string
+  # color <- plt.cm object
 
   fig, ax = plt.subplots(1)
   fig.subplots_adjust(left=0.12, right=0.95, bottom=0.12, top=0.92)
@@ -358,6 +382,10 @@ def plot_matrix(data, name, title, color=plt.cm.bwr):
   return 0
 
 def oblique_projection(vector, obl_basis):
+  # vector    <- np.array[DIMM]
+  # obl_basis <- np.array[DIMM, DIMM]
+  # return    -> np.array[DIMM]
+
   if not (obl_basis.shape[0] == obl_basis.shape[1]) and (obl_basis.shape[0] == vector.shape[0]):
     print(vector.shape)
     print(obl_basis.shape)
@@ -366,7 +394,11 @@ def oblique_projection(vector, obl_basis):
   q, r = np.linalg.qr(obl_basis)
 
   orth_coefs = np.dot(q.T, vector)
-  coefs = np.dot(np.linalg.inv(r), orth_coefs)
+  try:
+    coefs = np.dot(np.linalg.inv(r), orth_coefs)
+  except np.linalg.linalg.LinAlgError:
+    coefs = np.zeros(DIMM)
+
   return coefs
 
 plot_all()
