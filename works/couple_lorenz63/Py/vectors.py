@@ -87,7 +87,7 @@ def calc_fsv(all_true):
 
   all_fsv = np.zeros((STEPS, DIMM, DIMM))
   all_fse = np.zeros((STEPS, DIMM))
-  window = 10
+  window = 1
   for i in range(window, STEPS):
     true = all_true[i-window,:]
     m = finite_time_tangent_using_nonlinear(true, DT, window)
@@ -106,7 +106,7 @@ def calc_isv(all_true):
 
   all_isv = np.zeros((STEPS, DIMM, DIMM))
   all_ise = np.zeros((STEPS, DIMM))
-  window = 10
+  window = 1
   for i in range(STEPS, window-1, -1):
     true = all_true[i-window,:]
     m = finite_time_tangent_using_nonlinear(true, DT, window)
