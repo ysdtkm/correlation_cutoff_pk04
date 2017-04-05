@@ -386,7 +386,7 @@ def oblique_projection(vector, obl_basis):
   # obl_basis <- np.array[DIMM, DIMM]
   # return    -> np.array[DIMM]
 
-  if not (obl_basis.shape[0] == obl_basis.shape[1]) and (obl_basis.shape[0] == vector.shape[0]):
+  if not ((obl_basis.shape[0] == obl_basis.shape[1]) and (obl_basis.shape[0] == vector.shape[0])):
     print(vector.shape)
     print(obl_basis.shape)
     sys.exit("oblique projection: only square matrix is arrowed as obl_basis")
