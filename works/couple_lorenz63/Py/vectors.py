@@ -170,7 +170,7 @@ def vector_common(blv, flv, k):
 
 def nullspace(a):
   # refer to 658Ep19
-  # a      <- np.array[DIMM,DIMM]
+  # a      <- np.array[DIMM,DIMM+1]
   # return <- np.array[DIMM]
   u, s, vh = np.linalg.svd(a)
   return vh.T[:,-1]
