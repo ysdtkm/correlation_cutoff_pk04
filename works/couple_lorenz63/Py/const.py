@@ -4,11 +4,11 @@ import math
 import numpy as np
 
 # note: "dimc" in comments is dimension of component (for non/weakly coupled)
-DIMM = 40   # dimension of model variable n
+DIMM = 9    # dimension of model variable n
 DIMO = DIMM # dimension of observation variable m
 
 DT = 0.01
-TMAX = 10
+TMAX = 20
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 VRFS = int(STEPS * 0.25) # verification period: [VRFS,STEPS)
@@ -18,18 +18,15 @@ OERR = 0.1
 FERR_INI = 10.0
 
 EXPLIST = [ \
-  {"name":"etkf_no_infl",  "inf":1.0, "aint":10, \
-        "diag":np.ones(DIMM), "nmem":DIMM+1, \
+  {"name":"etkf_non_int25",  "inf":1.2, "aint":25, \
+        "diag":np.ones(DIMM), "nmem":10, \
+        "method":"etkf", "couple":"none"}, \
+  {"name":"etkf_weak_int25",  "inf":1.2, "aint":25, \
+        "diag":np.ones(DIMM), "nmem":10, \
+        "method":"etkf", "couple":"weak"}, \
+  {"name":"etkf_strong_int25",  "inf":1.2, "aint":25, \
+        "diag":np.ones(DIMM), "nmem":10, \
         "method":"etkf", "couple":"strong"}, \
-  # {"name":"etkf_non_int25",  "inf":1.2, "aint":25, \
-  #       "diag":np.ones(DIMM), "nmem":4, \
-  #       "method":"etkf", "couple":"none"}, \
-  # {"name":"etkf_weak_int25",  "inf":1.2, "aint":25, \
-  #       "diag":np.ones(DIMM), "nmem":4, \
-  #       "method":"etkf", "couple":"weak"}, \
-  # {"name":"etkf_strong_int25",  "inf":1.2, "aint":25, \
-  #       "diag":np.ones(DIMM), "nmem":4, \
-  #       "method":"etkf", "couple":"strong"}, \
   # {"name":"tdvar_non_int25", "inf":1.0, "aint":25, \
   #       "diag":np.ones(DIMM), \
   #       "nmem":1, "method":"3dvar", "couple":"none"}, \
