@@ -116,15 +116,17 @@ def plot_lv_projection(hist_lv, hist_fcst, name, title, nmem, is_oblique):
         for k in range(nmem):
           projection[j,k] += np.abs(np.dot(hist_lv[i,:,j], \
               hist_fcst[i,k,:] - hist_fcst_mean[i,:]))
-  projection /= OERR * DIMM * (STEPS / 2.0)
+  projection /= (STEPS / 2.0)
 
   data = np.log(projection)
   fig, ax = plt.subplots(1)
   fig.subplots_adjust(left=0.12, right=0.95, bottom=0.12, top=0.92)
   cmax = np.max(np.abs(data))
-  map1 = ax.pcolor(data, cmap=plt.cm.gist_rainbow_r)
-  if not is_oblique:
-    pass # map1.set_clim(-10, -4)
+  map1 = ax.pcolor(data, cmap=plt.cm.jet)
+  if is_oblique:
+    map1.set_clim(-3.5, 1.5)
+  else:
+    map1.set_clim(-5, 0)
   ax.set_xlim(xmax=nmem)
   ax.set_xlabel("member")
   ax.set_ylabel("index of vectors")
