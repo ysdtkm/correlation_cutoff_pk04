@@ -54,9 +54,9 @@ def tendency(x_in, i_s=0, i_e=DIMM):
     k1    = 10.0
     k2    = -11.0
 
-    # todo: refine B.C. for uncoupled component
-    # for non-coupled
-    x = np.zeros((DIMM))
+    # B.C. for non-coupled. Obtained from (a757b4e) unit_test.py
+    x = np.array([  0.35128345,  0.41208204, 23.57932048, -2.68240888, -2.26472921, \
+                   29.22828843, 14.33420545,  0.65398139, 16.64817181])
     x[i_s:i_e] = x_in[:]
 
     dx = np.empty((DIMM))
