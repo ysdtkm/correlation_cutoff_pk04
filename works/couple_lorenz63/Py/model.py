@@ -12,13 +12,13 @@ def timestep(x, dt, i_s=0, i_e=DIMM, bc=None):
   # return -> np.array(dimm)
 
   x0 = np.copy(x)
-  k1 = tendency(x0, i_s, i_e)
+  k1 = tendency(x0, i_s, i_e, bc)
   x2 = x0 + k1 * dt / 2.0
-  k2 = tendency(x2, i_s, i_e)
+  k2 = tendency(x2, i_s, i_e, bc)
   x3 = x0 + k2 * dt / 2.0
-  k3 = tendency(x3, i_s, i_e)
+  k3 = tendency(x3, i_s, i_e, bc)
   x4 = x0 + k3 * dt
-  k4 = tendency(x4, i_s, i_e)
+  k4 = tendency(x4, i_s, i_e, bc)
   return x0 + (k1 + 2.0 * k2 + 2.0 * k3 + k4) * dt / 6.0
 
 def tendency(x_in, i_s=0, i_e=DIMM, bc=None):
@@ -59,7 +59,7 @@ def tendency(x_in, i_s=0, i_e=DIMM, bc=None):
     if i_s == 0 and i_e == DIMM:
       x = np.copy(x_in)
     else:
-      if bc != None:
+      if not (bc is None):
         x = np.copy(bc)
       else:
         # B.C. for non-coupled. Obtained from (a757b4e) unit_test.py
