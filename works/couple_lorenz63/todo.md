@@ -3,6 +3,8 @@
 ## Short-term todo
 * use explicit BC in forward model
   * 6/13: almost done
+  * weakly coupledではどうなってる？
+  * visualization
 * use explicit BC in backward model
 * write a test code
 * check how random value is created
