@@ -3,11 +3,12 @@
 import numpy as np
 from const import *
 
-def timestep(x, dt, i_s=0, i_e=DIMM):
+def timestep(x, dt, i_s=0, i_e=DIMM, bc=None):
   # x      <- np.array(dimm)
   # dt     <- float
   # i_s    <- int
   # i_e    <- int
+  # bc     <- np.array(DIMM)       : boundary condition
   # return -> np.array(dimm)
 
   x0 = np.copy(x)
@@ -20,7 +21,7 @@ def timestep(x, dt, i_s=0, i_e=DIMM):
   k4 = tendency(x4, i_s, i_e)
   return x0 + (k1 + 2.0 * k2 + 2.0 * k3 + k4) * dt / 6.0
 
-def tendency(x_in, i_s=0, i_e=DIMM):
+def tendency(x_in, i_s=0, i_e=DIMM, bc=None):
   ### here, (dimm = i_e - i_s <= DIMM) unless strongly coupled
   # a31p63-64
   # x      <- np.array(dimm)
@@ -54,10 +55,17 @@ def tendency(x_in, i_s=0, i_e=DIMM):
     k1    = 10.0
     k2    = -11.0
 
-    # B.C. for non-coupled. Obtained from (a757b4e) unit_test.py
-    x = np.array([  0.35128345,  0.41208204, 23.57932048, -2.68240888, -2.26472921, \
-                   29.22828843, 14.33420545,  0.65398139, 16.64817181])
-    x[i_s:i_e] = x_in[:]
+    # set boundary conditions
+    if i_s == 0 and i_e == DIMM:
+      x = np.copy(x_in)
+    else:
+      if bc != None:
+        x = np.copy(bc)
+      else:
+        # B.C. for non-coupled. Obtained from (a757b4e) unit_test.py
+        x = np.array([  0.35128345,  0.41208204, 23.57932048, -2.68240888, -2.26472921, \
+                       29.22828843, 14.33420545,  0.65398139, 16.64817181])
+      x[i_s:i_e] = x_in[:]
 
     dx = np.empty((DIMM))
     # extratropic atm

@@ -9,9 +9,14 @@ from mpl_toolkits.mplot3d import Axes3D
 from const import *
 
 def plot_all():
+  Plot_3d = True
+
   hist_true = np.fromfile("data/true.bin", np.float64)
   hist_true = hist_true.reshape((STEPS, DIMM))
-  vectors = ["blv", "flv", "clv", "fsv", "isv"]
+  if Calc_lv:
+    vectors = ["blv", "flv", "clv", "fsv", "isv"]
+  else:
+    vectors = []
   vector_name = {"blv": "Backward_LV", "flv": "Forward_LV", "clv": "Characteristic_LV", \
                  "fsv": "Final_SV", "isv": "Initial_SV"}
   hist_vector = {}
@@ -21,7 +26,8 @@ def plot_all():
 
   os.system("mkdir -p image/true")
 
-  plot_le()
+  if Calc_lv:
+    plot_le()
   for vec in vectors:
     plot_lv_time(hist_vector[vec], vector_name[vec])
     # plot_trajectory_lv(hist_true, hist_vector[vec], vector_name[vec])
@@ -38,7 +44,8 @@ def plot_all():
 
     plot_rmse_spread(hist_true, hist_fcst, name, nmem)
     plot_time_value(hist_true, hist_fcst, hist_obs, name, nmem)
-    plot_3d_trajectory(hist_true, hist_fcst, name, nmem)
+    if Plot_3d:
+      plot_3d_trajectory(hist_true, hist_fcst, name, nmem)
 
     if (exp["method"] == "etkf"):
       for vec in vectors:
