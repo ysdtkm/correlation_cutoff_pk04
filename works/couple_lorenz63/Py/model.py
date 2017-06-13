@@ -189,6 +189,7 @@ def finite_time_tangent(x0, dt, iw):
   return m_finite
 
 def finite_time_tangent_using_nonlinear(x0, dt, iw):
+  ### todo: boundary conditions needed if used for 4DVar
   # Return tangent linear matrix, calculated numerically using the NL model
   # x0     <- np.array(DIMM)       : state vector at t0
   # dt     <- float                : timestep

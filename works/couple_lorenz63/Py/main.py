@@ -167,6 +167,7 @@ def exec_deterministic_fcst(settings, anl):
     if (i % settings["aint"] == 0):
       fcst_all[i,0,:] = np.mean(anl[i,:,:], axis=0)
       for lt in range(1, FCST_LT):
+        # todo: uncoupled forecast
         fcst_all[i,lt,:] = timestep(fcst_all[i-1,lt,:], DT)
   fcst_all.tofile("data/%s_fcst.bin" % settings["name"])
   return 0
