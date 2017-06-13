@@ -215,6 +215,7 @@ def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
   hist_err = hist_fcst_mean - hist_true
 
   if (DIMM == 3 or DIMM == 9):
+    rmse_component = []
     for i_component in range(DIMM//3):
       grid_from = 3 * i_component
       name_component = ["extro", "trop", "ocn"][i_component]
@@ -226,6 +227,7 @@ def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
       # RMSE and Spread time average
       rmse = np.sqrt(np.mean(mse_time[STEP_FREE:STEPS]))
       sprd = np.sqrt(np.mean(sprd2_time[STEP_FREE:STEPS]))
+      rmse_component.append(rmse)
 
       # RMSE-Spread time series
       plt.rcParams["font.size"] = 16
@@ -239,6 +241,7 @@ def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
       plt.savefig("./image/%s/%s_%s_%s.png" % (name, name, name_component, "time"))
       plt.clf()
       plt.close()
+    print("%25s" % name, ["%5g" % x for x in rmse_component])
 
   else: # lorenz96
     # MSE and Spread_square time series (grid average)
