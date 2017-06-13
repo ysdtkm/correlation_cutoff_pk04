@@ -123,5 +123,27 @@ def test_cost_function_grad():
 
   return 0
 
-test_tangent_model()
-# test_cost_function_grad()
+def obtain_climatology():
+  nstep = 100000
+  all_true = np.empty((nstep, DIMM))
+
+  np.random.seed(1)
+  true = np.random.normal(0.0, FERR_INI, DIMM)
+
+  for i in range(0, nstep):
+    true[:] = timestep(true[:], DT)
+    all_true[i,:] = true[:]
+  # all_true.tofile("data/true_for_clim.bin")
+
+  mean = np.mean(all_true[nstep//2:,:], axis=0)
+  print("mean")
+  print(mean)
+
+  mean2 = np.mean(all_true[nstep//2:,:]**2, axis=0)
+  stdv = np.sqrt(mean2 - mean**2)
+  print("stdv")
+  print(stdv)
+
+  return 0
+
+obtain_climatology()
