@@ -18,9 +18,9 @@ OERR = 0.1
 FERR_INI = 10.0
 
 EXPLIST = [ \
-  {"name":"etkf_non_clim_int25",  "inf":1.2, "aint":25, \
-        "diag":np.ones(DIMM), "nmem":10, \
-        "method":"etkf", "couple":"none", "bc":"climatology"}, \
+  # {"name":"etkf_non_clim_int25",  "inf":1.2, "aint":25, \
+  #       "diag":np.ones(DIMM), "nmem":10, \
+  #       "method":"etkf", "couple":"none", "bc":"climatology"}, \
   {"name":"etkf_non_int25",  "inf":1.2, "aint":25, \
         "diag":np.ones(DIMM), "nmem":10, \
         "method":"etkf", "couple":"none", "bc":"persistent"}, \
@@ -30,9 +30,9 @@ EXPLIST = [ \
   {"name":"etkf_strong_int25",  "inf":1.2, "aint":25, \
         "diag":np.ones(DIMM), "nmem":10, \
         "method":"etkf", "couple":"strong"}, \
-  {"name":"tdvar_non_clim_int25", "inf":1.0, "aint":25, \
-        "diag":np.ones(DIMM), \
-        "nmem":1, "method":"3dvar", "couple":"none", "bc":"climatology"}, \
+  # {"name":"tdvar_non_clim_int25", "inf":1.0, "aint":25, \
+  #       "diag":np.ones(DIMM), \
+  #       "nmem":1, "method":"3dvar", "couple":"none", "bc":"climatology"}, \
   {"name":"tdvar_non_int25", "inf":1.0, "aint":25, \
         "diag":np.ones(DIMM), \
         "nmem":1, "method":"3dvar", "couple":"none", "bc":"persistent"}, \
@@ -42,9 +42,9 @@ EXPLIST = [ \
   {"name":"tdvar_strong_int25", "inf":1.0, "aint":25, \
         "diag":np.ones(DIMM), \
         "nmem":1, "method":"3dvar", "couple":"strong"}, \
-  {"name":"fdvar_non_clim_int25", "inf":1.0, "aint":25, \
-        "diag":np.ones(DIMM), \
-        "nmem":1, "method":"4dvar", "couple":"none", "bc":"climatology"}, \
+  # {"name":"fdvar_non_clim_int25", "inf":1.0, "aint":25, \
+  #       "diag":np.ones(DIMM), \
+  #       "nmem":1, "method":"4dvar", "couple":"none", "bc":"climatology"}, \
   {"name":"fdvar_non_int25", "inf":1.0, "aint":25, \
         "diag":np.ones(DIMM), \
         "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
