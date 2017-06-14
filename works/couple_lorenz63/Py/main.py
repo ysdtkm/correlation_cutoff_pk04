@@ -80,10 +80,10 @@ def exec_assim_cycle(settings, all_fcst, all_obs):
 
   # forecast-analysis cycle
   for i in range(STEP_FREE, STEPS):
-    if settings["couple"] == "none" and settings["bc"] == "persistent":
-      persis_bc = np.mean(all_fcst[i-1,:,:], axis=0)
-    else:
+    if settings["couple"] == "none" and settings["bc"] == "climatology":
       persis_bc = None
+    else:
+      persis_bc = np.mean(all_fcst[i-1,:,:], axis=0)
 
     for m in range(0, settings["nmem"]):
       if (settings["couple"] == "strong" or settings["couple"] == "weak"):
