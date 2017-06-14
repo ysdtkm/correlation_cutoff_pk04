@@ -102,14 +102,12 @@ def exec_assim_cycle(settings, all_fcst, all_obs):
       elif (settings["couple"] == "weak" or settings["couple"] == "none"):
         dim_atm = 6
         # atmospheric assimilation
-        # todo: need BC for 4DVar
         fcst[:, :dim_atm], \
           all_bf[i, :dim_atm, :dim_atm], \
           all_ba[i, :dim_atm, :dim_atm]  \
           = analyze_one_window(fcst[:, :dim_atm], fcst_pre[:, :dim_atm], \
             all_obs[i, :dim_atm], h[:dim_atm, :dim_atm], r[:dim_atm, :dim_atm], settings, 0, 6, persis_bc)
         # oceanic assimilation
-        # todo: need BC for 4DVar
         fcst[:, dim_atm:], \
           all_bf[i, dim_atm:, dim_atm:], \
           all_ba[i, dim_atm:, dim_atm:]  \
@@ -152,7 +150,7 @@ def analyze_one_window(fcst, fcst_pre, obs, h, r, settings, i_s=0, i_e=DIMM, bc=
         etkf(fcst[:,:], h[:,:], r[:,:], yo[:,:], settings["inf"], settings["nmem"])
   elif (settings["method"] == "3dvar"):
     anl[0,:] = tdvar(fcst[0,:].T, h[:,:], r[:,:], yo[:,:], i_s, i_e)
-  elif (settings["method"] == "4dvar"): # todo: need bc
+  elif (settings["method"] == "4dvar"):
     anl[0,:] = fdvar(fcst_pre[0,:], h[:,:], r[:,:], yo[:,:], settings["aint"], i_s, i_e, bc)
 
   return anl[:,:], bf[:,:], ba[:,:]
