@@ -1,5 +1,5 @@
 topt = --halt-on-error --no-pdf
-src  = test.tex
+src  = temp.tex
 obj  = out.pdf
 
 all: $(obj)
