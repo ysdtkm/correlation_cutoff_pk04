@@ -8,50 +8,50 @@ DIMM = 9    # dimension of model variable n
 DIMO = DIMM # dimension of observation variable m
 
 DT = 0.01
-TMAX = 2
+TMAX = 20
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
-VRFS = int(STEPS * 0.25) # verification period: [VRFS,STEPS)
+VRFS = int(STEPS * 0.85) # verification period: [VRFS,STEPS)
 FCST_LT = 5
 
 OERR = 0.1
 FERR_INI = 10.0
 
 EXPLIST = [ \
-  # {"name":"etkf_non_clim_int25",  "inf":1.2, "aint":25, \
+  # {"name":"etkf_non_clim_int8",  "inf":1.1, "aint":8, \
   #       "diag":np.ones(DIMM), "nmem":10, \
   #       "method":"etkf", "couple":"none", "bc":"climatology"}, \
-  {"name":"etkf_non_int25",  "inf":1.2, "aint":25, \
+  {"name":"etkf_non_int8",  "inf":1.1, "aint":8, \
         "diag":np.ones(DIMM), "nmem":10, \
         "method":"etkf", "couple":"none", "bc":"persistent"}, \
-  {"name":"etkf_weak_int25",  "inf":1.2, "aint":25, \
+  {"name":"etkf_weak_int8",  "inf":1.1, "aint":8, \
         "diag":np.ones(DIMM), "nmem":10, \
         "method":"etkf", "couple":"weak"}, \
-  {"name":"etkf_strong_int25",  "inf":1.2, "aint":25, \
+  {"name":"etkf_strong_int8",  "inf":1.1, "aint":8, \
         "diag":np.ones(DIMM), "nmem":10, \
         "method":"etkf", "couple":"strong"}, \
-  # {"name":"tdvar_non_clim_int25", "inf":1.0, "aint":25, \
+  # {"name":"tdvar_non_clim_int8", "inf":1.0, "aint":8, \
   #       "diag":np.ones(DIMM), \
   #       "nmem":1, "method":"3dvar", "couple":"none", "bc":"climatology"}, \
-  {"name":"tdvar_non_int25", "inf":1.0, "aint":25, \
+  {"name":"tdvar_non_int8", "inf":1.0, "aint":8, \
         "diag":np.ones(DIMM), \
         "nmem":1, "method":"3dvar", "couple":"none", "bc":"persistent"}, \
-  {"name":"tdvar_weak_int25", "inf":1.0, "aint":25, \
+  {"name":"tdvar_weak_int8", "inf":1.0, "aint":8, \
         "diag":np.ones(DIMM), \
         "nmem":1, "method":"3dvar", "couple":"weak"}, \
-  {"name":"tdvar_strong_int25", "inf":1.0, "aint":25, \
+  {"name":"tdvar_strong_int8", "inf":1.0, "aint":8, \
         "diag":np.ones(DIMM), \
         "nmem":1, "method":"3dvar", "couple":"strong"}, \
-  # {"name":"fdvar_non_clim_int25", "inf":1.0, "aint":25, \
+  # {"name":"fdvar_non_clim_int8", "inf":1.0, "aint":8, \
   #       "diag":np.ones(DIMM), \
   #       "nmem":1, "method":"4dvar", "couple":"none", "bc":"climatology"}, \
-  {"name":"fdvar_non_int25", "inf":1.0, "aint":25, \
+  {"name":"fdvar_non_int8", "inf":1.0, "aint":8, \
         "diag":np.ones(DIMM), \
         "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
-  {"name":"fdvar_weak_int25", "inf":1.0, "aint":25, \
+  {"name":"fdvar_weak_int8", "inf":1.0, "aint":8, \
         "diag":np.ones(DIMM), \
         "nmem":1, "method":"4dvar", "couple":"weak"}, \
-  {"name":"fdvar_strong_int25", "inf":1.0, "aint":25, \
+  {"name":"fdvar_strong_int8", "inf":1.0, "aint":8, \
         "diag":np.ones(DIMM), \
         "nmem":1, "method":"4dvar", "couple":"strong"} \
 ]
