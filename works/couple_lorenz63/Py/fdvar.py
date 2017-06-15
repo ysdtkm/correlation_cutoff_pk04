@@ -21,13 +21,16 @@ def fdvar(fcst_0, h, r, yo, aint, i_s, i_e, bc=None):
 
   # only assimilate one set of obs at t1 = t0+dt*aint
   # input fcst_0 is [aint] steps former than analysis time
-  anl_0 = np.copy(fcst_0)
+
   try:
+    anl_0 = np.copy(fcst_0)
     anl_0 = fmin_bfgs(fdvar_2j, anl_0, args=(fcst_0, h, r, yo, aint, i_s, i_e, bc))
     # anl_0 = fmin_bfgs(fdvar_2j, anl_0, fprime=fdvar_2j_deriv, args=(fcst_0, h, r, yo, aint, i_s, i_e))
   except:
     print("Method fmin_bfgs failed to converge. Use fmin for this step instead.")
+    anl_0 = np.copy(fcst_0)
     anl_0 = fmin(fdvar_2j, anl_0, args=(fcst_0, h, r, yo, aint, i_s, i_e, bc), disp=False)
+
   anl_1 = np.copy(anl_0)
   for i in range(0, aint):
     anl_1 = timestep(anl_1, DT, i_s, i_e, bc)
@@ -48,7 +51,7 @@ def fdvar_2j(anl_0_nda, fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e, bc):
   h  = np.asmatrix(h_nda)
   r  = np.asmatrix(r_nda)
   yo = np.asmatrix(yo_nda)
-  b  = np.matrix(0.9 * tdvar_b()[i_s:i_e, i_s:i_e])
+  b  = np.matrix(1.2 * tdvar_b()[i_s:i_e, i_s:i_e])
   anl_0  = np.asmatrix(anl_0_nda).T
   fcst_0 = np.asmatrix(fcst_0_nda).T
 
@@ -79,7 +82,7 @@ def fdvar_2j_deriv(anl_0_nda, fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e):
   h  = np.asmatrix(h_nda)
   r  = np.asmatrix(r_nda)
   yo = np.asmatrix(yo_nda)
-  b  = np.matrix(0.9 * tdvar_b()[i_s:i_e, i_s:i_e])
+  b  = np.matrix(1.2 * tdvar_b()[i_s:i_e, i_s:i_e])
   anl_0  = np.asmatrix(anl_0_nda).T
   fcst_0 = np.asmatrix(fcst_0_nda).T
 
