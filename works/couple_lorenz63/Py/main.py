@@ -69,7 +69,7 @@ def exec_assim_cycle(settings, all_fcst, all_obs):
 
   # prepare containers
   r = getr()
-  h = geth(settings["diag"])
+  h = geth()
   fcst = np.empty((settings["nmem"], DIMM))
   all_ba = np.empty((STEPS, DIMM, DIMM))
   all_ba[:,:,:] = np.nan

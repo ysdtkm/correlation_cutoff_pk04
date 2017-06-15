@@ -8,7 +8,7 @@ from fdvar import *
 
 def test_fdvar_overflow():
   exp = EXPLIST[1]
-  h = geth(exp["diag"])
+  h = geth()
   r = getr()
   fcst_0 = np.array( \
     [[-5.443006274201698], \
