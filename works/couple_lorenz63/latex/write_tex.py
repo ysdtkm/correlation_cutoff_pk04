@@ -18,8 +18,9 @@ def main():
   for expname in explist:
     xlist = ["extro", "trop", "ocn"]
     ylist = ["strong", "weak", "non"]
-    txt_out = txt_out + figure_table(expname, filebase, xlist, ylist, datestr, last_commit)
-  txt_out = txt_out + footer()
+    txt_out += figure_table(expname, filebase, xlist, ylist, datestr, last_commit)
+  txt_out += write_rmse(datestr, last_commit)
+  txt_out += footer()
 
   f = io.open("./temp.tex", "w")
   f.write(txt_out)
@@ -32,6 +33,7 @@ def header(date, last_commit):
     \\documentclass{beamer}
     \\usepackage{xltxtra}
     \\usepackage{amsmath}
+    \\usepackage{verbatim}
     \\usepackage[subrefformat=parens]{subcaption}
     \\usetheme{Boadilla}
     \\usecolortheme{beaver}
@@ -85,6 +87,17 @@ def figure_table(expname, filebase, xlist, ylist, date, commit):
     \\end{frame}
   """[1:-1]
   content += closing
+
+  return textwrap.dedent(content[1:-1])
+
+def write_rmse(date, commit):
+  content = """
+    \\begin{frame}
+    \\frametitle{@@expname@@}
+    \\verbatiminput{../image/true/rmse.txt}
+    \\end{frame}
+  """[1:-1]
+  content = content.replace('@@expname@@', date + " " + commit + " rmse")
 
   return textwrap.dedent(content[1:-1])
 

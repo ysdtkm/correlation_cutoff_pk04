@@ -242,7 +242,10 @@ def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
       plt.savefig("./image/%s/%s_%s_%s.png" % (name, name, name_component, "time"), dpi=80)
       plt.clf()
       plt.close()
+    f = open("./image/true/rmse.txt", "a")
+    f.write(("%-25s" % name) + str(["%5g" % x for x in rmse_component]) + "\n")
     print("%-25s" % name, ["%5g" % x for x in rmse_component])
+    f.close()
 
   else: # lorenz96
     # MSE and Spread_square time series (grid average)
