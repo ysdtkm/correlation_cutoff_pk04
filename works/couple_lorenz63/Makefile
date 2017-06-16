@@ -10,7 +10,7 @@
 # cmd_step : 実行コマンド
 #================================
 
-STEP_ALL = calc plot
+STEP_ALL = calc plot tex
 time = time --format="spent %E sec"
 
 src_calc = Py/main.py Py/const.py Py/model.py Py/etkf.py Py/fdvar.py Py/tdvar.py \
@@ -23,6 +23,11 @@ src_plot = Py/plot.py Py/const.py
 dep_plot = calc
 out_plot = image/*
 cmd_plot = rm -rf image; mkdir -p image; $(time) python Py/plot.py
+
+src_tex = latex/write_tex.py
+dep_tex = plot
+out_tex =
+cmd_tex = cd latex && python write_tex.py
 
 # ===============================================
 # end of settings

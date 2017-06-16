@@ -1,20 +1,33 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os, io, textwrap, datetime
+import os, io, textwrap, datetime, sys, subprocess
+sys.path.append("../Py")
+import const
 
 def main():
-  txt_out = header()
-  txt_out = txt_out + figure_table()
+  git_output = str(subprocess.check_output("git show HEAD | head -n1", shell=True))
+  last_commit = git_output.split()[1][:7]
+  date = datetime.datetime.now()
+  datestr = "%04d%02d%02d" % (date.year, date.month, date.day)
+
+  txt_out = header(datestr, last_commit)
+  # explist = const.EXPLIST
+  explist = ["etkf", "tdvar", "fdvar"]
+  filebase = "../image/@@expname@@_@@yname@@_int8/@@expname@@_@@yname@@_int8_@@xname@@_time.png"
+  for expname in explist:
+    xlist = ["extro", "trop", "ocn"]
+    ylist = ["strong", "weak", "non"]
+    txt_out = txt_out + figure_table(expname, filebase, xlist, ylist, datestr, last_commit)
   txt_out = txt_out + footer()
+
   f = io.open("./temp.tex", "w")
   f.write(txt_out)
   f.close()
   os.system("make")
   return 0
 
-def header():
-  date = datetime.datetime.now()
+def header(date, last_commit):
   header = """
     \\documentclass{beamer}
     \\usepackage{xltxtra}
@@ -22,7 +35,7 @@ def header():
     \\usepackage[subrefformat=parens]{subcaption}
     \\usetheme{Boadilla}
     \\usecolortheme{beaver}
-    \\title{Coupled Lorenz63 model experiments}
+    \\title{@@title@@}
     \\date{@@date@@}
     \\author{Takuma Yoshida}
     \\parskip=12pt
@@ -34,47 +47,45 @@ def header():
     \\setbeamertemplate{footline}{}
 
     \\begin{document}
-    \\maketitle
+    % \\maketitle
   """
-  header = header.replace('@@date@@', "%04d%02d%02d" % (date.year, date.month, date.day))
+  header = header.replace('@@date@@', date)
+  header = header.replace('@@title@@', last_commit)
   return textwrap.dedent(header[1:-1])
 
-def figure_table():
+def figure_table(expname, filebase, xlist, ylist, date, commit):
   content = """
     \\begin{frame}
-    \\frametitle{figures}
+    \\frametitle{@@expname@@}
+    \\vspace*{-10mm}
     \\begin{figure}[h]
       \\flushleft
-      \\begin{minipage}[b]{0.32\\linewidth}
-        \\centering
-        \\includegraphics[keepaspectratio, scale=0.23]{../image/etkf_weak_int8/etkf_weak_int8_trop_time.png}
-        % \\subcaption{trop}\\label{poly04}
-      \\end{minipage}
-      \\begin{minipage}[b]{0.32\\linewidth}
-        \\centering
-        \\includegraphics[keepaspectratio, scale=0.23]{../image/etkf_weak_int8/etkf_weak_int8_trop_time.png}
-        % \\subcaption{trop}\\label{poly06}
-      \\end{minipage}
-      \\begin{minipage}[b]{0.32\\linewidth}
-        \\centering
-        \\includegraphics[keepaspectratio, scale=0.23]{../image/etkf_weak_int8/etkf_weak_int8_trop_time.png}
-        % \\subcaption{trop}\\label{poly08}
-      \\end{minipage} \\\\
+  """[1:-1]
+  content = content.replace('@@expname@@', date + " " + commit + " " + expname)
 
-      \\begin{minipage}[b]{0.32\\linewidth}
-        \\centering
-        \\includegraphics[keepaspectratio, scale=0.23]{../image/etkf_weak_int8/etkf_weak_int8_trop_time.png}
-        % \\subcaption{trop}\\label{poly12}
-      \\end{minipage}
-      \\begin{minipage}[b]{0.32\\linewidth}
-        \\centering
-        \\includegraphics[keepaspectratio, scale=0.23]{../image/etkf_weak_int8/etkf_weak_int8_trop_time.png}
-        % \\subcaption{trop}\\label{poly20}
-      \\end{minipage}
-      % \\caption{polygons}\\label{reg_poly}
+  for yname in ylist:
+    for xname in xlist:
+      tex_figure = """
+        \\begin{minipage}[b]{0.32\\linewidth}
+          \\centering
+          \\includegraphics[keepaspectratio, scale=0.22]{@@filebase@@}
+          % \\subcaption{@@num@@}
+        \\end{minipage}
+        """[1:-1]
+      tex_figure = tex_figure.replace('@@filebase@@', filebase)
+      tex_figure = tex_figure.replace('@@expname@@', expname)
+      tex_figure = tex_figure.replace('@@xname@@', xname)
+      tex_figure = tex_figure.replace('@@yname@@', yname)
+      content += tex_figure
+    content += "\\\\"
+
+  closing = """
+    % \\caption{polygons}\\label{reg_poly}
     \\end{figure}
     \\end{frame}
-  """
+  """[1:-1]
+  content += closing
+
   return textwrap.dedent(content[1:-1])
 
 def footer():

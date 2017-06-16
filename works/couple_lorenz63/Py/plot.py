@@ -230,14 +230,15 @@ def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
       rmse_component.append(rmse)
 
       # RMSE-Spread time series
-      plt.rcParams["font.size"] = 16
+      plt.rcParams["font.size"] = 14
       plt.yscale('log')
       plt.plot(np.sqrt(mse_time), label="RMSE")
       if (nmem > 1):
         plt.plot(np.sqrt(sprd2_time), label="Spread")
       plt.legend()
       plt.xlabel("timestep")
-      plt.title("[%s %s] RMSE:%6g Spread:%6g" % (name, name_component, rmse, sprd))
+      plt.ylim([0.001, 100])
+      plt.title("[%s %s] RMSE:%6.4g Spread:%6.4g" % (name, name_component, rmse, sprd))
       plt.savefig("./image/%s/%s_%s_%s.png" % (name, name, name_component, "time"))
       plt.clf()
       plt.close()
