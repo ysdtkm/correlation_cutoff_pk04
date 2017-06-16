@@ -68,7 +68,7 @@ def figure_table(expname, filebase, xlist, ylist, date, commit):
       tex_figure = """
         \\begin{minipage}[b]{0.32\\linewidth}
           \\centering
-          \\includegraphics[keepaspectratio, scale=0.22]{@@filebase@@}
+          \\includegraphics[width=36mm]{@@filebase@@}
           % \\subcaption{@@num@@}
         \\end{minipage}
         """[1:-1]
