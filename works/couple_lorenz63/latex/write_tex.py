@@ -27,6 +27,7 @@ def main():
   f.write(txt_out)
   f.close()
   os.system("make")
+  os.system("cp -f ./out.pdf ./%s_%s.pdf" % (datestr, last_commit))
   return 0
 
 def header(date, last_commit):
