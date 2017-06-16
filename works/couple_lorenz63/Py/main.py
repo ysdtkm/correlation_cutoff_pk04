@@ -14,6 +14,7 @@ def main():
   nature = exec_nature()
   obs = exec_obs(nature)
   for settings in EXPLIST:
+    np.random.seed(100000007)
     free = exec_free_run(settings)
     anl  = exec_assim_cycle(settings, free, obs)
     exec_deterministic_fcst(settings, anl)
