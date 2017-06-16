@@ -13,13 +13,14 @@ def main():
 
   txt_out = header(datestr, last_commit)
   # explist = const.EXPLIST
+  tmax = const.STEPS
   explist = ["etkf", "tdvar", "fdvar"]
   filebase = "../image/@@expname@@_@@yname@@_int8/@@expname@@_@@yname@@_int8_@@xname@@_time.png"
   for expname in explist:
     xlist = ["extro", "trop", "ocn"]
     ylist = ["strong", "weak", "non"]
-    txt_out += figure_table(expname, filebase, xlist, ylist, datestr, last_commit)
-  txt_out += write_rmse(datestr, last_commit)
+    txt_out += figure_table(expname, filebase, xlist, ylist, datestr, last_commit, tmax)
+  txt_out += write_rmse(datestr, last_commit, tmax)
   txt_out += footer()
 
   f = io.open("./temp.tex", "w")
@@ -55,7 +56,7 @@ def header(date, last_commit):
   header = header.replace('@@title@@', last_commit)
   return textwrap.dedent(header[1:-1])
 
-def figure_table(expname, filebase, xlist, ylist, date, commit):
+def figure_table(expname, filebase, xlist, ylist, date, commit, tmax):
   content = """
     \\begin{frame}
     \\frametitle{@@expname@@}
@@ -63,7 +64,7 @@ def figure_table(expname, filebase, xlist, ylist, date, commit):
     \\begin{figure}[h]
       \\flushleft
   """[1:-1]
-  content = content.replace('@@expname@@', date + " " + commit + " " + expname)
+  content = content.replace('@@expname@@', date + " " + commit + " " + str(tmax) + " steps " + expname)
 
   for yname in ylist:
     for xname in xlist:
@@ -90,14 +91,14 @@ def figure_table(expname, filebase, xlist, ylist, date, commit):
 
   return textwrap.dedent(content[1:-1])
 
-def write_rmse(date, commit):
+def write_rmse(date, commit, tmax):
   content = """
     \\begin{frame}
     \\frametitle{@@expname@@}
     \\verbatiminput{../image/true/rmse.txt}
     \\end{frame}
   """[1:-1]
-  content = content.replace('@@expname@@', date + " " + commit + " rmse")
+  content = content.replace('@@expname@@', date + " " + commit + " " + str(tmax) + " steps rmse")
 
   return textwrap.dedent(content[1:-1])
 
