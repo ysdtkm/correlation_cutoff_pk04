@@ -239,7 +239,7 @@ def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
       plt.xlabel("timestep")
       plt.ylim([0.001, 100])
       plt.title("[%s %s] RMSE:%6.4g Spread:%6.4g" % (name, name_component, rmse, sprd))
-      plt.savefig("./image/%s/%s_%s_%s.png" % (name, name, name_component, "time"))
+      plt.savefig("./image/%s/%s_%s_%s.png" % (name, name, name_component, "time"), dpi=80)
       plt.clf()
       plt.close()
     print("%-25s" % name, ["%5g" % x for x in rmse_component])
