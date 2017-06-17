@@ -225,8 +225,8 @@ def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
       sprd2_time = np.mean(hist_fcst_sprd2[:,grid_from:grid_from+3], axis=1)
 
       # RMSE and Spread time average
-      rmse = np.sqrt(np.mean(mse_time[STEP_FREE:STEPS]))
-      sprd = np.sqrt(np.mean(sprd2_time[STEP_FREE:STEPS]))
+      rmse = np.sqrt(np.mean(mse_time[STEPS//2:]))
+      sprd = np.sqrt(np.mean(sprd2_time[STEPS//2:]))
       rmse_component.append(rmse)
 
       # RMSE-Spread time series
@@ -253,8 +253,8 @@ def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
     sprd2_time = np.mean(hist_fcst_sprd2[:,:], axis=1)
 
     # RMSE and Spread time average
-    rmse = np.sqrt(np.mean(mse_time[STEP_FREE:STEPS]))
-    sprd = np.sqrt(np.mean(sprd2_time[STEP_FREE:STEPS]))
+    rmse = np.sqrt(np.mean(mse_time[STEPS//2:]))
+    sprd = np.sqrt(np.mean(sprd2_time[STEPS//2:]))
 
     # RMSE-Spread time series
     plt.rcParams["font.size"] = 16
