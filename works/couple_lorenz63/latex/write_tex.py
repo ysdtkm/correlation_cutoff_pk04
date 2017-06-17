@@ -9,9 +9,10 @@ def main():
   git_output = str(subprocess.check_output("git show HEAD | head -n1", shell=True))
   last_commit = git_output.split()[1][:7]
   date = datetime.datetime.now()
-  datestr = "%04d%02d%02d" % (date.year, date.month, date.day)
+  datestr = "%04d%02d%02d_%02d%02d" % (date.year, date.month, date.day, date.hour, date.minute)
+  date_for_tex = datestr.replace("_", "\\_")
 
-  txt_out = header(datestr, last_commit)
+  txt_out = header(date_for_tex, last_commit)
   # explist = const.EXPLIST
   tmax = const.STEPS
   explist = ["etkf", "tdvar", "fdvar"]
@@ -19,15 +20,16 @@ def main():
   for expname in explist:
     xlist = ["extro", "trop", "ocn"]
     ylist = ["strong", "weak", "non"]
-    txt_out += figure_table(expname, filebase, xlist, ylist, datestr, last_commit)
-  txt_out += write_rmse(datestr, last_commit)
+    txt_out += figure_table(expname, filebase, xlist, ylist, date_for_tex, last_commit)
+  txt_out += write_rmse(date_for_tex, last_commit)
   txt_out += footer()
 
   f = io.open("./temp.tex", "w")
   f.write(txt_out)
   f.close()
   os.system("make")
-  os.system("cp -f ./out.pdf ./%s_%s_%dsteps.pdf" % (datestr, last_commit, tmax))
+  os.system("mkdir -p ./archive")
+  os.system("cp -f ./out.pdf ./archive/%s_%s_%dsteps.pdf" % (datestr, last_commit, tmax))
   return 0
 
 def header(date, last_commit):
