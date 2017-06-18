@@ -1,6 +1,13 @@
-git pull; git push
+git s
+echo -n "input something if you want to avoid auto-commit: "
+read INPUT
+if [ "${INPUT}" = "" ]; then
+  git cam mod; git pull; git push
+else
+  exit 1
+fi
 
-aws s3 cp myjob.sh s3://ysdtkm-bucket-1/
+aws s3 cp aws/myjob.sh s3://ysdtkm-bucket-1/
 DATE=`date "+%Y%m%d-%H%M%S"`
 id=`aws batch submit-job \
   --job-name batch_python_${DATE} \
