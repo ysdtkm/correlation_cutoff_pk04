@@ -57,5 +57,6 @@ idcut=`python -c "import sys; print(sys.argv[2])" ${id}`
 
 echo "type following to obtain result"
 echo "aws batch describe-jobs --jobs ${idcut} | grep status"
+echo ""
 
 rm -f ./aws/env.json
