@@ -13,7 +13,7 @@ id=`aws batch submit-job \
   --job-name batch_python_${DATE} \
   --job-queue queue_fast \
   --job-definition def-with-other-image:9 \
-  --container-overrides file://env.json | grep jobId`
+  --container-overrides file://aws/env.json | grep jobId`
 
 idcut=`python -c "import sys; print(sys.argv[2])" ${id}`
 
