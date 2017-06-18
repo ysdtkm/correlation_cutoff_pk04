@@ -20,7 +20,9 @@ def main():
     xlist = ["extro", "trop", "ocn"]
     ylist = ["strong", "weak", "non"]
     txt_out += figure_table(expname, filebase, xlist, ylist, date_for_tex, last_commit)
+
   txt_out += write_rmse(date_for_tex, last_commit)
+  txt_out += lyapunov_exponent(date_for_tex, last_commit)
 
   filebase = "../image/@@expname@@_@@yname@@_int8/@@expname@@_@@yname@@_int8_@@xname@@_val.png"
   for expname in explist:
@@ -114,6 +116,22 @@ def write_rmse(date, commit):
   content = content.replace('@@expname@@', date + " " + commit + " rmse")
 
   if os.path.isfile("../image/true/rmse.txt"):
+    return textwrap.dedent(content[1:-1])
+  else:
+    return ""
+
+def lyapunov_exponent(date, commit):
+  content = """
+    \\begin{frame}
+    \\frametitle{@@expname@@}
+    \\fontsize{5.4pt}{5.4pt}{
+      \\verbatiminput{../data/lyapunov.txt}
+    }
+    \\end{frame}
+  """[1:-1]
+  content = content.replace('@@expname@@', date + " " + commit + " lyapunov exponents")
+
+  if os.path.isfile("../data/lyapunov.txt"):
     return textwrap.dedent(content[1:-1])
   else:
     return ""
