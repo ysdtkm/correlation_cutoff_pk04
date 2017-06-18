@@ -10,8 +10,10 @@ else
   exit 1
 fi
 
-echo -n "input job name: "
+echo ""
+echo -n "input \e[31job name\e[m: "
 read JOBNAME
+echo ""
 
 echo -n "choose queue type (default: slow): "
 read QUEUETYPE
