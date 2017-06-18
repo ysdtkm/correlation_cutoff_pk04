@@ -6,10 +6,10 @@ echo -e "\e[33mType (Ctrl-C) to stop.\e[m"
 echo ""
 echo -ne "input \e[33mJOB NAME\e[m: "
 read JOBNAME
-echo ""
 
 echo -n "choose queue type (default: slow): "
 read QUEUETYPE
+echo ""
 if [ "${QUEUETYPE}" != "" ]; then
   queue="queue_fast"
 else
