@@ -2,7 +2,7 @@
 
 git s
 echo ""
-echo -n "input something if you want to avoid auto-commit: "
+echo -n "want to stop auto-commit?: "
 read STOPFLAG
 
 echo ""
@@ -10,18 +10,18 @@ echo -ne "input \e[33mJOB NAME\e[m: "
 read JOBNAME
 echo ""
 
-if [ "${STOPFLAG}" = "" ]; then
-  git cam "${JOBNAME}"; git pull; git push
-else
-  exit 1
-fi
-
 echo -n "choose queue type (default: slow): "
 read QUEUETYPE
 if [ "${QUEUETYPE}" != "" ]; then
   queue="queue_fast"
 else
   queue="queue_slow"
+fi
+
+if [ "${STOPFLAG}" = "" ]; then
+  git cam "${JOBNAME}"; git pull; git push
+else
+  exit 1
 fi
 
 cat <<EOF > ./aws/env.json
