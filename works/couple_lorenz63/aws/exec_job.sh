@@ -11,7 +11,7 @@ else
 fi
 
 echo ""
-echo -n "input \e[31m job name\e[m : "
+echo -ne "input \e[31mjob name\e[m: "
 read JOBNAME
 echo ""
 
