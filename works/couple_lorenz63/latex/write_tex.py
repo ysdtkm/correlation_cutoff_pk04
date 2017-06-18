@@ -39,7 +39,8 @@ def main():
 
 def header(date, last_commit):
   header = """
-    \\documentclass{beamer}
+    \\documentclass[demo]{beamer}
+    \\usepackage[]{graphicx}
     \\usepackage{xltxtra}
     \\usepackage{amsmath}
     \\usepackage{verbatim}

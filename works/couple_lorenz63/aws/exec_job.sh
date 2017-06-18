@@ -48,7 +48,7 @@ EOF
 aws s3 cp aws/myjob.sh s3://ysdtkm-bucket-1/
 DATE=`date "+%Y%m%d-%H%M%S"`
 id=`aws batch submit-job \
-  --job-name batch_python_${DATE} \
+  --job-name python_${DATE}_${JOBNAME} \
   --job-queue ${queue} \
   --job-definition def-with-other-image:9 \
   --container-overrides file://aws/env.json | grep jobId`
