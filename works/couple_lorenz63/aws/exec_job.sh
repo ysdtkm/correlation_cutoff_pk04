@@ -1,10 +1,8 @@
 #!/bin/bash
+set -e
 
 git s
-echo ""
-echo -n "want to stop auto-commit?: "
-read STOPFLAG
-
+echo -e "\e[33mType (Ctrl-C) to stop.\e[m"
 echo ""
 echo -ne "input \e[33mJOB NAME\e[m: "
 read JOBNAME
@@ -18,12 +16,7 @@ else
   queue="queue_slow"
 fi
 
-set -e
-if [ "${STOPFLAG}" = "" ]; then
-  git cam "${JOBNAME}"; git pull; git push
-else
-  exit 1
-fi
+git cam "${JOBNAME}"; git pull; git push
 
 cat <<EOF > ./aws/env.json
 {
