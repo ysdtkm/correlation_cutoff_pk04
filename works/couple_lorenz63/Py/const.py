@@ -8,7 +8,7 @@ DIMM = 9    # dimension of model variable n
 DIMO = DIMM # dimension of observation variable m
 
 DT = 0.01
-TMAX = 2
+TMAX = 20
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 VRFS = int(STEPS * 0.85) # verification period: [VRFS,STEPS)
@@ -18,22 +18,22 @@ OERR = 5.0
 FERR_INI = 10.0
 
 EXPLIST = [ \
-  # {"name":"etkf_non_clim_int8",  "rho":1.1, "aint":8, "nmem":10, \
-  #       "method":"etkf", "couple":"none", "bc":"climatology"}, \
-  {"name":"etkf_non_int8",  "rho":1.2, "aint":8, "nmem":10, \
-        "method":"etkf", "couple":"none", "bc":"persistent"}, \
-  {"name":"etkf_weak_int8",  "rho":1.2, "aint":8, "nmem":10, \
-        "method":"etkf", "couple":"weak"}, \
-  {"name":"etkf_strong_int8",  "rho":1.2, "aint":8, "nmem":10, \
-        "method":"etkf", "couple":"strong"}, \
-  # {"name":"tdvar_non_clim_int8", "aint":8, \
-  #       "nmem":1, "method":"3dvar", "couple":"none", "bc":"climatology"}, \
-  {"name":"tdvar_non_int8", "aint":8, \
-        "nmem":1, "method":"3dvar", "couple":"none", "bc":"persistent"}, \
-  {"name":"tdvar_weak_int8", "aint":8, \
-        "nmem":1, "method":"3dvar", "couple":"weak"}, \
-  {"name":"tdvar_strong_int8", "aint":8, \
-        "nmem":1, "method":"3dvar", "couple":"strong"}, \
+  # # {"name":"etkf_non_clim_int8",  "rho":1.1, "aint":8, "nmem":10, \
+  # #       "method":"etkf", "couple":"none", "bc":"climatology"}, \
+  # {"name":"etkf_non_int8",  "rho":1.2, "aint":8, "nmem":10, \
+  #       "method":"etkf", "couple":"none", "bc":"persistent"}, \
+  # {"name":"etkf_weak_int8",  "rho":1.2, "aint":8, "nmem":10, \
+  #       "method":"etkf", "couple":"weak"}, \
+  # {"name":"etkf_strong_int8",  "rho":1.2, "aint":8, "nmem":10, \
+  #       "method":"etkf", "couple":"strong"}, \
+  # # {"name":"tdvar_non_clim_int8", "aint":8, \
+  # #       "nmem":1, "method":"3dvar", "couple":"none", "bc":"climatology"}, \
+  # {"name":"tdvar_non_int8", "aint":8, \
+  #       "nmem":1, "method":"3dvar", "couple":"none", "bc":"persistent"}, \
+  # {"name":"tdvar_weak_int8", "aint":8, \
+  #       "nmem":1, "method":"3dvar", "couple":"weak"}, \
+  # {"name":"tdvar_strong_int8", "aint":8, \
+  #       "nmem":1, "method":"3dvar", "couple":"strong"}, \
   # {"name":"fdvar_non_clim_int8", "aint":8, \
   #       "nmem":1, "method":"4dvar", "couple":"none", "bc":"climatology"}, \
   {"name":"fdvar_non_int8", "aint":8, \
