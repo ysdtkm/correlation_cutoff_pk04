@@ -39,8 +39,7 @@ def main():
 
 def header(date, last_commit):
   header = """
-    \\documentclass[demo]{beamer}
-    \\usepackage[]{graphicx}
+    \\documentclass{beamer}
     \\usepackage{xltxtra}
     \\usepackage{amsmath}
     \\usepackage{verbatim}
@@ -57,6 +56,11 @@ def header(date, last_commit):
     \\setbeamertemplate{footline}[frame number]{}
     \\setbeamertemplate{navigation symbols}{}
     \\setbeamertemplate{footline}{}
+
+    \\newcommand{\\includegraphicsmaybe}[2][width=10mm]{
+      \\IfFileExists{#2}{\\includegraphics[#1]{#2}}{\\includegraphics[#1]{dummy.png}
+    }}
+
 
     \\begin{document}
     % \\maketitle
@@ -80,7 +84,7 @@ def figure_table(expname, filebase, xlist, ylist, date, commit):
       tex_figure = """
         \\begin{minipage}[b]{0.32\\linewidth}
           \\centering
-          \\includegraphics[width=36mm]{@@filebase@@}
+          \\includegraphicsmaybe[width=36mm]{@@filebase@@}
           % \\subcaption{@@num@@}
         \\end{minipage}
         """[1:-1]
