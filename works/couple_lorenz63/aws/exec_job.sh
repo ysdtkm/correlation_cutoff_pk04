@@ -18,6 +18,7 @@ else
   queue="queue_slow"
 fi
 
+set -e
 if [ "${STOPFLAG}" = "" ]; then
   git cam "${JOBNAME}"; git pull; git push
 else
