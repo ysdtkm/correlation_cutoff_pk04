@@ -109,7 +109,10 @@ def write_rmse(date, commit):
   """[1:-1]
   content = content.replace('@@expname@@', date + " " + commit + " rmse")
 
-  return textwrap.dedent(content[1:-1])
+  if os.path.isfile("../image/true/rmse.txt"):
+    return textwrap.dedent(content[1:-1])
+  else:
+    return ""
 
 def footer():
   footer = """
