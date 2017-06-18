@@ -11,7 +11,8 @@
 #================================
 
 STEP_ALL = calc plot tex
-time = time --format="spent %E sec"
+# time = time --format="spent %E sec"
+time =
 
 src_calc = Py/main.py Py/const.py Py/model.py Py/etkf.py Py/fdvar.py Py/tdvar.py \
            Py/vectors.py
