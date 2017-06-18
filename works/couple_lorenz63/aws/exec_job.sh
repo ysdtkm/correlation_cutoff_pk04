@@ -2,7 +2,7 @@ aws s3 cp myjob.sh s3://ysdtkm-bucket-1/
 DATE=`date "+%Y%m%d-%H%M%S"`
 id=`aws batch submit-job \
   --job-name batch_python_${DATE} \
-  --job-queue queue-non-ami \
+  --job-queue queue_fast \
   --job-definition def-with-other-image:9 \
   --container-overrides file://env.json | grep jobId`
 
