@@ -1,3 +1,5 @@
+git pull; git push
+
 aws s3 cp myjob.sh s3://ysdtkm-bucket-1/
 DATE=`date "+%Y%m%d-%H%M%S"`
 id=`aws batch submit-job \

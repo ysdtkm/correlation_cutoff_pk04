@@ -8,7 +8,7 @@ DIMM = 9    # dimension of model variable n
 DIMO = DIMM # dimension of observation variable m
 
 DT = 0.01
-TMAX = 10000
+TMAX = 20
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 VRFS = int(STEPS * 0.85) # verification period: [VRFS,STEPS)
@@ -43,9 +43,8 @@ EXPLIST = [ \
   {"name":"fdvar_strong_int8", "aint":8, \
         "nmem":1, "method":"4dvar", "couple":"strong"} \
 ]
-EXPLIST=[]
 
-Calc_lv = True
+Calc_lv = False
 
 def getr():
   r = np.identity(DIMO) * (OERR * OERR)
