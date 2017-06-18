@@ -1,3 +1,5 @@
+#!/bin/bash
+
 git s
 echo -n "input something if you want to avoid auto-commit: "
 read INPUT
@@ -11,7 +13,7 @@ aws s3 cp aws/myjob.sh s3://ysdtkm-bucket-1/
 DATE=`date "+%Y%m%d-%H%M%S"`
 id=`aws batch submit-job \
   --job-name batch_python_${DATE} \
-  --job-queue queue_fast \
+  --job-queue queue_slow \
   --job-definition def-with-other-image:9 \
   --container-overrides file://aws/env.json | grep jobId`
 
