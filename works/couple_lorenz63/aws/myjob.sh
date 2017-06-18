@@ -11,3 +11,5 @@ cp -f data/lyapunov.txt image/true/
 cp -f latex/out.pdf image/
 aws s3 cp image s3://ysdtkm-bucket-1/couple_lorenz63/tar/${title} --recursive
 aws s3 cp latex/out.pdf s3://ysdtkm-bucket-1/couple_lorenz63/${title}.pdf
+
+git show HEAD | head -n1
