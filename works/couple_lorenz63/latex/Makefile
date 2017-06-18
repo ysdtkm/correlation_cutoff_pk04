@@ -18,6 +18,7 @@ $(obj): $(src)
 	echo $(src) | sed -e 's/.tex/.snm/g' | xargs rm -f
 	echo $(src) | sed -e 's/.tex/.toc/g' | xargs rm -f
 	echo $(src) | sed -e 's/.tex/.nav/g' | xargs rm -f
+	rm -f missfont.log
 
 clean:
 	rm -rf $(obj)
