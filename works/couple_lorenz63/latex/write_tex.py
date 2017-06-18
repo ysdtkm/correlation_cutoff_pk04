@@ -11,9 +11,8 @@ def main():
   date = datetime.datetime.now()
   datestr = "%04d%02d%02d_%02d%02d" % (date.year, date.month, date.day, date.hour, date.minute)
   date_for_tex = datestr.replace("_", "\\_")
-
   txt_out = header(date_for_tex, last_commit)
-  # explist = const.EXPLIST
+
   tmax = const.STEPS
   explist = ["etkf", "tdvar", "fdvar"]
   filebase = "../image/@@expname@@_@@yname@@_int8/@@expname@@_@@yname@@_int8_@@xname@@_time.png"
@@ -22,8 +21,14 @@ def main():
     ylist = ["strong", "weak", "non"]
     txt_out += figure_table(expname, filebase, xlist, ylist, date_for_tex, last_commit)
   txt_out += write_rmse(date_for_tex, last_commit)
-  txt_out += footer()
 
+  filebase = "../image/@@expname@@_@@yname@@_int8/@@expname@@_@@yname@@_int8_@@xname@@_val.png"
+  for expname in explist:
+    xlist = ["extro", "trop", "ocn"]
+    ylist = ["strong", "weak", "non"]
+    txt_out += figure_table(expname, filebase, xlist, ylist, date_for_tex, last_commit)
+
+  txt_out += footer()
   f = io.open("./temp.tex", "w")
   f.write(txt_out)
   f.close()

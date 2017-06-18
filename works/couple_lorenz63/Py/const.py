@@ -14,7 +14,7 @@ STEP_FREE = STEPS // 4
 VRFS = int(STEPS * 0.85) # verification period: [VRFS,STEPS)
 FCST_LT = 5
 
-OERR = 1.0
+OERR = 5.0
 FERR_INI = 10.0
 
 EXPLIST = [ \
