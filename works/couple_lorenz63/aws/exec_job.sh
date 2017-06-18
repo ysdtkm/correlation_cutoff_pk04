@@ -1,6 +1,7 @@
 #!/bin/bash
 
 git s
+echo ""
 echo -n "input something if you want to avoid auto-commit: "
 read INPUT
 if [ "${INPUT}" = "" ]; then

@@ -132,6 +132,7 @@ def write_lyapunov_exponents(all_ble, all_fle, all_clv):
     f.write(str_vector(np.mean(all_clv[STEPS//2:,i,:]**2, axis=0)) + "\n")
   f.close()
   os.system("cat data/lyapunov.txt")
+  os.system("mkdir -p image/true; cp -f data/lyapunov.txt image/true/")
   return 0
 
 def orth_norm_vectors(lv):
