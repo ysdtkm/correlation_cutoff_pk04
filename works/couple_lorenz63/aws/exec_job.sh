@@ -18,6 +18,7 @@ fi
 
 git cam "${JOBNAME}"; git pull; git push
 echo ""
+COMMIT=`git show HEAD | head -n1 | cut -c8-14`
 
 cat <<EOF > ./aws/env.json
 {
@@ -36,6 +37,10 @@ cat <<EOF > ./aws/env.json
     {
       "name": "BATCH_JOB_NAME",
       "value": "${JOBNAME}"
+    },
+    {
+      "name": "BATCH_COMMIT",
+      "value": "${COMMIT}"
     }
   ]
 }

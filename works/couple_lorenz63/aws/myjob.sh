@@ -1,13 +1,11 @@
 #!/bin/bash
 
-ls /tmp
 cd /tmp/repos/works/couple_lorenz63
-git pull
+git pull; git checkout ${BATCH_COMMIT}
 make
 
-commit=`git show HEAD | head -n1 | cut -c8-14`
 DATE=`date "+%Y%m%d_%H%M%S"`
-title="${DATE}_${commit}_${BATCH_JOB_NAME}"
+title="${DATE}_${BATCH_COMMIT}_${BATCH_JOB_NAME}"
 
 cp -f data/lyapunov.txt image/true/
 cp -f latex/out.pdf image/
