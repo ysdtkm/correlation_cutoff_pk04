@@ -17,6 +17,7 @@ else
 fi
 
 git cam "${JOBNAME}"; git pull; git push
+echo ""
 
 cat <<EOF > ./aws/env.json
 {
