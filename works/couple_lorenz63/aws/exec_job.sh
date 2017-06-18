@@ -3,17 +3,18 @@
 git s
 echo ""
 echo -n "input something if you want to avoid auto-commit: "
-read INPUT
-if [ "${INPUT}" = "" ]; then
-  git cam mod; git pull; git push
-else
-  exit 1
-fi
+read STOPFLAG
 
 echo ""
 echo -ne "input \e[33mJOB NAME\e[m: "
 read JOBNAME
 echo ""
+
+if [ "${STOPFLAG}" = "" ]; then
+  git cam "${JOBNAME}"; git pull; git push
+else
+  exit 1
+fi
 
 echo -n "choose queue type (default: slow): "
 read QUEUETYPE

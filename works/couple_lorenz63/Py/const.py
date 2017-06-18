@@ -8,7 +8,7 @@ DIMM = 9    # dimension of model variable n
 DIMO = DIMM # dimension of observation variable m
 
 DT = 0.01
-TMAX = 1
+TMAX = 20
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 VRFS = int(STEPS * 0.85) # verification period: [VRFS,STEPS)
@@ -36,8 +36,8 @@ EXPLIST = [ \
         "nmem":1, "method":"3dvar", "couple":"strong"}, \
   # {"name":"fdvar_non_clim_int8", "aint":8, \
   #       "nmem":1, "method":"4dvar", "couple":"none", "bc":"climatology"}, \
-  # {"name":"fdvar_non_int8", "aint":8, \
-  #       "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
+  {"name":"fdvar_non_int8", "aint":8, \
+        "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
   {"name":"fdvar_weak_int8", "aint":8, \
         "nmem":1, "method":"4dvar", "couple":"weak"}, \
   {"name":"fdvar_strong_int8", "aint":8, \
