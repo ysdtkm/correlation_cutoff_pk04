@@ -49,7 +49,7 @@ def tendency(x_in, i_s=0, i_e=DIMM, bc=None):
     tau   = 0.1
     c     = 1.0
     cz    = 1.0
-    ce    = 0.08
+    ce    = 0.30
     # offset and scaling
     s     = 1.0
     k1    = 10.0
