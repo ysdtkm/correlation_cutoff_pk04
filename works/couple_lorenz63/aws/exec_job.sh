@@ -22,8 +22,8 @@ COMMIT=`git show HEAD | head -n1 | cut -c8-14`
 
 cat <<EOF > ./aws/env.json
 {
-  "vcpus": 1,
-  "memory": 1000,
+  "vcpus": 4,
+  "memory": 20000,
   "command": ["./myjob.sh"],
   "environment": [
     {
