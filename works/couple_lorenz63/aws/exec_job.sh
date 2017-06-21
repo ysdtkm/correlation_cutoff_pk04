@@ -16,7 +16,11 @@ else
   queue="queue_slow"
 fi
 
-git cam "${JOBNAME}"; git pull; git push
+set +e
+git cam "${JOBNAME}"
+set -e
+
+git pull; git push
 echo ""
 COMMIT=`git show HEAD | head -n1 | cut -c8-14`
 
