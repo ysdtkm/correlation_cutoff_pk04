@@ -18,13 +18,13 @@ OERR = 5.0
 FERR_INI = 10.0
 
 EXPLIST = [ \
-  # # {"name":"etkf_non_clim_int8",  "rho":1.1, "aint":8, "nmem":10, \
-  # #       "method":"etkf", "couple":"none", "bc":"climatology"}, \
-  # {"name":"etkf_non_int8",  "rho":1.2, "aint":8, "nmem":10, \
+  # {"name":"etkf_non_clim_int8",  "rho":1.1, "aint":8, "nmem":10, \
+  #       "method":"etkf", "couple":"none", "bc":"climatology"}, \
+  # {"name":"etkf_non_int8",  "rho":1.1, "aint":8, "nmem":10, \
   #       "method":"etkf", "couple":"none", "bc":"persistent"}, \
-  # {"name":"etkf_weak_int8",  "rho":1.2, "aint":8, "nmem":10, \
+  # {"name":"etkf_weak_int8",  "rho":1.1, "aint":8, "nmem":10, \
   #       "method":"etkf", "couple":"weak"}, \
-  # {"name":"etkf_strong_int8",  "rho":1.2, "aint":8, "nmem":10, \
+  # {"name":"etkf_strong_int8",  "rho":1.1, "aint":8, "nmem":10, \
   #       "method":"etkf", "couple":"strong"}, \
   # # {"name":"tdvar_non_clim_int8", "aint":8, \
   # #       "nmem":1, "method":"3dvar", "couple":"none", "bc":"climatology"}, \
@@ -44,7 +44,7 @@ EXPLIST = [ \
   #       "nmem":1, "method":"4dvar", "couple":"strong"} \
 ]
 
-Calc_lv = True
+Calc_lv = False
 
 def getr():
   r = np.identity(DIMO) * (OERR * OERR)

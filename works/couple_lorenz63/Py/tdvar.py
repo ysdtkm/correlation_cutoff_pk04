@@ -5,6 +5,8 @@ import sys
 from scipy.optimize import fmin_bfgs
 from const import *
 
+Amplitude_B = 0.4
+
 def tdvar(fcst, h, r, yo, i_s, i_e):
   # fcst   <- np.array[dimc]        : first guess
   # h      <- np.array[DIMO, dimc]  : observation operator
@@ -30,7 +32,7 @@ def tdvar_2j(anl_nda, fcst_nda, h_nda, r_nda, yo_nda, i_s, i_e):
   h  = np.asmatrix(h_nda)
   r  = np.asmatrix(r_nda)
   yo = np.asmatrix(yo_nda)
-  b  = np.matrix(1.2 * tdvar_b()[i_s:i_e, i_s:i_e])
+  b  = np.matrix(Amplitude_B * tdvar_b()[i_s:i_e, i_s:i_e])
 
   anl  = np.asmatrix(anl_nda).T
   fcst = np.asmatrix(fcst_nda).T
@@ -52,7 +54,7 @@ def tdvar_interpol(fcst, h_nda, r_nda, yo_nda, i_s, i_e):
   h  = np.asmatrix(h_nda)
   r  = np.asmatrix(r_nda)
   yo = np.asmatrix(yo_nda)
-  b  = np.matrix(1.2 * tdvar_b()[i_s:i_e, i_s:i_e])
+  b  = np.matrix(Amplitude_B * tdvar_b()[i_s:i_e, i_s:i_e])
 
   d = yo - h * xb
 
