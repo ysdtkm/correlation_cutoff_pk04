@@ -20,11 +20,11 @@ FERR_INI = 10.0
 EXPLIST = [ \
   # {"name":"etkf_non_clim_int8",  "rho":1.1, "aint":8, "nmem":10, \
   #       "method":"etkf", "couple":"none", "bc":"climatology"}, \
-  {"name":"etkf_non_int8",  "rho":1.05, "aint":8, "nmem":10, \
+  {"name":"etkf_non_int8",  "rho":1.3, "aint":8, "nmem":10, \
         "method":"etkf", "couple":"none", "bc":"persistent"}, \
-  {"name":"etkf_weak_int8",  "rho":1.05, "aint":8, "nmem":10, \
+  {"name":"etkf_weak_int8",  "rho":1.3, "aint":8, "nmem":10, \
         "method":"etkf", "couple":"weak"}, \
-  {"name":"etkf_strong_int8",  "rho":1.05, "aint":8, "nmem":10, \
+  {"name":"etkf_strong_int8",  "rho":1.3, "aint":8, "nmem":10, \
         "method":"etkf", "couple":"strong"}, \
   # # {"name":"tdvar_non_clim_int8", "aint":8, \
   # #       "nmem":1, "method":"3dvar", "couple":"none", "bc":"climatology"}, \
