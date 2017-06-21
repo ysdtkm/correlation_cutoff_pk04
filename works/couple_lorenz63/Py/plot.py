@@ -69,10 +69,10 @@ def plot_le():
   hist_fse = hist_fse.reshape((STEPS, DIMM))
   hist_ise = hist_ise.reshape((STEPS, DIMM))
 
-  mean_ble = np.mean(hist_ble[STEPS//2:,:], axis=0)
-  mean_fle = np.mean(hist_fle[STEPS//2:,:], axis=0)
-  mean_fse = np.mean(hist_fse[STEPS//2:,:], axis=0)
-  mean_ise = np.mean(hist_ise[STEPS//2:,:], axis=0)
+  mean_ble = np.mean(hist_ble[STEPS//4:(STEPS*3)//4,:], axis=0)
+  mean_fle = np.mean(hist_fle[STEPS//4:(STEPS*3)//4,:], axis=0)
+  mean_fse = np.mean(hist_fse[STEPS//4:(STEPS*3)//4,:], axis=0)
+  mean_ise = np.mean(hist_ise[STEPS//4:(STEPS*3)//4,:], axis=0)
 
   plt.rcParams["font.size"] = 12
   fig, ax1 = plt.subplots(1)
@@ -114,7 +114,7 @@ def plot_lv_projection(hist_lv, hist_fcst, name, title, nmem, is_oblique):
   projection = np.zeros((DIMM, nmem))
   hist_fcst_mean = np.mean(hist_fcst, axis=1)
 
-  for i in range(STEPS//2, STEPS):
+  for i in range(STEPS//4, (STEPS*3)//4):
     if is_oblique:
       for k in range(nmem):
         projection[:,k] += np.abs(oblique_projection(hist_fcst[i,k,:] - hist_fcst_mean[i,:], hist_lv[i,:,:]))
