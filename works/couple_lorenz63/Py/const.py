@@ -44,7 +44,7 @@ EXPLIST = [ \
   #       "nmem":1, "method":"4dvar", "couple":"strong"} \
 ]
 
-Calc_lv = False
+Calc_lv = True
 
 def getr():
   r = np.identity(DIMO) * (OERR * OERR)
