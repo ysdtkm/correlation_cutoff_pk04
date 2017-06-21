@@ -5,7 +5,7 @@ import sys
 from scipy.optimize import fmin_bfgs
 from const import *
 
-Amplitude_B = 0.8
+Amplitude_B = 1.5
 
 def tdvar(fcst, h, r, yo, i_s, i_e):
   # fcst   <- np.array[dimc]        : first guess
