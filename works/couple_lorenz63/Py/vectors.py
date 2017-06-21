@@ -45,8 +45,7 @@ def calc_flv(all_true):
   for i in range(STEPS, 0, -1):
     true = all_true[i-1,:]
     m = finite_time_tangent_using_nonlinear(true, DT, 1)
-    flv = np.dot(np.linalg.inv(m), flv) # ttk
-    # flv = np.dot(m.T, flv)
+    flv = np.dot(m.T, flv)
     if (i % orth_int == 0):
       flv, fle = orth_norm_vectors(flv)
       all_fle[i-1,:] = fle[:] / DT
