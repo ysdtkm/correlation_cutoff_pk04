@@ -20,20 +20,20 @@ FERR_INI = 10.0
 EXPLIST = [ \
   # {"name":"etkf_non_clim_int8",  "rho":1.1, "aint":8, "nmem":10, \
   #       "method":"etkf", "couple":"none", "bc":"climatology"}, \
-  {"name":"etkf_non_int8",  "rho":1.15, "aint":8, "nmem":10, \
-        "method":"etkf", "couple":"none", "bc":"persistent"}, \
-  {"name":"etkf_weak_int8",  "rho":1.15, "aint":8, "nmem":10, \
-        "method":"etkf", "couple":"weak"}, \
-  {"name":"etkf_strong_int8",  "rho":1.15, "aint":8, "nmem":10, \
-        "method":"etkf", "couple":"strong"}, \
+  # {"name":"etkf_non_int8",  "rho":1.1, "aint":8, "nmem":10, \
+  #       "method":"etkf", "couple":"none", "bc":"persistent"}, \
+  # {"name":"etkf_weak_int8",  "rho":1.1, "aint":8, "nmem":10, \
+  #       "method":"etkf", "couple":"weak"}, \
+  # {"name":"etkf_strong_int8",  "rho":1.1, "aint":8, "nmem":10, \
+  #       "method":"etkf", "couple":"strong"}, \
   # # {"name":"tdvar_non_clim_int8", "aint":8, \
   # #       "nmem":1, "method":"3dvar", "couple":"none", "bc":"climatology"}, \
-  # {"name":"tdvar_non_int8", "aint":8, \
-  #       "nmem":1, "method":"3dvar", "couple":"none", "bc":"persistent"}, \
-  # {"name":"tdvar_weak_int8", "aint":8, \
-  #       "nmem":1, "method":"3dvar", "couple":"weak"}, \
-  # {"name":"tdvar_strong_int8", "aint":8, \
-  #       "nmem":1, "method":"3dvar", "couple":"strong"}, \
+  {"name":"tdvar_non_int8", "aint":8, \
+        "nmem":1, "method":"3dvar", "couple":"none", "bc":"persistent"}, \
+  {"name":"tdvar_weak_int8", "aint":8, \
+        "nmem":1, "method":"3dvar", "couple":"weak"}, \
+  {"name":"tdvar_strong_int8", "aint":8, \
+        "nmem":1, "method":"3dvar", "couple":"strong"}, \
   # # {"name":"fdvar_non_clim_int8", "aint":8, \
   # #       "nmem":1, "method":"4dvar", "couple":"none", "bc":"climatology"}, \
   # {"name":"fdvar_non_int8", "aint":8, \
