@@ -343,10 +343,11 @@ def plot_3d_trajectory(hist_true, hist_fcst, name, nmem):
     fig.subplots_adjust(left=0.02, bottom=0.02, right=0.98, top=0.98, \
       wspace=0.04, hspace=0.04)
     ax = fig.add_subplot(111, projection='3d')
-    ax.plot(hist_true[:,0+i_adjust], hist_true[:,1+i_adjust], \
-      hist_true[:,2+i_adjust], label="true")
-    ax.plot(hist_fcst_mean[:,0+i_adjust], hist_fcst_mean[:,1+i_adjust], \
-      hist_fcst_mean[:,2+i_adjust], label="model")
+    st = STEPS // 2 # step to start plotting
+    ax.plot(hist_true[st:,0+i_adjust], hist_true[st:,1+i_adjust], \
+      hist_true[st:,2+i_adjust], label="true")
+    ax.plot(hist_fcst_mean[st:,0+i_adjust], hist_fcst_mean[st:,1+i_adjust], \
+      hist_fcst_mean[st:,2+i_adjust], label="model")
     ax.legend()
     # ax.set_xlim([-30,30])
     # ax.set_ylim([-30,30])

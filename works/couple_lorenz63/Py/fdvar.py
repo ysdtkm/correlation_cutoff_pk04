@@ -8,7 +8,7 @@ from const import *
 from tdvar import *
 from model import *
 
-def fdvar(fcst_0, h, r, yo, aint, i_s, i_e, bc=None):
+def fdvar(fcst_0, h, r, yo, aint, i_s, i_e, amp_b, bc=None):
   # fcst_0 <- np.array[dimc]       : first guess at beginning of window
   # h      <- np.array[DIMO, dimc] : observation operator
   # r      <- np.array[DIMO, DIMO] : observation error covariance
@@ -16,6 +16,7 @@ def fdvar(fcst_0, h, r, yo, aint, i_s, i_e, bc=None):
   # aint   <- int                  : assimilation interval
   # i_s    <- int                  : model grid number, assimilate only [i_s, i_e)
   # i_e    <- int
+  # amp_b  <- float
   # bc     <- np.array[DIMM]       : boundary condition if needed
   # return -> np.array[dimc]       : assimilated field
 
@@ -24,19 +25,19 @@ def fdvar(fcst_0, h, r, yo, aint, i_s, i_e, bc=None):
 
   try:
     anl_0 = np.copy(fcst_0)
-    anl_0 = fmin_bfgs(fdvar_2j, anl_0, args=(fcst_0, h, r, yo, aint, i_s, i_e, bc))
+    anl_0 = fmin_bfgs(fdvar_2j, anl_0, args=(fcst_0, h, r, yo, aint, i_s, i_e, amp_b, bc))
     # anl_0 = fmin_bfgs(fdvar_2j, anl_0, fprime=fdvar_2j_deriv, args=(fcst_0, h, r, yo, aint, i_s, i_e))
   except:
     print("Method fmin_bfgs failed to converge. Use fmin for this step instead.")
     anl_0 = np.copy(fcst_0)
-    anl_0 = fmin(fdvar_2j, anl_0, args=(fcst_0, h, r, yo, aint, i_s, i_e, bc), disp=False)
+    anl_0 = fmin(fdvar_2j, anl_0, args=(fcst_0, h, r, yo, aint, i_s, i_e, amp_b, bc), disp=False)
 
   anl_1 = np.copy(anl_0)
   for i in range(0, aint):
     anl_1 = timestep(anl_1, DT, i_s, i_e, bc)
   return anl_1.T
 
-def fdvar_2j(anl_0_nda, fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e, bc):
+def fdvar_2j(anl_0_nda, fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e, amp_b, bc):
   # anl_0_nda  <- np.array[dimc]       : temporary analysis field
   # fcst_0_nda <- np.array[dimc]       : first guess field
   # h_nda      <- np.array[DIMO, dimc] : observation operator
@@ -45,13 +46,14 @@ def fdvar_2j(anl_0_nda, fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e, bc):
   # aint       <- int                  : assimilation interval
   # i_s        <- int                  : model grid number, assimilate only [i_s, i_e)
   # i_e        <- int
+  # amp_b      <- float
   # bc         <- np.array[DIMM]       : boundary condition if needed
   # return     -> float                : cost function 2J
 
   h  = np.asmatrix(h_nda)
   r  = np.asmatrix(r_nda)
   yo = np.asmatrix(yo_nda)
-  b  = np.matrix(Amplitude_B_fdvar * tdvar_b()[i_s:i_e, i_s:i_e])
+  b  = np.matrix(amp_b * tdvar_b()[i_s:i_e, i_s:i_e])
   anl_0  = np.asmatrix(anl_0_nda).T
   fcst_0 = np.asmatrix(fcst_0_nda).T
 
@@ -65,7 +67,7 @@ def fdvar_2j(anl_0_nda, fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e, bc):
          (h * anl_1 - yo).T * r.I * (h * anl_1 - yo)
   return twoj[0,0]
 
-def fdvar_2j_deriv(anl_0_nda, fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e):
+def fdvar_2j_deriv(anl_0_nda, fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e, amp_b):
   # anl_0_nda  <- np.array[dimc]       : temporary analysis field
   # fcst_0_nda <- np.array[dimc]       : first guess field
   # h_nda      <- np.array[DIMO, dimc] : observation operator
@@ -74,6 +76,7 @@ def fdvar_2j_deriv(anl_0_nda, fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e):
   # aint       <- int                  : assimilation interval
   # i_s        <- int                  : model grid number, assimilate only [i_s, i_e)
   # i_e        <- int
+  # amp_b      <- float
   # return     -> np.array[dimc]       : gradient of cost function 2J
 
   if i_s != 0 or i_e != DIMM:
@@ -82,7 +85,7 @@ def fdvar_2j_deriv(anl_0_nda, fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e):
   h  = np.asmatrix(h_nda)
   r  = np.asmatrix(r_nda)
   yo = np.asmatrix(yo_nda)
-  b  = np.matrix(Amplitude_B_fdvar * tdvar_b()[i_s:i_e, i_s:i_e])
+  b  = np.matrix(amp_b * tdvar_b()[i_s:i_e, i_s:i_e])
   anl_0  = np.asmatrix(anl_0_nda).T
   fcst_0 = np.asmatrix(fcst_0_nda).T
 
