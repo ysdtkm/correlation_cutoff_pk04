@@ -5,6 +5,10 @@ import numpy as np
 from const import *
 from model import *
 from fdvar import *
+from main import *
+import matplotlib as mpl
+mpl.use('Agg')
+import matplotlib.pyplot as plt
 
 def test_fdvar_overflow():
   exp = EXPLIST[1]
@@ -146,4 +150,95 @@ def obtain_climatology():
 
   return 0
 
-obtain_climatology()
+def obtain_tdvar_b():
+  np.random.seed(100000007*2)
+  nature = exec_nature()
+  obs = exec_obs(nature)
+  settings = {"name":"etkf_strong_int8",  "rho":1.1, "aint":8, "nmem":10, \
+              "method":"etkf", "couple":"strong"}
+  np.random.seed(100000007*3)
+  free = exec_free_run(settings)
+  anl  = exec_assim_cycle(settings, free, obs)
+  hist_bf = np.fromfile("data/%s_covr_back.bin" % settings["name"], np.float64)
+  hist_bf = hist_bf.reshape((STEPS, DIMM, DIMM))
+  mean_bf = np.nanmean(hist_bf[STEPS//2:, :, :], axis=0)
+
+  print("[ \\")
+  for i in range(DIMM):
+    print("[", end="")
+    for j in range(DIMM):
+      print("%12.9g" % mean_bf[i,j], end="")
+      if j < (DIMM - 1):
+        print(", ", end="")
+    if i < (DIMM - 1):
+      print("], \\")
+    else:
+      print("]  \\")
+      print("]")
+
+def print_two_dim_nparray(data, format="%12.9g"):
+  n = data.shape[0]
+  m = data.shape[1]
+  print("[ \\")
+  for i in range(n):
+    print("[", end="")
+    for j in range(m):
+      print(format % data[i,j], end="")
+      if j < (m - 1):
+        print(", ", end="")
+    if i < (n - 1):
+      print("], \\")
+    else:
+      print("]  \\")
+      print("]")
+
+def plot_matrix(data, name="", title="", color=plt.cm.bwr):
+  fig, ax = plt.subplots(1)
+  fig.subplots_adjust(left=0.12, right=0.95, bottom=0.12, top=0.92)
+  cmax = np.max(np.abs(data)) / 100
+  map1 = ax.pcolor(data, cmap=color)
+  if (color == plt.cm.bwr):
+    map1.set_clim(-1.0 * cmax, cmax)
+  x0,x1 = ax.get_xlim()
+  y0,y1 = ax.get_ylim()
+  ax.set_aspect(abs(x1-x0)/abs(y1-y0))
+  ax.set_xlabel("x")
+  cbar = plt.colorbar(map1)
+  plt.title(title)
+  plt.gca().invert_yaxis()
+  plt.savefig("./matrix_%s_%s.png" % (name, title))
+  plt.close()
+  return 0
+
+def check_b():
+  new = np.array([ \
+  [   31.296179,   44.2633605,  -0.51824455, -0.0765104746,  0.160601432, -0.238184143, 0.0275271624, -0.049991561, 0.0966464721], \
+  [  44.2633605,   77.9498178, -0.114422561, -0.0777510266,  0.287639389, -0.428048075, 0.0300395202, -0.103521189,  0.151026639], \
+  [ -0.51824455, -0.114422561,   59.3253303, 0.0550755696, 0.0793199082, -0.221180975,  0.101849791,  0.379401384, 0.0187837308], \
+  [-0.0765104746, -0.0777510266, 0.0550755696,   5.00294314,   5.63983821,  -2.27517755,  -0.12217024,   1.81940323,  0.954634433], \
+  [ 0.160601432,  0.287639389, 0.0793199082,   5.63983821,   10.1444547, 0.0401058189,  0.482065267,    2.7664626,   0.87513345], \
+  [-0.238184143, -0.428048075, -0.221180975,  -2.27517755, 0.0401058189,   11.6740375, -0.389886499,  -2.19701294, 0.0501196105], \
+  [0.0275271624, 0.0300395202,  0.101849791,  -0.12217024,  0.482065267, -0.389886499,   3.63307352,   7.70722361,   1.91325068], \
+  [-0.049991561, -0.103521189,  0.379401384,   1.81940323,    2.7664626,  -2.19701294,   7.70722361,   27.8304653,   0.89669422], \
+  [0.0966464721,  0.151026639, 0.0187837308,  0.954634433,   0.87513345, 0.0501196105,   1.91325068,   0.89669422,   18.9551383]  \
+  ])
+
+  old = np.array( \
+        [[1.55369946e-02, 2.59672759e-02, 2.14143702e-02, 5.50608636e-05, 2.06837903e-04, 9.53104122e-05, 4.01854229e-05, 1.10394688e-04, 1.10795043e-04], \
+         [2.59672759e-02, 4.60323124e-02, 3.22253391e-02, 9.67994015e-05, 3.47479991e-04, 1.59885557e-04, 6.25825607e-05, 1.71056662e-04, 1.75287574e-04], \
+         [2.14143702e-02, 3.22253391e-02, 4.49870690e-02, 8.07242543e-05, 2.90997346e-04, 1.68933576e-04, 7.17501951e-05, 1.91677973e-04, 2.08898907e-04], \
+         [5.50608636e-05, 9.67994015e-05, 8.07242543e-05, 1.19388552e-04, 1.32465565e-04, 1.41518295e-04, 1.26069316e-04, 3.89377305e-04, 5.26723750e-04], \
+         [2.06837903e-04, 3.47479991e-04, 2.90997346e-04, 1.32465565e-04, 2.19079467e-04, 1.28264891e-04, 2.15409763e-04, 5.82014129e-04, 7.50531420e-04], \
+         [9.53104122e-05, 1.59885557e-04, 1.68933576e-04, 1.41518295e-04, 1.28264891e-04, 3.00276052e-04, 2.90918095e-04, 8.40635972e-04, 8.63515366e-04], \
+         [4.01854229e-05, 6.25825607e-05, 7.17501951e-05, 1.26069316e-04, 2.15409763e-04, 2.90918095e-04, 9.88628471e-04, 2.56406108e-03, 2.73643907e-03], \
+         [1.10394688e-04, 1.71056662e-04, 1.91677973e-04, 3.89377305e-04, 5.82014129e-04, 8.40635972e-04, 2.56406108e-03, 8.41665768e-03, 6.19483319e-03], \
+         [1.10795043e-04, 1.75287574e-04, 2.08898907e-04, 5.26723750e-04, 7.50531420e-04, 8.63515366e-04, 2.73643907e-03, 6.19483319e-03, 1.08456084e-02]] \
+      )
+
+  print_two_dim_nparray(old / new * 10000, "%8.4g")
+  print_two_dim_nparray(new, "%8.4g")
+
+  plot_matrix(old / new, "", "", color=plt.cm.bwr)
+  return 0
+
+check_b()

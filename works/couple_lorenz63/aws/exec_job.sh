@@ -2,15 +2,18 @@
 set -e
 
 git s
-echo -e "\e[33mType (Ctrl-C) to stop.\e[m"
-echo ""
-echo -ne "input \e[33mJOB NAME\e[m: "
-read JOBNAME
+if [ $# -lt 1 ]; then
+  echo -e "\e[33mType (Ctrl-C) to stop.\e[m"
+  echo ""
+  echo -ne "input \e[33mJOB NAME\e[m: "
+  read JOBNAME
+else
+  echo -e "\e[33mType Enter to continue. Type (Ctrl-C) to stop.\e[m"
+  read DUMMY
+  JOBNAME=$1
+fi
 
-echo -n "choose queue type (default: slow): "
-read QUEUETYPE
-echo ""
-if [ "${QUEUETYPE}" != "" ]; then
+if [ $# -ge 2 ]; then
   queue="queue_fast"
 else
   queue="queue_slow"

@@ -51,7 +51,7 @@ def fdvar_2j(anl_0_nda, fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e, bc):
   h  = np.asmatrix(h_nda)
   r  = np.asmatrix(r_nda)
   yo = np.asmatrix(yo_nda)
-  b  = np.matrix(1.2 * tdvar_b()[i_s:i_e, i_s:i_e])
+  b  = np.matrix(Amplitude_B_fdvar * tdvar_b()[i_s:i_e, i_s:i_e])
   anl_0  = np.asmatrix(anl_0_nda).T
   fcst_0 = np.asmatrix(fcst_0_nda).T
 
@@ -82,7 +82,7 @@ def fdvar_2j_deriv(anl_0_nda, fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e):
   h  = np.asmatrix(h_nda)
   r  = np.asmatrix(r_nda)
   yo = np.asmatrix(yo_nda)
-  b  = np.matrix(1.2 * tdvar_b()[i_s:i_e, i_s:i_e])
+  b  = np.matrix(Amplitude_B_fdvar * tdvar_b()[i_s:i_e, i_s:i_e])
   anl_0  = np.asmatrix(anl_0_nda).T
   fcst_0 = np.asmatrix(fcst_0_nda).T
 
