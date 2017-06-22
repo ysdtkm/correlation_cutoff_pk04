@@ -20,29 +20,47 @@ Amplitude_B_tdvar = 0.6
 Amplitude_B_fdvar = 0.3
 
 EXPLIST = [ \
-  # {"name":"etkf_non_clim_int8",  "rho":1.1, "aint":8, "nmem":10, \
-  #       "method":"etkf", "couple":"none", "bc":"climatology"}, \
-  {"name":"etkf_non_int8",  "rho":1.1, "aint":8, "nmem":10, \
-        "method":"etkf", "couple":"none", "bc":"persistent"}, \
-  {"name":"etkf_weak_int8",  "rho":1.1, "aint":8, "nmem":10, \
-        "method":"etkf", "couple":"weak"}, \
-  {"name":"etkf_strong_int8",  "rho":1.1, "aint":8, "nmem":10, \
-        "method":"etkf", "couple":"strong"}, \
-  # {"name":"tdvar_non_clim_int8", "aint":8, \
-  #       "nmem":1, "method":"3dvar", "couple":"none", "bc":"climatology"}, \
-  {"name":"tdvar_non_int8", "aint":8, "amp_b":0.6, \
-        "nmem":1, "method":"3dvar", "couple":"none", "bc":"persistent"}, \
-  {"name":"tdvar_weak_int8", "aint":8, "amp_b":0.6, \
-        "nmem":1, "method":"3dvar", "couple":"weak"}, \
-  {"name":"tdvar_strong_int8", "aint":8, "amp_b":0.6, \
-        "nmem":1, "method":"3dvar", "couple":"strong"}, \
+  # # {"name":"etkf_non_clim_int8",  "rho":1.1, "aint":8, "nmem":10, \
+  # #       "method":"etkf", "couple":"none", "bc":"climatology"}, \
+  # {"name":"etkf_non_int8",  "rho":1.1, "aint":8, "nmem":10, \
+  #       "method":"etkf", "couple":"none", "bc":"persistent"}, \
+  # {"name":"etkf_weak_int8",  "rho":1.1, "aint":8, "nmem":10, \
+  #       "method":"etkf", "couple":"weak"}, \
+  # {"name":"etkf_strong_int8",  "rho":1.1, "aint":8, "nmem":10, \
+  #       "method":"etkf", "couple":"strong"}, \
+  # # {"name":"tdvar_non_clim_int8", "aint":8, \
+  # #       "nmem":1, "method":"3dvar", "couple":"none", "bc":"climatology"}, \
+  # {"name":"tdvar_non_int8", "aint":8, "amp_b":0.6, \
+  #       "nmem":1, "method":"3dvar", "couple":"none", "bc":"persistent"}, \
+  # {"name":"tdvar_weak_int8", "aint":8, "amp_b":0.6, \
+  #       "nmem":1, "method":"3dvar", "couple":"weak"}, \
+  # {"name":"tdvar_strong_int8", "aint":8, "amp_b":0.6, \
+  #       "nmem":1, "method":"3dvar", "couple":"strong"}, \
   # {"name":"fdvar_non_clim_int8", "aint":8, \
   #       "nmem":1, "method":"4dvar", "couple":"none", "bc":"climatology"}, \
-  {"name":"fdvar_non_int8", "aint":8, "amp_b":0.3, \
+  {"name":"fdvar_non_int8_b02", "aint":8, "amp_b":0.2, \
         "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
-  {"name":"fdvar_weak_int8", "aint":8, "amp_b":0.3, \
+  {"name":"fdvar_weak_int8_b02", "aint":8, "amp_b":0.2, \
         "nmem":1, "method":"4dvar", "couple":"weak"}, \
-  {"name":"fdvar_strong_int8", "aint":8, "amp_b":0.3, \
+  {"name":"fdvar_strong_int8_b02", "aint":8, "amp_b":0.2, \
+        "nmem":1, "method":"4dvar", "couple":"strong"} \
+  {"name":"fdvar_non_int8_b03", "aint":8, "amp_b":0.3, \
+        "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
+  {"name":"fdvar_weak_int8_b03", "aint":8, "amp_b":0.3, \
+        "nmem":1, "method":"4dvar", "couple":"weak"}, \
+  {"name":"fdvar_strong_int8_b03", "aint":8, "amp_b":0.3, \
+        "nmem":1, "method":"4dvar", "couple":"strong"} \
+  {"name":"fdvar_non_int8_b04", "aint":8, "amp_b":0.4, \
+        "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
+  {"name":"fdvar_weak_int8_b04", "aint":8, "amp_b":0.4, \
+        "nmem":1, "method":"4dvar", "couple":"weak"}, \
+  {"name":"fdvar_strong_int8_b04", "aint":8, "amp_b":0.4, \
+        "nmem":1, "method":"4dvar", "couple":"strong"} \
+  {"name":"fdvar_non_int8_b05", "aint":8, "amp_b":0.5, \
+        "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
+  {"name":"fdvar_weak_int8_b05", "aint":8, "amp_b":0.5, \
+        "nmem":1, "method":"4dvar", "couple":"weak"}, \
+  {"name":"fdvar_strong_int8_b05", "aint":8, "amp_b":0.5, \
         "nmem":1, "method":"4dvar", "couple":"strong"} \
 ]
 
