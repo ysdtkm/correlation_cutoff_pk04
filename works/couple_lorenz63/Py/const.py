@@ -8,7 +8,7 @@ DIMM = 9    # dimension of model variable n
 DIMO = DIMM # dimension of observation variable m
 
 DT = 0.01
-TMAX = 2
+TMAX = 100
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 VRFS = int(STEPS * 0.85) # verification period: [VRFS,STEPS)
@@ -17,7 +17,7 @@ FCST_LT = 5
 OERR = 5.0
 FERR_INI = 10.0
 Amplitude_B_tdvar = 0.6
-Amplitude_B_fdvar = 0.4
+Amplitude_B_fdvar = 0.3
 
 EXPLIST = [ \
   # {"name":"etkf_non_clim_int8",  "rho":1.1, "aint":8, "nmem":10, \
