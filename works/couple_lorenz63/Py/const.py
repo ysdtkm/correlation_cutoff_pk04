@@ -36,29 +36,17 @@ EXPLIST = [ \
   #       "nmem":1, "method":"3dvar", "couple":"strong"}, \
   # {"name":"fdvar_non_clim_int8", "aint":8, \
   #       "nmem":1, "method":"4dvar", "couple":"none", "bc":"climatology"}, \
-  {"name":"fdvar_non_int8_b01", "aint":8, "amp_b":0.1, \
+  {"name":"fdvar_non_int8_b005", "aint":8, "amp_b":0.05, \
         "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
-  {"name":"fdvar_weak_int8_b01", "aint":8, "amp_b":0.1, \
+  {"name":"fdvar_weak_int8_b005", "aint":8, "amp_b":0.05, \
         "nmem":1, "method":"4dvar", "couple":"weak"}, \
-  {"name":"fdvar_strong_int8_b01", "aint":8, "amp_b":0.1, \
+  {"name":"fdvar_strong_int8_b005", "aint":8, "amp_b":0.05, \
         "nmem":1, "method":"4dvar", "couple":"strong"}, \
-  {"name":"fdvar_non_int8_b015", "aint":8, "amp_b":0.15, \
+  {"name":"fdvar_non_int8_b007", "aint":8, "amp_b":0.07, \
         "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
-  {"name":"fdvar_weak_int8_b015", "aint":8, "amp_b":0.15, \
+  {"name":"fdvar_weak_int8_b007", "aint":8, "amp_b":0.07, \
         "nmem":1, "method":"4dvar", "couple":"weak"}, \
-  {"name":"fdvar_strong_int8_b015", "aint":8, "amp_b":0.15, \
-        "nmem":1, "method":"4dvar", "couple":"strong"}, \
-  {"name":"fdvar_non_int8_b06", "aint":8, "amp_b":0.6, \
-        "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
-  {"name":"fdvar_weak_int8_b06", "aint":8, "amp_b":0.6, \
-        "nmem":1, "method":"4dvar", "couple":"weak"}, \
-  {"name":"fdvar_strong_int8_b06", "aint":8, "amp_b":0.6, \
-        "nmem":1, "method":"4dvar", "couple":"strong"}, \
-  {"name":"fdvar_non_int8_b08", "aint":8, "amp_b":0.8, \
-        "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
-  {"name":"fdvar_weak_int8_b08", "aint":8, "amp_b":0.8, \
-        "nmem":1, "method":"4dvar", "couple":"weak"}, \
-  {"name":"fdvar_strong_int8_b08", "aint":8, "amp_b":0.8, \
+  {"name":"fdvar_strong_int8_b007", "aint":8, "amp_b":0.07, \
         "nmem":1, "method":"4dvar", "couple":"strong"} \
 ]
 
