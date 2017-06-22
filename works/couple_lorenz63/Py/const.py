@@ -16,7 +16,7 @@ FCST_LT = 5
 
 OERR = 5.0
 FERR_INI = 10.0
-Amplitude_B_tdvar = 0.4
+Amplitude_B_tdvar = 0.6
 Amplitude_B_fdvar = 0.4
 
 EXPLIST = [ \
