@@ -16,8 +16,6 @@ FCST_LT = 5
 
 OERR = 5.0
 FERR_INI = 10.0
-Amplitude_B_tdvar = 0.6
-Amplitude_B_fdvar = 0.3
 
 EXPLIST = [ \
   # # {"name":"etkf_non_clim_int8",  "rho":1.1, "aint":8, "nmem":10, \
@@ -38,29 +36,29 @@ EXPLIST = [ \
   #       "nmem":1, "method":"3dvar", "couple":"strong"}, \
   # {"name":"fdvar_non_clim_int8", "aint":8, \
   #       "nmem":1, "method":"4dvar", "couple":"none", "bc":"climatology"}, \
-  {"name":"fdvar_non_int8_b02", "aint":8, "amp_b":0.2, \
+  {"name":"fdvar_non_int8_b01", "aint":8, "amp_b":0.1, \
         "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
-  {"name":"fdvar_weak_int8_b02", "aint":8, "amp_b":0.2, \
+  {"name":"fdvar_weak_int8_b01", "aint":8, "amp_b":0.1, \
         "nmem":1, "method":"4dvar", "couple":"weak"}, \
-  {"name":"fdvar_strong_int8_b02", "aint":8, "amp_b":0.2, \
+  {"name":"fdvar_strong_int8_b01", "aint":8, "amp_b":0.1, \
         "nmem":1, "method":"4dvar", "couple":"strong"}, \
-  {"name":"fdvar_non_int8_b03", "aint":8, "amp_b":0.3, \
+  {"name":"fdvar_non_int8_b015", "aint":8, "amp_b":0.15, \
         "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
-  {"name":"fdvar_weak_int8_b03", "aint":8, "amp_b":0.3, \
+  {"name":"fdvar_weak_int8_b015", "aint":8, "amp_b":0.15, \
         "nmem":1, "method":"4dvar", "couple":"weak"}, \
-  {"name":"fdvar_strong_int8_b03", "aint":8, "amp_b":0.3, \
+  {"name":"fdvar_strong_int8_b015", "aint":8, "amp_b":0.15, \
         "nmem":1, "method":"4dvar", "couple":"strong"}, \
-  {"name":"fdvar_non_int8_b04", "aint":8, "amp_b":0.4, \
+  {"name":"fdvar_non_int8_b06", "aint":8, "amp_b":0.6, \
         "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
-  {"name":"fdvar_weak_int8_b04", "aint":8, "amp_b":0.4, \
+  {"name":"fdvar_weak_int8_b06", "aint":8, "amp_b":0.6, \
         "nmem":1, "method":"4dvar", "couple":"weak"}, \
-  {"name":"fdvar_strong_int8_b04", "aint":8, "amp_b":0.4, \
+  {"name":"fdvar_strong_int8_b06", "aint":8, "amp_b":0.6, \
         "nmem":1, "method":"4dvar", "couple":"strong"}, \
-  {"name":"fdvar_non_int8_b05", "aint":8, "amp_b":0.5, \
+  {"name":"fdvar_non_int8_b08", "aint":8, "amp_b":0.8, \
         "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
-  {"name":"fdvar_weak_int8_b05", "aint":8, "amp_b":0.5, \
+  {"name":"fdvar_weak_int8_b08", "aint":8, "amp_b":0.8, \
         "nmem":1, "method":"4dvar", "couple":"weak"}, \
-  {"name":"fdvar_strong_int8_b05", "aint":8, "amp_b":0.5, \
+  {"name":"fdvar_strong_int8_b08", "aint":8, "amp_b":0.8, \
         "nmem":1, "method":"4dvar", "couple":"strong"} \
 ]
 
