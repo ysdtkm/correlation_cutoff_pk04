@@ -43,19 +43,19 @@ EXPLIST = [ \
   {"name":"fdvar_weak_int8_b02", "aint":8, "amp_b":0.2, \
         "nmem":1, "method":"4dvar", "couple":"weak"}, \
   {"name":"fdvar_strong_int8_b02", "aint":8, "amp_b":0.2, \
-        "nmem":1, "method":"4dvar", "couple":"strong"} \
+        "nmem":1, "method":"4dvar", "couple":"strong"}, \
   {"name":"fdvar_non_int8_b03", "aint":8, "amp_b":0.3, \
         "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
   {"name":"fdvar_weak_int8_b03", "aint":8, "amp_b":0.3, \
         "nmem":1, "method":"4dvar", "couple":"weak"}, \
   {"name":"fdvar_strong_int8_b03", "aint":8, "amp_b":0.3, \
-        "nmem":1, "method":"4dvar", "couple":"strong"} \
+        "nmem":1, "method":"4dvar", "couple":"strong"}, \
   {"name":"fdvar_non_int8_b04", "aint":8, "amp_b":0.4, \
         "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
   {"name":"fdvar_weak_int8_b04", "aint":8, "amp_b":0.4, \
         "nmem":1, "method":"4dvar", "couple":"weak"}, \
   {"name":"fdvar_strong_int8_b04", "aint":8, "amp_b":0.4, \
-        "nmem":1, "method":"4dvar", "couple":"strong"} \
+        "nmem":1, "method":"4dvar", "couple":"strong"}, \
   {"name":"fdvar_non_int8_b05", "aint":8, "amp_b":0.5, \
         "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
   {"name":"fdvar_weak_int8_b05", "aint":8, "amp_b":0.5, \
