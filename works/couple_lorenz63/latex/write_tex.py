@@ -13,6 +13,7 @@ def main():
   date_for_tex = datestr.replace("_", "\\_")
   txt_out = header(date_for_tex, last_commit)
 
+  # rmse-spread
   tmax = const.STEPS
   explist = ["etkf", "tdvar", "fdvar"]
   filebase = "../image/@@expname@@_@@yname@@_int8/@@expname@@_@@yname@@_int8_@@xname@@_time.png"
@@ -21,14 +22,21 @@ def main():
     ylist = ["strong", "weak", "non"]
     txt_out += figure_table(expname, filebase, xlist, ylist, date_for_tex, last_commit)
 
+  # rmse table
   txt_out += write_rmse(date_for_tex, last_commit)
   txt_out += lyapunov_exponent(date_for_tex, last_commit)
 
-  filebase = "../image/@@expname@@_@@yname@@_int8/@@expname@@_@@yname@@_int8_@@xname@@_val.png"
-  for expname in explist:
-    xlist = ["extro", "trop", "ocn"]
-    ylist = ["strong", "weak", "non"]
-    txt_out += figure_table(expname, filebase, xlist, ylist, date_for_tex, last_commit)
+  # time series
+  # filebase = "../image/@@expname@@_@@yname@@_int8/@@expname@@_@@yname@@_int8_@@xname@@_val.png"
+  # for expname in explist:
+  #   xlist = ["extro", "trop", "ocn"]
+  #   ylist = ["strong", "weak", "non"]
+  #   txt_out += figure_table(expname, filebase, xlist, ylist, date_for_tex, last_commit)
+
+  # all figures
+  filebase = "../image/@@expname@@/@@expname@@_@@imgname@@.png"
+  for exp in const.EXPLIST:
+    txt_out += figure_all(exp["name"], filebase, date_for_tex, last_commit)
 
   txt_out += footer()
   f = io.open("./temp.tex", "w")
@@ -99,6 +107,42 @@ def figure_table(expname, filebase, xlist, ylist, date, commit):
 
   closing = """
     % \\caption{polygons}\\label{reg_poly}
+    \\end{figure}
+    \\end{frame}
+  """[1:-1]
+  content += closing
+
+  return textwrap.dedent(content[1:-1])
+
+def figure_all(expname, filebase, date, commit):
+  content = """
+    \\begin{frame}
+    \\frametitle{@@expname@@}
+    \\vspace*{-10mm}
+    \\begin{figure}[h]
+      \\flushleft
+  """[1:-1]
+  content = content.replace('@@expname@@', date + " " + commit + " "  + expname.replace("_", "\\_"))
+
+  imglist = ["anl_covar_logrms", "back_covar_logrms", "anl_covar_mean", "back_covar_mean", \
+             "extro_traj", "trop_traj", "ocn_traj", "", \
+             "extro_val", "trop_val", "ocn_val", "", \
+             "extro_time", "trop_time", "ocn_time", ""]
+  for i, imgname in enumerate(imglist):
+    tex_figure = """
+      \\begin{minipage}[b]{0.24\\linewidth}
+        \\centering
+        \\includegraphicsmaybe[width=27mm]{@@filebase@@}
+      \\end{minipage}
+      """[1:-1]
+    tex_figure = tex_figure.replace('@@filebase@@', filebase)
+    tex_figure = tex_figure.replace('@@expname@@', expname)
+    tex_figure = tex_figure.replace('@@imgname@@', imgname)
+    content += tex_figure
+    if i % 4 == 3:
+      content += "\\\\"
+
+  closing = """
     \\end{figure}
     \\end{frame}
   """[1:-1]

@@ -370,9 +370,9 @@ def plot_covariance_matr(hist_covar, name, sel):
     mean_covar = np.nan_to_num(np.nanmean(hist_covar, axis=0))
     rms_log = np.log(rms_covar)
   rms_log[np.isneginf(rms_log)] = 0
-  plot_matrix(rms_covar , name, "%s_covar_rms_%s"  % (sel, name))
-  plot_matrix(rms_log , name, "%s_covar_logrms_%s"  % (sel, name), plt.cm.Reds)
-  plot_matrix(mean_covar, name, "%s_covar_mean_%s" % (sel, name))
+  plot_matrix(rms_covar , name, "%s_%s_covar_rms"  % (name, sel))
+  plot_matrix(rms_log , name, "%s_%s_covar_logrms"  % (name, sel), plt.cm.Reds)
+  plot_matrix(mean_covar, name, "%s_%s_covar_mean" % (name, sel))
 
 def plot_matrix(data, name, title, color=plt.cm.bwr):
   # data  <- np.array[n,n]
