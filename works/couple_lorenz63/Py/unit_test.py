@@ -5,7 +5,7 @@ import numpy as np
 from const import *
 from model import *
 from fdvar import *
-from main import *
+from main import exec_nature, exec_obs, exec_free_run, exec_assim_cycle
 import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
@@ -241,4 +241,4 @@ def check_b():
   plot_matrix(old / new, "", "", color=plt.cm.bwr)
   return 0
 
-check_b()
+obtain_tdvar_b()

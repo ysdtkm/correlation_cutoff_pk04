@@ -171,5 +171,6 @@ def exec_deterministic_fcst(settings, anl):
   fcst_all.tofile("data/%s_fcst.bin" % settings["name"])
   return 0
 
-main()
+if __name__ == "__main__":
+  main()
 

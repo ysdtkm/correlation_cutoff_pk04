@@ -8,7 +8,7 @@ DIMM = 9    # dimension of model variable n
 DIMO = DIMM # dimension of observation variable m
 
 DT = 0.01
-TMAX = 100
+TMAX = 1000
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 VRFS = int(STEPS * 0.85) # verification period: [VRFS,STEPS)
@@ -36,21 +36,15 @@ EXPLIST = [ \
   #       "nmem":1, "method":"3dvar", "couple":"strong"}, \
   # {"name":"fdvar_non_clim_int8", "aint":8, \
   #       "nmem":1, "method":"4dvar", "couple":"none", "bc":"climatology"}, \
-  {"name":"fdvar_non_int8_b005", "aint":8, "amp_b":0.05, \
-        "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
-  {"name":"fdvar_weak_int8_b005", "aint":8, "amp_b":0.05, \
-        "nmem":1, "method":"4dvar", "couple":"weak"}, \
-  {"name":"fdvar_strong_int8_b005", "aint":8, "amp_b":0.05, \
-        "nmem":1, "method":"4dvar", "couple":"strong"}, \
-  {"name":"fdvar_non_int8_b007", "aint":8, "amp_b":0.07, \
-        "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
-  {"name":"fdvar_weak_int8_b007", "aint":8, "amp_b":0.07, \
-        "nmem":1, "method":"4dvar", "couple":"weak"}, \
-  {"name":"fdvar_strong_int8_b007", "aint":8, "amp_b":0.07, \
-        "nmem":1, "method":"4dvar", "couple":"strong"} \
+  # {"name":"fdvar_non_int8_b005", "aint":8, "amp_b":0.05, \
+  #       "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
+  # {"name":"fdvar_weak_int8_b005", "aint":8, "amp_b":0.05, \
+  #       "nmem":1, "method":"4dvar", "couple":"weak"}, \
+  # {"name":"fdvar_strong_int8_b005", "aint":8, "amp_b":0.05, \
+  #       "nmem":1, "method":"4dvar", "couple":"strong"}, \
 ]
 
-Calc_lv = False
+Calc_lv = True
 
 def getr():
   r = np.identity(DIMO) * (OERR * OERR)
