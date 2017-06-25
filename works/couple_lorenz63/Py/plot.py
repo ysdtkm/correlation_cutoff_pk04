@@ -235,6 +235,7 @@ def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
       plt.plot(np.sqrt(mse_time), label="RMSE")
       if (nmem > 1):
         plt.plot(np.sqrt(sprd2_time), label="Spread")
+      plt.axhline(y=OERR, label="sqrt(R)")
       plt.legend()
       plt.xlabel("timestep")
       plt.ylim([0.01, 100])
