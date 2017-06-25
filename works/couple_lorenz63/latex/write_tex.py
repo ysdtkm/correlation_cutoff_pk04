@@ -154,7 +154,9 @@ def write_rmse(date, commit):
   content = """
     \\begin{frame}
     \\frametitle{@@expname@@}
-    \\verbatiminput{../image/true/rmse.txt}
+    \\small{
+      \\verbatiminput{../image/true/rmse.txt}
+    }
     \\end{frame}
   """[1:-1]
   content = content.replace('@@expname@@', date + " " + commit + " rmse")
