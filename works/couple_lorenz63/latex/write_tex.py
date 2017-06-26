@@ -23,6 +23,7 @@ def main():
     txt_out += figure_table(expname, filebase, xlist, ylist, date_for_tex, last_commit)
 
   # rmse table
+  txt_out += figure_single(date_for_tex, last_commit)
   txt_out += write_rmse(date_for_tex, last_commit)
   txt_out += lyapunov_exponent(date_for_tex, last_commit)
 
@@ -107,6 +108,31 @@ def figure_table(expname, filebase, xlist, ylist, date, commit):
 
   closing = """
     % \\caption{polygons}\\label{reg_poly}
+    \\end{figure}
+    \\end{frame}
+  """[1:-1]
+  content += closing
+
+  return textwrap.dedent(content[1:-1])
+
+def figure_single(date, commit):
+  content = """
+    \\begin{frame}
+    \\frametitle{@@title@@}
+    \\vspace*{-10mm}
+    \\begin{figure}[h]
+      \\flushleft
+  """[1:-1]
+  content = content.replace('@@title@@', date + " " + commit)
+
+  tex_figure = """
+    \\centering
+    \\includegraphicsmaybe[width=78mm]{@@filebase@@}
+    """[1:-1]
+  tex_figure = tex_figure.replace('@@filebase@@', "../image/true/rmse_bar.png")
+  content += tex_figure
+
+  closing = """
     \\end{figure}
     \\end{frame}
   """[1:-1]

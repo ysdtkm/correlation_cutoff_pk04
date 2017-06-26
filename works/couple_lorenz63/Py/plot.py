@@ -460,7 +460,7 @@ def plot_rmse_bar(hist_true):
   ax.set_xticks(x2)
   ax.set_xticklabels(lab,rotation = 45)
   ax.legend(p, [i.get_label() for i in p])
-  plt.savefig("bar.png")
+  plt.savefig("./image/true/rmse_bar.png")
 
   return 0
 
