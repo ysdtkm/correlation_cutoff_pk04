@@ -457,7 +457,7 @@ def plot_rmse_bar(hist_true):
 
   ax.set_ylim(0, OERR*3.0)
   ax.set_xticks(x2)
-  ax.set_xticklabels(lab,rotation = 45)
+  ax.set_xticklabels(lab,rotation = -90)
   oerr = ax.axhline(y=OERR, label="sqrt(R)")
 
   p = [p1, p2, p3, oerr]
