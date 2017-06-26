@@ -454,11 +454,13 @@ def plot_rmse_bar(hist_true):
   p1 = ax.bar(x1,y1,width,label="extro")
   p2 = ax.bar(x2,y2,width,label="trop")
   p3 = ax.bar(x3,y3,width,label="ocn")
-  p = [p1, p2, p3]
 
   ax.set_ylim(0, OERR*3.0)
   ax.set_xticks(x2)
   ax.set_xticklabels(lab,rotation = 45)
+  oerr = ax.axhline(y=OERR, label="sqrt(R)")
+
+  p = [p1, p2, p3, oerr]
   ax.legend(p, [i.get_label() for i in p])
   plt.savefig("./image/true/rmse_bar.png")
 
