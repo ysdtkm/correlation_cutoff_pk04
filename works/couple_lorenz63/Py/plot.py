@@ -32,6 +32,9 @@ def plot_all():
     plot_lv_time(hist_vector[vec], vector_name[vec])
     # plot_trajectory_lv(hist_true, hist_vector[vec], vector_name[vec])
 
+  global rmse_hash
+  rmse_hash = {}
+
   for exp in EXPLIST:
     name = exp["name"]
     nmem = exp["nmem"]
@@ -56,6 +59,7 @@ def plot_all():
         hist_covar = np.fromfile("data/%s_covr_%s.bin" % (name, sel), np.float64)
         hist_covar = hist_covar.reshape((STEPS, DIMM, DIMM))
         plot_covariance_matr(hist_covar, name, sel)
+  plot_rmse_bar(hist_true)
 
 def plot_le():
   # plot lyapunov exponents
@@ -214,6 +218,8 @@ def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
         1.0 / (nmem - 1.0) * (hist_fcst[:,i,:]**2 - hist_fcst_mean[:,:]**2)
   hist_err = hist_fcst_mean - hist_true
 
+  global rmse_hash
+
   if (DIMM == 3 or DIMM == 9):
     rmse_component = []
     for i_component in range(DIMM//3):
@@ -247,6 +253,7 @@ def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
     f.write(("%-25s" % name) + str(["%5g" % x for x in rmse_component]) + "\n")
     print("%-25s" % name, ["%5g" % x for x in rmse_component])
     f.close()
+    rmse_hash[name] = rmse_component
 
   else: # lorenz96
     # MSE and Spread_square time series (grid average)
@@ -418,5 +425,43 @@ def oblique_projection(vector, obl_basis):
     coefs = np.zeros(DIMM)
 
   return coefs
+
+def plot_rmse_bar(hist_true):
+  if DIMM != 9:
+    return 0
+
+  global rmse_hash
+  plt.rcParams["font.size"] = 9
+
+  width=0.25
+  x1 = [i for i in range(len(rmse_hash))]
+  x2 = [i+width for i in x1]
+  x3 = [i+2*width for i in x1]
+
+  lab = []
+  y1 = []
+  y2 = []
+  y3 = []
+  for name in rmse_hash:
+    lab.append(name)
+    y1.append(rmse_hash[name][0])
+    y2.append(rmse_hash[name][1])
+    y3.append(rmse_hash[name][2])
+
+  fig, ax = plt.subplots()
+  fig.subplots_adjust(bottom=0.3)
+
+  p1 = ax.bar(x1,y1,width,label="extro")
+  p2 = ax.bar(x2,y2,width,label="trop")
+  p3 = ax.bar(x3,y3,width,label="ocn")
+  p = [p1, p2, p3]
+
+  ax.set_ylim(0, OERR*3.0)
+  ax.set_xticks(x2)
+  ax.set_xticklabels(lab,rotation = 45)
+  ax.legend(p, [i.get_label() for i in p])
+  plt.savefig("bar.png")
+
+  return 0
 
 plot_all()
