@@ -18,7 +18,7 @@ def main():
   txt_out += write_txt(date_for_tex, last_commit, "../image/true/rmse.txt", "9pt")
   txt_out += write_txt(date_for_tex, last_commit, "../data/lyapunov.txt", "5.4pt")
 
-  # rmse-spread
+  # rmse-spread comparison
   for expname in ["etkf", "tdvar", "fdvar"]:
     filelist = []
     for strx in ["extro", "trop", "ocn"]:
@@ -36,19 +36,18 @@ def main():
     for imgname in imglist:
       filelist.append("../image/%s/%s_%s.png" % (exp["name"], exp["name"], imgname))
     txt_out += figure_table(exp["name"], filelist, 4, 4, date_for_tex, last_commit)
-    # txt_out += figure_all(exp["name"], filebase, date_for_tex, last_commit)
 
-  # footer
-  tmax = const.STEPS
+  # conditions
+  txt_out += write_txt(date_for_tex, last_commit, "../Py/const.py", "6pt")
+
+  # footer, output and compile
   txt_out += footer()
-
-  # output and compile
   f = io.open("./temp.tex", "w")
   f.write(txt_out)
   f.close()
   os.system("make")
   os.system("mkdir -p ./archive")
-  os.system("cp -f ./out.pdf ./archive/%s_%s_%dsteps.pdf" % (datestr, last_commit, tmax))
+  os.system("cp -f ./out.pdf ./archive/%s_%s_%dsteps.pdf" % (datestr, last_commit, const.STEPS))
   return 0
 
 def header(date, last_commit):
@@ -84,15 +83,6 @@ def header(date, last_commit):
   return textwrap.dedent(header[1:-1])
 
 def figure_table(expname, file_list, nx, ny, date, commit):
-  content = """
-    \\begin{frame}
-    \\frametitle{@@expname@@}
-    \\vspace*{-10mm}
-    \\begin{figure}[h]
-      \\flushleft
-  """[1:-1]
-  content = content.replace('@@expname@@', date + " " + commit + " "  + expname.replace("_", "\\_"))
-
   if ny == 1 and nx == 1:
     width_cell = "0.96"
     width_img = "90mm"
@@ -106,12 +96,21 @@ def figure_table(expname, file_list, nx, ny, date, commit):
     print("figure_table skipped due to unrecognized nx and ny")
     return ""
 
+  content = """
+    \\begin{frame}
+    \\frametitle{@@expname@@}
+    \\vspace*{-10mm}
+    \\begin{figure}[h]
+      \\flushleft
+  """[1:-1]
+  content = content.replace('@@expname@@', date + " " + commit + " "  + expname.replace("_", "\\_"))
+
   for iy in range(ny):
     for ix in range(nx):
       tex_figure = """
         \\begin{minipage}[b]{@@widthcell@@\\linewidth}
           \\centering
-          \\includegraphicsmaybe[width=@@widthimg@@]{@@filename@@}
+          \\includegraphicsmaybe[width=@@widthimg@@]{"@@filename@@"}
           % \\subcaption{@@num@@}
         \\end{minipage}
         """[1:-1]
@@ -136,7 +135,7 @@ def write_txt(date, commit, path, size):
     return ""
 
   content = """
-    \\begin{frame}
+    \\begin{frame}[allowframebreaks]
     \\frametitle{@@expname@@}
     \\fontsize{@@size@@}{@@size@@}{
       \\verbatiminput{@@filepath@@}
