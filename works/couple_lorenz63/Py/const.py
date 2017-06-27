@@ -36,41 +36,41 @@ EXPLIST = [ \
   #       "nmem":1, "method":"3dvar", "couple":"strong"}, \
   # {"name":"fdvar_non_clim_int8", "aint":8, \
   #       "nmem":1, "method":"4dvar", "couple":"none", "bc":"climatology"}, \
-  {"name":"fdvar_non_int8_b1", "aint":8, "amp_b":1.0, \
+  {"name":"fdvar_non_int25_b1", "aint":25, "amp_b":1.0, \
         "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
-  {"name":"fdvar_weak_int8_b1", "aint":8, "amp_b":1.0, \
+  {"name":"fdvar_weak_int25_b1", "aint":25, "amp_b":1.0, \
         "nmem":1, "method":"4dvar", "couple":"weak"}, \
-  {"name":"fdvar_strong_int8_b1", "aint":8, "amp_b":1.0, \
+  {"name":"fdvar_strong_int25_b1", "aint":25, "amp_b":1.0, \
         "nmem":1, "method":"4dvar", "couple":"strong"}, \
-  {"name":"fdvar_non_int8_b2", "aint":8, "amp_b":2.0, \
+  {"name":"fdvar_non_int25_b2", "aint":25, "amp_b":2.0, \
         "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
-  {"name":"fdvar_weak_int8_b2", "aint":8, "amp_b":2.0, \
+  {"name":"fdvar_weak_int25_b2", "aint":25, "amp_b":2.0, \
         "nmem":1, "method":"4dvar", "couple":"weak"}, \
-  {"name":"fdvar_strong_int8_b2", "aint":8, "amp_b":2.0, \
+  {"name":"fdvar_strong_int25_b2", "aint":25, "amp_b":2.0, \
         "nmem":1, "method":"4dvar", "couple":"strong"}, \
-  {"name":"fdvar_non_int8_b3", "aint":8, "amp_b":3.0, \
+  {"name":"fdvar_non_int25_b3", "aint":25, "amp_b":3.0, \
         "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
-  {"name":"fdvar_weak_int8_b3", "aint":8, "amp_b":3.0, \
+  {"name":"fdvar_weak_int25_b3", "aint":25, "amp_b":3.0, \
         "nmem":1, "method":"4dvar", "couple":"weak"}, \
-  {"name":"fdvar_strong_int8_b3", "aint":8, "amp_b":3.0, \
+  {"name":"fdvar_strong_int25_b3", "aint":25, "amp_b":3.0, \
         "nmem":1, "method":"4dvar", "couple":"strong"}, \
-  {"name":"fdvar_non_int8_b5", "aint":8, "amp_b":5.0, \
+  {"name":"fdvar_non_int25_b5", "aint":25, "amp_b":5.0, \
         "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
-  {"name":"fdvar_weak_int8_b5", "aint":8, "amp_b":5.0, \
+  {"name":"fdvar_weak_int25_b5", "aint":25, "amp_b":5.0, \
         "nmem":1, "method":"4dvar", "couple":"weak"}, \
-  {"name":"fdvar_strong_int8_b5", "aint":8, "amp_b":5.0, \
+  {"name":"fdvar_strong_int25_b5", "aint":25, "amp_b":5.0, \
         "nmem":1, "method":"4dvar", "couple":"strong"}, \
-  {"name":"fdvar_non_int8_b7", "aint":8, "amp_b":7.0, \
+  {"name":"fdvar_non_int25_b7", "aint":25, "amp_b":7.0, \
         "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
-  {"name":"fdvar_weak_int8_b7", "aint":8, "amp_b":7.0, \
+  {"name":"fdvar_weak_int25_b7", "aint":25, "amp_b":7.0, \
         "nmem":1, "method":"4dvar", "couple":"weak"}, \
-  {"name":"fdvar_strong_int8_b7", "aint":8, "amp_b":7.0, \
+  {"name":"fdvar_strong_int25_b7", "aint":25, "amp_b":7.0, \
         "nmem":1, "method":"4dvar", "couple":"strong"}, \
-  {"name":"fdvar_non_int8_b10", "aint":8, "amp_b":10.0, \
+  {"name":"fdvar_non_int25_b10", "aint":25, "amp_b":10.0, \
         "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
-  {"name":"fdvar_weak_int8_b10", "aint":8, "amp_b":10.0, \
+  {"name":"fdvar_weak_int25_b10", "aint":25, "amp_b":10.0, \
         "nmem":1, "method":"4dvar", "couple":"weak"}, \
-  {"name":"fdvar_strong_int8_b10", "aint":8, "amp_b":10.0, \
+  {"name":"fdvar_strong_int25_b10", "aint":25, "amp_b":10.0, \
         "nmem":1, "method":"4dvar", "couple":"strong"} \
 ]
 
