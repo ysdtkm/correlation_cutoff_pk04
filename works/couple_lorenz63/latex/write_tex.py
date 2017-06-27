@@ -13,6 +13,11 @@ def main():
   date_for_tex = datestr.replace("_", "\\_")
   txt_out = header(date_for_tex, last_commit)
 
+  # rmse and lyapunov exponents
+  txt_out += figure_single(date_for_tex, last_commit)
+  txt_out += write_txt(date_for_tex, last_commit, "../image/true/rmse.txt", "9pt")
+  txt_out += write_txt(date_for_tex, last_commit, "../data/lyapunov.txt", "5.4pt")
+
   # rmse-spread
   tmax = const.STEPS
   explist = ["etkf", "tdvar", "fdvar"]
@@ -21,11 +26,6 @@ def main():
     xlist = ["extro", "trop", "ocn"]
     ylist = ["strong", "weak", "non"]
     txt_out += figure_table(expname, filebase, xlist, ylist, date_for_tex, last_commit)
-
-  # rmse table
-  txt_out += figure_single(date_for_tex, last_commit)
-  txt_out += write_rmse(date_for_tex, last_commit)
-  txt_out += lyapunov_exponent(date_for_tex, last_commit)
 
   # time series
   # filebase = "../image/@@expname@@_@@yname@@_int8/@@expname@@_@@yname@@_int8_@@xname@@_val.png"
@@ -176,37 +176,23 @@ def figure_all(expname, filebase, date, commit):
 
   return textwrap.dedent(content[1:-1])
 
-def write_rmse(date, commit):
+def write_txt(date, commit, path, size):
+  if not os.path.isfile(path):
+    return ""
+
   content = """
     \\begin{frame}
     \\frametitle{@@expname@@}
-    \\small{
-      \\verbatiminput{../image/true/rmse.txt}
+    \\fontsize{@@size@@}{@@size@@}{
+      \\verbatiminput{@@filepath@@}
     }
     \\end{frame}
   """[1:-1]
   content = content.replace('@@expname@@', date + " " + commit + " rmse")
+  content = content.replace('@@filepath@@', path)
+  content = content.replace('@@size@@', size)
 
-  if os.path.isfile("../image/true/rmse.txt"):
-    return textwrap.dedent(content[1:-1])
-  else:
-    return ""
-
-def lyapunov_exponent(date, commit):
-  content = """
-    \\begin{frame}
-    \\frametitle{@@expname@@}
-    \\fontsize{5.4pt}{5.4pt}{
-      \\verbatiminput{../data/lyapunov.txt}
-    }
-    \\end{frame}
-  """[1:-1]
-  content = content.replace('@@expname@@', date + " " + commit + " lyapunov exponents")
-
-  if os.path.isfile("../data/lyapunov.txt"):
-    return textwrap.dedent(content[1:-1])
-  else:
-    return ""
+  return textwrap.dedent(content[1:-1])
 
 def footer():
   footer = """

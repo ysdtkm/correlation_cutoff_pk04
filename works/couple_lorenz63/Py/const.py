@@ -8,7 +8,7 @@ DIMM = 9    # dimension of model variable n
 DIMO = DIMM # dimension of observation variable m
 
 DT = 0.01
-TMAX = 100
+TMAX = 1
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 VRFS = int(STEPS * 0.85) # verification period: [VRFS,STEPS)
@@ -40,14 +40,14 @@ EXPLIST = [ \
         "nmem":1, "method":"4dvar", "couple":"none", "bc":"climatology"}, \
   {"name":"fdvar_non_clim_int25_b2", "aint":25, "amp_b":2.0, \
         "nmem":1, "method":"4dvar", "couple":"none", "bc":"climatology"}, \
-  {"name":"fdvar_non_clim_int25_b3", "aint":25, "amp_b":3.0, \
-        "nmem":1, "method":"4dvar", "couple":"none", "bc":"climatology"}, \
-  {"name":"fdvar_non_clim_int25_b5", "aint":25, "amp_b":5.0, \
-        "nmem":1, "method":"4dvar", "couple":"none", "bc":"climatology"}, \
-  {"name":"fdvar_non_clim_int25_b7", "aint":25, "amp_b":7.0, \
-        "nmem":1, "method":"4dvar", "couple":"none", "bc":"climatology"}, \
-  {"name":"fdvar_non_climnon_clim_25_b10", "aint":25, "amp_b":10.0, \
-        "nmem":1, "method":"4dvar", "couple":"none", "bc":"climatology"} \
+  # {"name":"fdvar_non_clim_int25_b3", "aint":25, "amp_b":3.0, \
+  #       "nmem":1, "method":"4dvar", "couple":"none", "bc":"climatology"}, \
+  # {"name":"fdvar_non_clim_int25_b5", "aint":25, "amp_b":5.0, \
+  #       "nmem":1, "method":"4dvar", "couple":"none", "bc":"climatology"}, \
+  # {"name":"fdvar_non_clim_int25_b7", "aint":25, "amp_b":7.0, \
+  #       "nmem":1, "method":"4dvar", "couple":"none", "bc":"climatology"}, \
+  # {"name":"fdvar_non_climnon_clim_25_b10", "aint":25, "amp_b":10.0, \
+  #       "nmem":1, "method":"4dvar", "couple":"none", "bc":"climatology"} \
 ]
 
 Calc_lv = False
