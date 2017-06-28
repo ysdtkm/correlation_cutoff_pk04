@@ -9,7 +9,7 @@ def main():
   git_output = str(subprocess.check_output("git show HEAD | head -n1", shell=True))
   last_commit = git_output.split()[1][:7]
   date = datetime.datetime.now()
-  datestr = "%04d%02d%02d_%02d%02d" % (date.year, date.month, date.day, date.hour, date.minute)
+  datestr = "%04d%02d%02d" % (date.year, date.month, date.day)
   date_for_tex = datestr.replace("_", "\\_")
   txt_out = header(date_for_tex, last_commit)
 
