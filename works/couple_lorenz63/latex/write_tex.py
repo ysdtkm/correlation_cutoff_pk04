@@ -39,6 +39,8 @@ def main():
 
   # conditions
   txt_out += write_txt(date_for_tex, last_commit, "../Py/const.py", "6pt")
+  os.system('md5sum ../data/* | ruby -e \'lines=[]; STDIN.each{|l|; if (l.split[1].include?("/true.bin") or l.split[1].include?("cycle") or l.split[1].include?("/obs.bin")); lines.push(l.split[0][0...4] + " " + l.split[1]); end}; lines.sort!  ; lines.each{|l| puts l}\' > ./md5sum.txt')
+  txt_out += write_txt(date_for_tex, last_commit, "./md5sum.txt", "9pt")
 
   # footer, output and compile
   txt_out += footer()
