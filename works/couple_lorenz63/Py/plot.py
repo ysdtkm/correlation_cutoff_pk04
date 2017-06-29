@@ -451,6 +451,7 @@ def plot_rmse_bar(hist_true):
   ax.set_ylim(0, OERR*3.0)
   ax.set_xticks([(i + width * (nexp - 1) * 0.5) for i in range(3)])
   ax.set_xticklabels(["extro", "trop", "ocean"], rotation = 0)
+  ax.set_ylabel("RMSE")
   oerr = ax.axhline(y=OERR, label="sqrt(R)")
 
   plist.append(oerr)
