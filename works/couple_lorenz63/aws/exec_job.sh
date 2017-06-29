@@ -55,7 +55,7 @@ cat <<EOF > ./aws/env.json
 EOF
 
 aws s3 cp aws/myjob.sh s3://ysdtkm-bucket-1/
-DATE=`date "+%Y%m%d-%H%M"`
+DATE=`date "+%Y%m%d_%H%M"`
 id=`aws batch submit-job \
   --job-name ${DATE}_${JOBNAME} \
   --job-queue ${queue} \
