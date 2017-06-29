@@ -93,9 +93,9 @@ def exec_assim_cycle(settings, all_fcst, all_obs):
         fcst[m,0:6] = timestep(all_fcst[i-1,m,0:6], DT, 0, 6, persis_bc)
         fcst[m,6:9] = timestep(all_fcst[i-1,m,6:9], DT, 6, 9, persis_bc)
 
-    if (i % settings["aint"] == 0):
+    if (i % AINT == 0):
       obs_used[i,:] = all_obs[i,:]
-      fcst_pre = all_fcst[i-settings["aint"],:,:]
+      fcst_pre = all_fcst[i-AINT,:,:]
 
       if (settings["couple"] == "strong"):
         fcst[:,:], all_bf[i,:,:], all_ba[i,:,:] = \
@@ -152,7 +152,7 @@ def analyze_one_window(fcst, fcst_pre, obs, h, r, settings, i_s=0, i_e=DIMM, bc=
   elif (settings["method"] == "3dvar"):
     anl[0,:] = tdvar(fcst[0,:].T, h[:,:], r[:,:], yo[:,:], i_s, i_e, settings["amp_b"])
   elif (settings["method"] == "4dvar"):
-    anl[0,:] = fdvar(fcst_pre[0,:], h[:,:], r[:,:], yo[:,:], settings["aint"], i_s, i_e, settings["amp_b"], bc)
+    anl[0,:] = fdvar(fcst_pre[0,:], h[:,:], r[:,:], yo[:,:], AINT, i_s, i_e, settings["amp_b"], bc)
 
   return anl[:,:], bf[:,:], ba[:,:]
 
@@ -163,7 +163,7 @@ def exec_deterministic_fcst(settings, anl):
 
   fcst_all = np.empty((STEPS, FCST_LT, DIMM))
   for i in range(STEP_FREE, STEPS):
-    if (i % settings["aint"] == 0):
+    if (i % AINT == 0):
       fcst_all[i,0,:] = np.mean(anl[i,:,:], axis=0)
       for lt in range(1, FCST_LT):
         # todo: uncoupled forecast

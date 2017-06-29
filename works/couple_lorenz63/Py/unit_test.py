@@ -36,9 +36,8 @@ def test_fdvar_overflow():
     [-12.512758026367278], \
     [117.90228464480583]] \
   )
-  aint = exp["aint"]
 
-  fdvar(fcst_0, h, r, yo, aint)
+  fdvar(fcst_0, h, r, yo, AINT)
   return 0
 
 def test_tangent_model():
