@@ -47,8 +47,8 @@ def tendency(x_in, i_s=0, i_e=DIMM, bc=None):
     b     = 8.0 / 3.0
     # coupling
     tau   = 0.1
-    c     = 0.0 # 1.0
-    cz    = 0.0 # 1.0 #ttk
+    c     = 1.0
+    cz    = 1.0
     ce    = 0.08
     # offset and scaling
     s     = 1.0
