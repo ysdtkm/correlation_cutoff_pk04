@@ -437,7 +437,7 @@ def plot_rmse_bar(hist_true):
   width = 1.0 / (nexp + 1)
 
   fig, ax = plt.subplots()
-  fig.subplots_adjust(bottom=0.3)
+  fig.subplots_adjust(bottom=0.2)
 
   plist = []
   j = 0
@@ -454,7 +454,7 @@ def plot_rmse_bar(hist_true):
   oerr = ax.axhline(y=OERR, label="sqrt(R)")
 
   plist.append(oerr)
-  ax.legend(plist, [i.get_label() for i in plist])
+  ax.legend(plist, [i.get_label() for i in plist], loc="upper left")
   plt.savefig("./image/true/rmse_bar.png")
 
   return 0
