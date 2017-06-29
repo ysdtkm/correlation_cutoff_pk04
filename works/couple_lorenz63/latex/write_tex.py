@@ -111,6 +111,9 @@ def figure_table(expname, file_list, nx, ny, date, commit):
     print("figure_table skipped due to unrecognized nx and ny")
     return ""
 
+  while len(file_list) < (nx * ny):
+    file_list.append("")
+
   content = """
     \\begin{frame}
     \\frametitle{@@expname@@}
@@ -125,7 +128,7 @@ def figure_table(expname, file_list, nx, ny, date, commit):
       tex_figure = """
         \\begin{minipage}[b]{@@widthcell@@\\linewidth}
           \\centering
-          \\includegraphicsmaybe[width=@@widthimg@@]{"@@filename@@"}
+          \\includegraphicsmaybe[width=@@widthimg@@]{@@filename@@}
           % \\subcaption{@@num@@}
         \\end{minipage}
         """[1:-1]

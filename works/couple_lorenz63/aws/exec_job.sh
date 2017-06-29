@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-git s
+git status --short --branch
 if [ $# -lt 1 ]; then
   echo -e "\e[33mType (Ctrl-C) to stop.\e[m"
   echo ""
@@ -20,7 +20,8 @@ else
 fi
 
 set +e
-git cam "${JOBNAME}"
+git add .
+git commit -m "${JOBNAME}"
 set -e
 
 git pull; git push
@@ -56,7 +57,7 @@ EOF
 aws s3 cp aws/myjob.sh s3://ysdtkm-bucket-1/
 DATE=`date "+%Y%m%d-%H%M%S"`
 id=`aws batch submit-job \
-  --job-name python_${DATE}_${JOBNAME} \
+  --job-name ${DATE}_${JOBNAME} \
   --job-queue ${queue} \
   --job-definition def-with-other-image:9 \
   --container-overrides file://aws/env.json | grep jobId`
