@@ -4,7 +4,7 @@ cd /tmp/repos/works/couple_lorenz63
 git pull; git checkout ${BATCH_COMMIT}
 make
 
-DATE=`date "+%Y%m%d"`
+DATE=`date "+%Y%m%d-%H%M"`
 title="${DATE}_${BATCH_COMMIT}_${BATCH_JOB_NAME}"
 
 cp -f data/lyapunov.txt image/true/
