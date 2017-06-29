@@ -246,4 +246,54 @@ def check_b():
   plot_matrix(np.log(np.abs(new)), "", "new", color=plt.cm.Reds)
   return 0
 
-check_b()
+def compare_coupled_vs_persistent_bc():
+  nstep = 10000
+  leadtime = 100
+
+  np.random.seed(100000007*2)
+  all_true = np.empty((nstep, DIMM))
+  true = np.random.normal(0.0, FERR_INI, DIMM)
+  fcst_cp = np.empty((DIMM))
+  fcst_bc = np.empty((DIMM))
+  msd_extro = np.zeros((leadtime))
+  msd_trop = np.zeros((leadtime))
+  msd_ocean = np.zeros((leadtime))
+
+  # forward integration i-1 -> i
+  for i in range(nstep):
+    true[:] = timestep(true[:], DT)
+    all_true[i,:] = true[:]
+
+  fcst_interval = 100
+  for i in range(nstep // fcst_interval):
+    persis_bc = all_true[i*fcst_interval,:]
+    fcst_cp[:] = all_true[i*fcst_interval,:]
+    fcst_bc[:] = all_true[i*fcst_interval,:]
+
+    for j in range(leadtime):
+      fcst_cp[:] = timestep(fcst_cp[:], DT)
+      fcst_bc[0:6] = timestep(fcst_bc[0:6], DT, 0, 6, persis_bc)
+      fcst_bc[6:9] = timestep(fcst_bc[6:9], DT, 6, 9, persis_bc)
+
+      msd_extro[j] += np.mean((fcst_cp[0:3] - fcst_bc[0:3])**2)
+      msd_trop[j]  += np.mean((fcst_cp[3:6] - fcst_bc[3:6])**2)
+      msd_ocean[j] += np.mean((fcst_cp[6:9] - fcst_bc[6:9])**2)
+
+  msd_extro /= (nstep / fcst_interval)
+  msd_trop  /= (nstep / fcst_interval)
+  msd_ocean /= (nstep / fcst_interval)
+
+  for j in range(leadtime):
+    print(j+1, msd_extro[j]**0.5, msd_trop[j]**0.5, msd_ocean[j]**0.5)
+
+  plt.plot(range(1, 101), msd_extro[:]**0.5, label="extro")
+  plt.plot(range(1, 101), msd_trop[:]**0.5, label="trop")
+  plt.plot(range(1, 101), msd_ocean[:]**0.5, label="ocean")
+  plt.axhline(y = OERR, label="sqrt(R)")
+  plt.axvline(x = 8, label="assimilation interval")
+  plt.legend()
+  plt.xlabel("forecast leadtime (steps)")
+  plt.ylabel("RMSD, coupled vs persistent BC forecasts")
+  plt.savefig("./rmsd_coupled_vs_persistentbc.png")
+
+compare_coupled_vs_persistent_bc()
