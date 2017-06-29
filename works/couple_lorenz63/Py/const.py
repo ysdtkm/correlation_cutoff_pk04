@@ -18,31 +18,31 @@ FERR_INI = 10.0
 AINT = 8
 
 EXPLIST = [ \
-  # {"name":"etkf_non_clim",  "rho":1.1, "nmem":10, \
+  # {"name":"etkf_non_clim",  "rho":1.15, "nmem":10, \
   #       "method":"etkf", "couple":"none", "bc":"climatology"}, \
-  {"name":"etkf_non_3mem",  "rho":1.1, "nmem":3, \
+  {"name":"etkf_non_3mem",  "rho":1.15, "nmem":3, \
         "method":"etkf", "couple":"none", "bc":"persistent"}, \
-  {"name":"etkf_weak_3mem",  "rho":1.1, "nmem":3, \
+  {"name":"etkf_weak_3mem",  "rho":1.15, "nmem":3, \
         "method":"etkf", "couple":"weak"}, \
-  {"name":"etkf_strong_3mem",  "rho":1.1, "nmem":3, \
+  {"name":"etkf_strong_3mem",  "rho":1.15, "nmem":3, \
         "method":"etkf", "couple":"strong"}, \
-  {"name":"etkf_non_4mem",  "rho":1.1, "nmem":4, \
+  {"name":"etkf_non_4mem",  "rho":1.15, "nmem":4, \
         "method":"etkf", "couple":"none", "bc":"persistent"}, \
-  {"name":"etkf_weak_4mem",  "rho":1.1, "nmem":4, \
+  {"name":"etkf_weak_4mem",  "rho":1.15, "nmem":4, \
         "method":"etkf", "couple":"weak"}, \
-  {"name":"etkf_strong_4mem",  "rho":1.1, "nmem":4, \
+  {"name":"etkf_strong_4mem",  "rho":1.15, "nmem":4, \
         "method":"etkf", "couple":"strong"}, \
-  {"name":"etkf_non_6mem",  "rho":1.1, "nmem":6, \
+  {"name":"etkf_non_6mem",  "rho":1.15, "nmem":6, \
         "method":"etkf", "couple":"none", "bc":"persistent"}, \
-  {"name":"etkf_weak_6mem",  "rho":1.1, "nmem":6, \
+  {"name":"etkf_weak_6mem",  "rho":1.15, "nmem":6, \
         "method":"etkf", "couple":"weak"}, \
-  {"name":"etkf_strong_6mem",  "rho":1.1, "nmem":6, \
+  {"name":"etkf_strong_6mem",  "rho":1.15, "nmem":6, \
         "method":"etkf", "couple":"strong"}, \
-  {"name":"etkf_non_10mem",  "rho":1.1, "nmem":10, \
+  {"name":"etkf_non_10mem",  "rho":1.15, "nmem":10, \
         "method":"etkf", "couple":"none", "bc":"persistent"}, \
-  {"name":"etkf_weak_10mem",  "rho":1.1, "nmem":10, \
+  {"name":"etkf_weak_10mem",  "rho":1.15, "nmem":10, \
         "method":"etkf", "couple":"weak"}, \
-  {"name":"etkf_strong_10mem",  "rho":1.1, "nmem":10, \
+  {"name":"etkf_strong_10mem",  "rho":1.15, "nmem":10, \
         "method":"etkf", "couple":"strong"} \
   # # {"name":"tdvar_non_clim", \
   # #       "nmem":1, "method":"3dvar", "couple":"none", "bc":"climatology"}, \
