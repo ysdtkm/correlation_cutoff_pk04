@@ -433,35 +433,28 @@ def plot_rmse_bar(hist_true):
   global rmse_hash
   plt.rcParams["font.size"] = 9
 
-  width=0.25
-  x1 = [i for i in range(len(rmse_hash))]
-  x2 = [i+width for i in x1]
-  x3 = [i+2*width for i in x1]
-
-  lab = []
-  y1 = []
-  y2 = []
-  y3 = []
-  for name in rmse_hash:
-    lab.append(name)
-    y1.append(rmse_hash[name][0])
-    y2.append(rmse_hash[name][1])
-    y3.append(rmse_hash[name][2])
+  nexp = len(rmse_hash)
+  width = 1.0 / (nexp + 1)
 
   fig, ax = plt.subplots()
   fig.subplots_adjust(bottom=0.3)
 
-  p1 = ax.bar(x1,y1,width,label="extro")
-  p2 = ax.bar(x2,y2,width,label="trop")
-  p3 = ax.bar(x3,y3,width,label="ocn")
+  plist = []
+  j = 0
+  for name in rmse_hash:
+    shift = width * j
+    x = [(i + shift) for i in range(3)]
+    p = ax.bar(x, rmse_hash[name], width, label=name )
+    plist.append(p)
+    j += 1
 
   ax.set_ylim(0, OERR*3.0)
-  ax.set_xticks(x2)
-  ax.set_xticklabels(lab,rotation = -90)
+  ax.set_xticks([(i + width * (nexp - 1) * 0.5) for i in range(3)])
+  ax.set_xticklabels(["extro", "trop", "ocean"], rotation = 0)
   oerr = ax.axhline(y=OERR, label="sqrt(R)")
 
-  p = [p1, p2, p3, oerr]
-  ax.legend(p, [i.get_label() for i in p])
+  plist.append(oerr)
+  ax.legend(plist, [i.get_label() for i in plist])
   plt.savefig("./image/true/rmse_bar.png")
 
   return 0
