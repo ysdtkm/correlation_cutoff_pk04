@@ -25,8 +25,8 @@ def fdvar(fcst_0, h, r, yo, aint, i_s, i_e, amp_b, bc=None):
 
   try:
     anl_0 = np.copy(fcst_0)
-    anl_0 = fmin_bfgs(fdvar_2j, anl_0, args=(fcst_0, h, r, yo, aint, i_s, i_e, amp_b, bc))
-    # anl_0 = fmin_bfgs(fdvar_2j, anl_0, fprime=fdvar_2j_deriv, args=(fcst_0, h, r, yo, aint, i_s, i_e))
+    # anl_0 = fmin_bfgs(fdvar_2j, anl_0, args=(fcst_0, h, r, yo, aint, i_s, i_e, amp_b, bc))
+    anl_0 = fmin_bfgs(fdvar_2j, anl_0, fprime=fdvar_2j_deriv, args=(fcst_0, h, r, yo, aint, i_s, i_e, amp_b, bc))
   except:
     print("Method fmin_bfgs failed to converge. Use fmin for this step instead.")
     anl_0 = np.copy(fcst_0)
@@ -36,6 +36,39 @@ def fdvar(fcst_0, h, r, yo, aint, i_s, i_e, amp_b, bc=None):
   for i in range(0, aint):
     anl_1 = timestep(anl_1, DT, i_s, i_e, bc)
   return anl_1.T
+
+def fdvar_analytical(fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e, amp_b, bc=None):
+  # fcst_0_nda <- np.array[dimc]       : first guess at beginning of window
+  # h_nda      <- np.array[DIMO, dimc] : observation operator
+  # r_nda      <- np.array[DIMO, DIMO] : observation error covariance
+  # yo_nda     <- np.array[DIMO, 1]    : observation
+  # aint       <- int                  : assimilation interval
+  # i_s        <- int                  : model grid number, assimilate only [i_s, i_e)
+  # i_e        <- int
+  # amp_b      <- float
+  # bc         <- np.array[DIMM]       : boundary condition if needed
+  # return     -> np.array[dimc]       : assimilated field
+
+  if not (i_s == 0 and i_e == DIMM):
+    raise Exception("fdvar_analytical_innerloop() is not for non-coupled. i_s = %d and i_e = %d is given." % (i_s, i_e))
+
+  m = np.asmatrix(finite_time_tangent(fcst_0_nda, DT, aint))
+  h  = np.asmatrix(h_nda)
+  r  = np.asmatrix(r_nda)
+  yo = np.asmatrix(yo_nda)
+  b  = np.matrix(amp_b * tdvar_b()[i_s:i_e, i_s:i_e])
+  fcst_0 = np.asmatrix(fcst_0_nda).T
+
+  d = yo - h * fcst_0
+  mt_ht_ri = m.T * h.T * r.I
+  delta_x0 = (b.I + mt_ht_ri * h * m).I * mt_ht_ri * d
+  anl_0_nda = fcst_0_nda + delta_x0.A.flatten()
+
+  anl_1_nda = np.copy(anl_0_nda)
+  for i in range(aint):
+    anl_1_nda = timestep(anl_1_nda, DT, i_s, i_e, bc)
+
+  return anl_1_nda
 
 def fdvar_2j(anl_0_nda, fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e, amp_b, bc):
   # anl_0_nda  <- np.array[dimc]       : temporary analysis field
@@ -67,7 +100,7 @@ def fdvar_2j(anl_0_nda, fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e, amp_b,
          (h * anl_1 - yo).T * r.I * (h * anl_1 - yo)
   return twoj[0,0]
 
-def fdvar_2j_deriv(anl_0_nda, fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e, amp_b):
+def fdvar_2j_deriv(anl_0_nda, fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e, amp_b, bc=None):
   # anl_0_nda  <- np.array[dimc]       : temporary analysis field
   # fcst_0_nda <- np.array[dimc]       : first guess field
   # h_nda      <- np.array[DIMO, dimc] : observation operator
