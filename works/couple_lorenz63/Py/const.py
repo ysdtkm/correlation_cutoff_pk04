@@ -20,11 +20,11 @@ AINT = 8
 EXPLIST = [ \
   # {"name":"etkf_non_clim",  "rho":1.1, "nmem":10, \
   #       "method":"etkf", "couple":"none", "bc":"climatology"}, \
-  {"name":"etkf_non",  "rho":1.1, "nmem":10, \
+  {"name":"etkf_non_4mem",  "rho":1.1, "nmem":4, \
         "method":"etkf", "couple":"none", "bc":"persistent"}, \
-  {"name":"etkf_weak",  "rho":1.1, "nmem":10, \
+  {"name":"etkf_weak_4mem",  "rho":1.1, "nmem":4, \
         "method":"etkf", "couple":"weak"}, \
-  {"name":"etkf_strong",  "rho":1.1, "nmem":10, \
+  {"name":"etkf_strong_4mem",  "rho":1.1, "nmem":4, \
         "method":"etkf", "couple":"strong"}, \
   # {"name":"tdvar_non_clim", \
   #       "nmem":1, "method":"3dvar", "couple":"none", "bc":"climatology"}, \
