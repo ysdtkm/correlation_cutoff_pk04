@@ -15,8 +15,8 @@ def main():
 
   # rmse and lyapunov exponents
   txt_out += figure_table("", ["../image/true/rmse_bar.png"], 1, 1, date_for_tex, last_commit)
-  txt_out += write_txt(date_for_tex, last_commit, "../image/true/rmse.txt", "9pt")
-  txt_out += write_txt(date_for_tex, last_commit, "../data/lyapunov.txt", "5.4pt")
+  txt_out += write_txt(date_for_tex, last_commit, "../image/true/rmse.txt", "9pt", "rmse")
+  txt_out += write_txt(date_for_tex, last_commit, "../data/lyapunov.txt", "5.4pt", "lyapunov exponents")
 
   # rmse-spread comparison
   for expname in ["etkf", "tdvar", "fdvar"]:
@@ -38,9 +38,20 @@ def main():
     txt_out += figure_table(exp["name"], filelist, 4, 4, date_for_tex, last_commit)
 
   # conditions
-  txt_out += write_txt(date_for_tex, last_commit, "../Py/const.py", "6pt")
-  os.system('md5sum ../data/* | ruby -e \'lines=[]; STDIN.each{|l|; if (l.split[1].include?("/true.bin") or l.split[1].include?("cycle") or l.split[1].include?("/obs.bin")); lines.push(l.split[0][0...4] + " " + l.split[1]); end}; lines.sort!  ; lines.each{|l| puts l}\' > ./md5sum.txt')
-  txt_out += write_txt(date_for_tex, last_commit, "./md5sum.txt", "9pt")
+  txt_out += write_txt(date_for_tex, last_commit, "../Py/const.py", "6pt", "settings")
+  md_raw = subprocess.getoutput('md5sum ../data/*').split("\n")
+  md_raw.sort()
+  md_txt = ""
+  for line in md_raw:
+    if ("cycle" in line) or ("/true.bin" in line) or ("/obs.bin" in line):
+      hash = line.split()[0]
+      filename = line.split()[1]
+      md_txt += hash[0:4] + " " + filename[8:] + "\n"
+  f = io.open("./md5sum.txt", "w")
+  f.write(md_txt)
+  f.close()
+
+  txt_out += write_txt(date_for_tex, last_commit, "./md5sum.txt", "9pt", "checksum")
 
   # footer, output and compile
   txt_out += footer()
@@ -132,7 +143,7 @@ def figure_table(expname, file_list, nx, ny, date, commit):
 
   return textwrap.dedent(content[1:-1])
 
-def write_txt(date, commit, path, size):
+def write_txt(date, commit, path, size, title):
   if not os.path.isfile(path):
     return ""
 
@@ -144,7 +155,7 @@ def write_txt(date, commit, path, size):
     }
     \\end{frame}
   """[1:-1]
-  content = content.replace('@@expname@@', date + " " + commit + " rmse")
+  content = content.replace('@@expname@@', date + " " + commit + " " + title)
   content = content.replace('@@filepath@@', path)
   content = content.replace('@@size@@', size)
 
