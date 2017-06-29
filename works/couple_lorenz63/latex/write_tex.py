@@ -19,12 +19,14 @@ def main():
   txt_out += write_txt(date_for_tex, last_commit, "../data/lyapunov.txt", "5.4pt", "lyapunov exponents")
 
   # rmse-spread comparison
-  for expname in ["etkf", "tdvar", "fdvar"]:
+  for strx in ["extro", "trop", "ocn"]:
     filelist = []
-    for strx in ["extro", "trop", "ocn"]:
-      for stry in ["strong", "weak", "non"]:
-        filelist.append("../image/%s_%s_int8/%s_%s_int8_%s_time.png" % (expname, stry, expname, stry, strx))
-    txt_out += figure_table(expname, filelist, 3, 3, date_for_tex, last_commit)
+    for exp in const.EXPLIST:
+      filelist.append("../image/%s/%s_%s_time.png" % (exp["name"], exp["name"], strx))
+    if len(filelist) <= 9:
+      txt_out += figure_table(strx, filelist, 3, 3, date_for_tex, last_commit)
+    else:
+      txt_out += figure_table(strx, filelist, 4, 4, date_for_tex, last_commit)
 
   # all figures
   for exp in const.EXPLIST:
