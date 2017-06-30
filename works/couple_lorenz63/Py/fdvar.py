@@ -52,7 +52,7 @@ def fdvar_analytical(fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e, amp_b, bc
   if not (i_s == 0 and i_e == DIMM):
     raise Exception("fdvar_analytical_innerloop() is not for non-coupled. i_s = %d and i_e = %d is given." % (i_s, i_e))
 
-  m = np.asmatrix(finite_time_tangent(fcst_0_nda, DT, aint))
+  m = np.asmatrix(finite_time_tangent_using_nonlinear(fcst_0_nda, DT, aint))
   h  = np.asmatrix(h_nda)
   r  = np.asmatrix(r_nda)
   yo = np.asmatrix(yo_nda)

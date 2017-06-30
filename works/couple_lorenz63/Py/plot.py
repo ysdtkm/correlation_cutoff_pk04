@@ -241,7 +241,10 @@ def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
       plt.plot(np.sqrt(mse_time), label="RMSE")
       if (nmem > 1):
         plt.plot(np.sqrt(sprd2_time), label="Spread")
-      plt.axhline(y=OERR, label="sqrt(R)")
+      if i_component == 2:
+        plt.axhline(y=OERR_O, label="sqrt(R)")
+      else:
+        plt.axhline(y=OERR_A, label="sqrt(R)")
       plt.legend()
       plt.xlabel("timestep")
       plt.ylim([0.01, 100])
@@ -448,13 +451,14 @@ def plot_rmse_bar(hist_true):
     plist.append(p)
     j += 1
 
-  ax.set_ylim(0, OERR*3.0)
+  ax.set_ylim(0, OERR_O*3.0)
   ax.set_xticks([(i + width * (nexp - 1) * 0.5) for i in range(3)])
   ax.set_xticklabels(["extro", "trop", "ocean"], rotation = 0)
   ax.set_ylabel("RMSE")
-  oerr = ax.axhline(y=OERR, label="sqrt(R)")
+  oerr_a = ax.axhline(y=OERR_A, label="sqrt(R_atmos)")
+  oerr_o = ax.axhline(y=OERR_O, label="sqrt(R_ocean)")
 
-  plist.append(oerr)
+  plist += [oerr_a, oerr_o]
   ax.legend(plist, [i.get_label() for i in plist], loc="upper left")
   plt.savefig("./image/true/rmse_bar.png")
 

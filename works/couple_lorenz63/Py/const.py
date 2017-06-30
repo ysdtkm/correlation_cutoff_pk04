@@ -13,35 +13,30 @@ STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 FCST_LT = 5
 
-OERR = 5.0
+OERR_A = 5.0
+OERR_O = 5.0
 FERR_INI = 10.0
 AINT = 8
 
 EXPLIST = [ \
-  # {"name":"etkf_non_3mem", "rho":1.2, "nmem":3, "method":"etkf", "couple":"none", "bc":"persistent"}, \
-  # {"name":"etkf_non_4mem", "rho":1.2, "nmem":4, "method":"etkf", "couple":"none", "bc":"persistent"}, \
-  # {"name":"etkf_non_6mem", "rho":1.2, "nmem":6, "method":"etkf", "couple":"none", "bc":"persistent"}, \
-  # {"name":"etkf_non_10mem", "rho":1.2, "nmem":10, "method":"etkf", "couple":"none", "bc":"persistent"}, \
-  # {"name":"etkf_weak_3mem", "rho":1.2, "nmem":3, "method":"etkf", "couple":"weak"}, \
-  # {"name":"etkf_weak_4mem", "rho":1.2, "nmem":4, "method":"etkf", "couple":"weak"}, \
-  # {"name":"etkf_weak_6mem", "rho":1.2, "nmem":6, "method":"etkf", "couple":"weak"}, \
-  # {"name":"etkf_weak_10mem", "rho":1.2, "nmem":10,  "method":"etkf", "couple":"weak"}, \
-  # {"name":"etkf_strong_3mem", "rho":1.2, "nmem":3, "method":"etkf", "couple":"strong"}, \
-  # {"name":"etkf_strong_4mem", "rho":1.2, "nmem":4, "method":"etkf", "couple":"strong"}, \
-  # {"name":"etkf_strong_6mem", "rho":1.2, "nmem":6, "method":"etkf", "couple":"strong"}, \
-  # {"name":"etkf_strong_10mem", "rho":1.2, "nmem":10, "method":"etkf", "couple":"strong"} \
-  # {"name":"tdvar_non_b5", "amp_b":5.0, "nmem":1, "method":"3dvar", "couple":"none", "bc":"persistent"}, \
-  # {"name":"tdvar_weak_b5", "amp_b":5.0, "nmem":1, "method":"3dvar", "couple":"weak"}, \
-  # {"name":"tdvar_strong_b5", "amp_b":5.0, "nmem":1, "method":"3dvar", "couple":"strong"}, \
-  # {"name":"fdvar_non_b3", "amp_b":3.0, "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
-  # {"name":"fdvar_weak_b3", "amp_b":3.0, "nmem":1, "method":"4dvar", "couple":"weak"}, \
+  {"name":"etkf_non_10mem", "rho":1.1, "nmem":10, "method":"etkf", "couple":"none", "bc":"persistent"}, \
+  {"name":"etkf_weak_10mem", "rho":1.1, "nmem":10, "method":"etkf", "couple":"weak"}, \
+  {"name":"etkf_strong_10mem", "rho":1.1, "nmem":10, "method":"etkf", "couple":"strong"}, \
+  {"name":"tdvar_non_b5", "amp_b":5.0, "nmem":1, "method":"3dvar", "couple":"none", "bc":"persistent"}, \
+  {"name":"tdvar_weak_b5", "amp_b":5.0, "nmem":1, "method":"3dvar", "couple":"weak"}, \
+  {"name":"tdvar_strong_b5", "amp_b":5.0, "nmem":1, "method":"3dvar", "couple":"strong"}, \
+  {"name":"fdvar_non_b3", "amp_b":3.0, "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
+  {"name":"fdvar_weak_b3", "amp_b":3.0, "nmem":1, "method":"4dvar", "couple":"weak"}, \
   {"name":"fdvar_strong_b3", "amp_b":3.0, "nmem":1, "method":"4dvar", "couple":"strong"} \
 ]
 
 Calc_lv = False
 
 def getr():
-  r = np.identity(DIMO) * (OERR * OERR)
+  r = np.identity(DIMO) * OERR_A ** 2
+  if DIMM == 9:
+    for i in range(6, 9):
+      r[i,i] = OERR_O ** 2
   return r
 
 def geth():

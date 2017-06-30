@@ -290,7 +290,7 @@ def compare_coupled_vs_persistent_bc():
   plt.plot(range(1, leadtime+1), msd_ocean[:]**0.5, label="ocean")
   plt.xlim(0, leadtime)
   plt.ylim(0, 8)
-  plt.axhline(y = OERR)
+  plt.axhline(y = OERR_A)
   plt.axvline(x = 8)
   plt.axvline(x = 25)
   plt.legend()

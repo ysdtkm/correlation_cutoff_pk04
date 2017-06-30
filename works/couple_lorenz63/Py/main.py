@@ -47,7 +47,12 @@ def exec_obs(nature):
 
   all_obs = np.empty((STEPS, DIMO))
   for i in range(0, STEPS):
-    all_obs[i,:] = nature[i] + np.random.normal(0.0, OERR, DIMO)
+    if DIMM == 9:
+      all_obs[i,:6] = nature[i,:6] + np.random.normal(0.0, OERR_A, 6)
+      all_obs[i,6:] = nature[i,6:] + np.random.normal(0.0, OERR_O, 3)
+    else:
+      all_obs[i,:] = nature[i,:] + np.random.normal(0.0, OERR_A, DIMO)
+
   all_obs.tofile("data/obs.bin")
   return all_obs
 
