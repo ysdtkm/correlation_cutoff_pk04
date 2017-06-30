@@ -124,13 +124,14 @@ def write_lyapunov_exponents(all_ble, all_fle, all_clv):
 
   f = open("data/lyapunov.txt", "w")
   f.write("backward LEs:\n")
-  f.write(str_vector(np.mean(all_ble[STEPS//2:,:], axis=0)) + "\n")
+  f.write(str_vector(np.mean(all_ble[STEPS//4:(STEPS*3)//4,:], axis=0)) + "\n")
   f.write("forward LEs:\n")
-  f.write(str_vector(np.mean(all_fle[STEPS//2:,:], axis=0)) + "\n")
+  f.write(str_vector(np.mean(all_fle[STEPS//4:(STEPS*3)//4:,:], axis=0)) + "\n")
   f.write("CLV RMS (column: LVs, row: model grid):\n")
   for i in range(DIMM):
-    f.write(str_vector(np.mean(all_clv[STEPS//2:,i,:]**2, axis=0)) + "\n")
+    f.write(str_vector(np.mean(all_clv[STEPS//4:(STEPS*3)//4:,i,:]**2, axis=0)) + "\n")
   f.close()
+  os.system("mkdir -p image/true")
   os.system("cat data/lyapunov.txt")
   return 0
 

@@ -1,0 +1,8 @@
+*.pdf
+*.aux
+*.toc
+*.nav
+*.out
+*.snm
+temp.tex
+

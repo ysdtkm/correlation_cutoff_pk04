@@ -8,54 +8,42 @@ DIMM = 9    # dimension of model variable n
 DIMO = DIMM # dimension of observation variable m
 
 DT = 0.01
-TMAX = 20
+TMAX = 1
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
-VRFS = int(STEPS * 0.25) # verification period: [VRFS,STEPS)
 FCST_LT = 5
 
-OERR = 0.1
+OERR_A = 5.0
+OERR_O = 5.0
 FERR_INI = 10.0
+AINT = 8
 
 EXPLIST = [ \
-  {"name":"etkf_non_int25",  "inf":1.2, "aint":25, \
-        "diag":np.ones(DIMM), "nmem":10, \
-        "method":"etkf", "couple":"none"}, \
-  {"name":"etkf_weak_int25",  "inf":1.2, "aint":25, \
-        "diag":np.ones(DIMM), "nmem":10, \
-        "method":"etkf", "couple":"weak"}, \
-  {"name":"etkf_strong_int25",  "inf":1.2, "aint":25, \
-        "diag":np.ones(DIMM), "nmem":10, \
-        "method":"etkf", "couple":"strong"}, \
-  # {"name":"tdvar_non_int25", "inf":1.0, "aint":25, \
-  #       "diag":np.ones(DIMM), \
-  #       "nmem":1, "method":"3dvar", "couple":"none"}, \
-  # {"name":"tdvar_weak_int25", "inf":1.0, "aint":25, \
-  #       "diag":np.ones(DIMM), \
-  #       "nmem":1, "method":"3dvar", "couple":"weak"}, \
-  # {"name":"tdvar_strong_int25", "inf":1.0, "aint":25, \
-  #       "diag":np.ones(DIMM), \
-  #       "nmem":1, "method":"3dvar", "couple":"strong"}, \
-  # {"name":"fdvar_non_int25", "inf":1.0, "aint":25, \
-  #       "diag":np.ones(DIMM), \
-  #       "nmem":1, "method":"4dvar", "couple":"none"}, \
-  # {"name":"fdvar_weak_int25", "inf":1.0, "aint":25, \
-  #       "diag":np.ones(DIMM), \
-  #       "nmem":1, "method":"4dvar", "couple":"weak"}, \
-  # {"name":"fdvar_strong_int25", "inf":1.0, "aint":25, \
-  #       "diag":np.ones(DIMM), \
-  #       "nmem":1, "method":"4dvar", "couple":"strong"} \
+  {"name":"etkf_non_6mem", "rho":1.1, "nmem":6, "method":"etkf", "couple":"none", "bc":"persistent"}, \
+  {"name":"etkf_weak_6mem", "rho":1.1, "nmem":6, "method":"etkf", "couple":"weak"}, \
+  {"name":"etkf_strong_6mem", "rho":1.1, "nmem":6, "method":"etkf", "couple":"strong"}, \
+  {"name":"tdvar_non_b5", "amp_b":5.0, "nmem":1, "method":"3dvar", "couple":"none", "bc":"persistent"}, \
+  {"name":"tdvar_weak_b5", "amp_b":5.0, "nmem":1, "method":"3dvar", "couple":"weak"}, \
+  {"name":"tdvar_strong_b5", "amp_b":5.0, "nmem":1, "method":"3dvar", "couple":"strong"}, \
+  {"name":"fdvar_non_b3", "amp_b":3.0, "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
+  {"name":"fdvar_weak_b3", "amp_b":3.0, "nmem":1, "method":"4dvar", "couple":"weak"}, \
+  {"name":"fdvar_strong_b3", "amp_b":3.0, "nmem":1, "method":"4dvar", "couple":"strong"} \
 ]
 
+Calc_lv = False
+
 def getr():
-  r = np.identity(DIMO) * (OERR * OERR)
+  r = np.identity(DIMO) * OERR_A ** 2
+  if DIMM == 9:
+    for i in range(6, 9):
+      r[i,i] = OERR_O ** 2
   return r
 
-def geth(diag_h):
+def geth():
   # DIMO == DIMM is assumed
   h = np.zeros((DIMO,DIMM))
   for i in range(0, DIMM):
-    h[i,i] = diag_h[i]
+    h[i,i] = 1.0
   return h
 
 def debug_obj_print(obj, scope):

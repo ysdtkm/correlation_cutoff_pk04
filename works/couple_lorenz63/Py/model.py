@@ -3,24 +3,25 @@
 import numpy as np
 from const import *
 
-def timestep(x, dt, i_s=0, i_e=DIMM):
+def timestep(x, dt, i_s=0, i_e=DIMM, bc=None):
   # x      <- np.array(dimm)
   # dt     <- float
   # i_s    <- int
   # i_e    <- int
+  # bc     <- np.array(DIMM)       : boundary condition
   # return -> np.array(dimm)
 
   x0 = np.copy(x)
-  k1 = tendency(x0, i_s, i_e)
+  k1 = tendency(x0, i_s, i_e, bc)
   x2 = x0 + k1 * dt / 2.0
-  k2 = tendency(x2, i_s, i_e)
+  k2 = tendency(x2, i_s, i_e, bc)
   x3 = x0 + k2 * dt / 2.0
-  k3 = tendency(x3, i_s, i_e)
+  k3 = tendency(x3, i_s, i_e, bc)
   x4 = x0 + k3 * dt
-  k4 = tendency(x4, i_s, i_e)
+  k4 = tendency(x4, i_s, i_e, bc)
   return x0 + (k1 + 2.0 * k2 + 2.0 * k3 + k4) * dt / 6.0
 
-def tendency(x_in, i_s=0, i_e=DIMM):
+def tendency(x_in, i_s=0, i_e=DIMM, bc=None):
   ### here, (dimm = i_e - i_s <= DIMM) unless strongly coupled
   # a31p63-64
   # x      <- np.array(dimm)
@@ -54,10 +55,17 @@ def tendency(x_in, i_s=0, i_e=DIMM):
     k1    = 10.0
     k2    = -11.0
 
-    # todo: refine B.C. for uncoupled component
-    # for non-coupled
-    x = np.zeros((DIMM))
-    x[i_s:i_e] = x_in[:]
+    # set boundary conditions
+    if i_s == 0 and i_e == DIMM:
+      x = np.copy(x_in)
+    else:
+      if not (bc is None):
+        x = np.copy(bc)
+      else:
+        # B.C. for non-coupled. Obtained from (a757b4e) unit_test.py
+        x = np.array([  0.35128345,  0.41208204, 23.57932048, -2.68240888, -2.26472921, \
+                       29.22828843, 14.33420545,  0.65398139, 16.64817181])
+      x[i_s:i_e] = x_in[:]
 
     dx = np.empty((DIMM))
     # extratropic atm
@@ -68,7 +76,7 @@ def tendency(x_in, i_s=0, i_e=DIMM):
     dx[3] =           -sigma * x[3] + sigma * x[4] - c  * (s * x[6] + k2) - ce * (s * x[0] + k1)
     dx[4] = -x[3] * x[5] + r * x[3] -         x[4] + c  * (s * x[7] + k2) + ce * (s * x[1] + k1)
     dx[5] =  x[3] * x[4] - b * x[5]                + cz * x[8]
-    # tropic ocn
+    # tropic ocean
     dx[6] = tau * (              -sigma * x[6] + sigma * x[7]) - c  * (x[3] + k2)
     dx[7] = tau * (-s * x[6] * x[8] + r * x[6] -         x[7]) + c  * (x[4] + k2)
     dx[8] = tau * ( s * x[6] * x[7] - b * x[8]               ) - cz * x[5]
@@ -147,7 +155,7 @@ def tangent_linear(x, dt):
     dx[5,5] = -b
     dx[5,8] = cz
 
-    # tropic ocn
+    # tropic ocean
     dx[6,3] = - c
     dx[6,6] = tau * (-sigma)
     dx[6,7] = tau * sigma
@@ -181,6 +189,7 @@ def finite_time_tangent(x0, dt, iw):
   return m_finite
 
 def finite_time_tangent_using_nonlinear(x0, dt, iw):
+  ### todo: boundary conditions needed if used for 4DVar
   # Return tangent linear matrix, calculated numerically using the NL model
   # x0     <- np.array(DIMM)       : state vector at t0
   # dt     <- float                : timestep

@@ -9,9 +9,14 @@ from mpl_toolkits.mplot3d import Axes3D
 from const import *
 
 def plot_all():
+  Plot_3d = True
+
   hist_true = np.fromfile("data/true.bin", np.float64)
   hist_true = hist_true.reshape((STEPS, DIMM))
-  vectors = ["blv", "flv", "clv", "fsv", "isv"]
+  if Calc_lv:
+    vectors = ["blv", "flv", "clv", "fsv", "isv"]
+  else:
+    vectors = []
   vector_name = {"blv": "Backward_LV", "flv": "Forward_LV", "clv": "Characteristic_LV", \
                  "fsv": "Final_SV", "isv": "Initial_SV"}
   hist_vector = {}
@@ -21,10 +26,14 @@ def plot_all():
 
   os.system("mkdir -p image/true")
 
-  plot_le()
+  if Calc_lv:
+    plot_le()
   for vec in vectors:
     plot_lv_time(hist_vector[vec], vector_name[vec])
     # plot_trajectory_lv(hist_true, hist_vector[vec], vector_name[vec])
+
+  global rmse_hash
+  rmse_hash = {}
 
   for exp in EXPLIST:
     name = exp["name"]
@@ -38,7 +47,8 @@ def plot_all():
 
     plot_rmse_spread(hist_true, hist_fcst, name, nmem)
     plot_time_value(hist_true, hist_fcst, hist_obs, name, nmem)
-    plot_3d_trajectory(hist_true, hist_fcst, name, nmem)
+    if Plot_3d:
+      plot_3d_trajectory(hist_true, hist_fcst, name, nmem)
 
     if (exp["method"] == "etkf"):
       for vec in vectors:
@@ -49,6 +59,7 @@ def plot_all():
         hist_covar = np.fromfile("data/%s_covr_%s.bin" % (name, sel), np.float64)
         hist_covar = hist_covar.reshape((STEPS, DIMM, DIMM))
         plot_covariance_matr(hist_covar, name, sel)
+  plot_rmse_bar(hist_true)
 
 def plot_le():
   # plot lyapunov exponents
@@ -62,10 +73,10 @@ def plot_le():
   hist_fse = hist_fse.reshape((STEPS, DIMM))
   hist_ise = hist_ise.reshape((STEPS, DIMM))
 
-  mean_ble = np.mean(hist_ble[STEPS//2:,:], axis=0)
-  mean_fle = np.mean(hist_fle[STEPS//2:,:], axis=0)
-  mean_fse = np.mean(hist_fse[STEPS//2:,:], axis=0)
-  mean_ise = np.mean(hist_ise[STEPS//2:,:], axis=0)
+  mean_ble = np.mean(hist_ble[STEPS//4:(STEPS*3)//4,:], axis=0)
+  mean_fle = np.mean(hist_fle[STEPS//4:(STEPS*3)//4,:], axis=0)
+  mean_fse = np.mean(hist_fse[STEPS//4:(STEPS*3)//4,:], axis=0)
+  mean_ise = np.mean(hist_ise[STEPS//4:(STEPS*3)//4,:], axis=0)
 
   plt.rcParams["font.size"] = 12
   fig, ax1 = plt.subplots(1)
@@ -107,7 +118,7 @@ def plot_lv_projection(hist_lv, hist_fcst, name, title, nmem, is_oblique):
   projection = np.zeros((DIMM, nmem))
   hist_fcst_mean = np.mean(hist_fcst, axis=1)
 
-  for i in range(STEPS//2, STEPS):
+  for i in range(STEPS//4, (STEPS*3)//4):
     if is_oblique:
       for k in range(nmem):
         projection[:,k] += np.abs(oblique_projection(hist_fcst[i,k,:] - hist_fcst_mean[i,:], hist_lv[i,:,:]))
@@ -146,7 +157,7 @@ def plot_trajectory_lv(hist_true, hist_lv, name):
     return 0
   for i_component in range(DIMM//3):
     i_adjust = i_component * 3
-    name_component = ["extro", "trop", "ocn"][i_component]
+    name_component = ["extra", "trop", "ocean"][i_component]
 
     if (DIMM == 9):
       colors = ["#008000", "#0000ff", "#8080ff", \
@@ -207,31 +218,45 @@ def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
         1.0 / (nmem - 1.0) * (hist_fcst[:,i,:]**2 - hist_fcst_mean[:,:]**2)
   hist_err = hist_fcst_mean - hist_true
 
+  global rmse_hash
+
   if (DIMM == 3 or DIMM == 9):
+    rmse_component = []
     for i_component in range(DIMM//3):
       grid_from = 3 * i_component
-      name_component = ["extro", "trop", "ocn"][i_component]
+      name_component = ["extra", "trop", "ocean"][i_component]
 
       # MSE and Spread_square time series (grid average)
       mse_time   = np.mean(hist_err[:,grid_from:grid_from+3]**2,     axis=1)
       sprd2_time = np.mean(hist_fcst_sprd2[:,grid_from:grid_from+3], axis=1)
 
       # RMSE and Spread time average
-      rmse = np.sqrt(np.mean(mse_time[STEP_FREE:STEPS]))
-      sprd = np.sqrt(np.mean(sprd2_time[STEP_FREE:STEPS]))
+      rmse = np.sqrt(np.mean(mse_time[STEPS//2:]))
+      sprd = np.sqrt(np.mean(sprd2_time[STEPS//2:]))
+      rmse_component.append(rmse)
 
       # RMSE-Spread time series
-      plt.rcParams["font.size"] = 16
+      plt.rcParams["font.size"] = 14
       plt.yscale('log')
       plt.plot(np.sqrt(mse_time), label="RMSE")
       if (nmem > 1):
         plt.plot(np.sqrt(sprd2_time), label="Spread")
+      if i_component == 2:
+        plt.axhline(y=OERR_O, label="sqrt(R)")
+      else:
+        plt.axhline(y=OERR_A, label="sqrt(R)")
       plt.legend()
       plt.xlabel("timestep")
-      plt.title("[%s %s] RMSE:%6g Spread:%6g" % (name, name_component, rmse, sprd))
-      plt.savefig("./image/%s/%s_%s_%s.png" % (name, name, name_component, "time"))
+      plt.ylim([0.01, 100])
+      plt.title("[%s %s] RMSE:%6.4g Spread:%6.4g" % (name, name_component, rmse, sprd))
+      plt.savefig("./image/%s/%s_%s_%s.png" % (name, name, name_component, "time"), dpi=80)
       plt.clf()
       plt.close()
+    f = open("./image/true/rmse.txt", "a")
+    f.write(("%-25s" % name) + str(["%5g" % x for x in rmse_component]) + "\n")
+    print("%-25s" % name, ["%5g" % x for x in rmse_component])
+    f.close()
+    rmse_hash[name] = rmse_component
 
   else: # lorenz96
     # MSE and Spread_square time series (grid average)
@@ -239,8 +264,8 @@ def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
     sprd2_time = np.mean(hist_fcst_sprd2[:,:], axis=1)
 
     # RMSE and Spread time average
-    rmse = np.sqrt(np.mean(mse_time[STEP_FREE:STEPS]))
-    sprd = np.sqrt(np.mean(sprd2_time[STEP_FREE:STEPS]))
+    rmse = np.sqrt(np.mean(mse_time[STEPS//2:]))
+    sprd = np.sqrt(np.mean(sprd2_time[STEPS//2:]))
 
     # RMSE-Spread time series
     plt.rcParams["font.size"] = 16
@@ -268,7 +293,7 @@ def plot_time_value(hist_true, hist_fcst, hist_obs, name, nmem):
   if (DIMM == 3 or DIMM == 9):
     for i_component in range(DIMM//3):
       i_adjust = i_component * 3
-      name_component = ["extro", "trop", "ocn"][i_component]
+      name_component = ["extra", "trop", "ocean"][i_component]
 
       # xyz time series
       plt.rcParams["font.size"] = 12
@@ -321,7 +346,7 @@ def plot_3d_trajectory(hist_true, hist_fcst, name, nmem):
     return 0
   for i_component in range(DIMM//3):
     i_adjust = i_component * 3
-    name_component = ["extro", "trop", "ocn"][i_component]
+    name_component = ["extra", "trop", "ocean"][i_component]
 
     # 3D trajectory
     plt.rcParams["font.size"] = 16
@@ -329,10 +354,11 @@ def plot_3d_trajectory(hist_true, hist_fcst, name, nmem):
     fig.subplots_adjust(left=0.02, bottom=0.02, right=0.98, top=0.98, \
       wspace=0.04, hspace=0.04)
     ax = fig.add_subplot(111, projection='3d')
-    ax.plot(hist_true[:,0+i_adjust], hist_true[:,1+i_adjust], \
-      hist_true[:,2+i_adjust], label="true")
-    ax.plot(hist_fcst_mean[:,0+i_adjust], hist_fcst_mean[:,1+i_adjust], \
-      hist_fcst_mean[:,2+i_adjust], label="model")
+    st = STEPS // 2 # step to start plotting
+    ax.plot(hist_true[st:,0+i_adjust], hist_true[st:,1+i_adjust], \
+      hist_true[st:,2+i_adjust], label="true")
+    ax.plot(hist_fcst_mean[st:,0+i_adjust], hist_fcst_mean[st:,1+i_adjust], \
+      hist_fcst_mean[st:,2+i_adjust], label="model")
     ax.legend()
     # ax.set_xlim([-30,30])
     # ax.set_ylim([-30,30])
@@ -356,9 +382,9 @@ def plot_covariance_matr(hist_covar, name, sel):
     mean_covar = np.nan_to_num(np.nanmean(hist_covar, axis=0))
     rms_log = np.log(rms_covar)
   rms_log[np.isneginf(rms_log)] = 0
-  plot_matrix(rms_covar , name, "%s_covar_rms_%s"  % (sel, name))
-  plot_matrix(rms_log , name, "%s_covar_logrms_%s"  % (sel, name), plt.cm.Reds)
-  plot_matrix(mean_covar, name, "%s_covar_mean_%s" % (sel, name))
+  plot_matrix(rms_covar , name, "%s_%s_covar_rms"  % (name, sel))
+  plot_matrix(rms_log , name, "%s_%s_covar_logrms"  % (name, sel), plt.cm.Reds)
+  plot_matrix(mean_covar, name, "%s_%s_covar_mean" % (name, sel))
 
 def plot_matrix(data, name, title, color=plt.cm.bwr):
   # data  <- np.array[n,n]
@@ -402,5 +428,40 @@ def oblique_projection(vector, obl_basis):
     coefs = np.zeros(DIMM)
 
   return coefs
+
+def plot_rmse_bar(hist_true):
+  if DIMM != 9:
+    return 0
+
+  global rmse_hash
+  plt.rcParams["font.size"] = 9
+
+  nexp = len(rmse_hash)
+  width = 1.0 / (nexp + 1)
+
+  fig, ax = plt.subplots()
+  fig.subplots_adjust(bottom=0.2)
+
+  plist = []
+  j = 0
+  for name in rmse_hash:
+    shift = width * j
+    x = [(i + shift) for i in range(3)]
+    p = ax.bar(x, rmse_hash[name], width, label=name )
+    plist.append(p)
+    j += 1
+
+  ax.set_ylim(0, OERR_O*3.0)
+  ax.set_xticks([(i + width * (nexp - 1) * 0.5) for i in range(3)])
+  ax.set_xticklabels(["extra", "trop", "ocean"], rotation = 0)
+  ax.set_ylabel("RMSE")
+  oerr_a = ax.axhline(y=OERR_A, label="sqrt(R_atmos)")
+  oerr_o = ax.axhline(y=OERR_O, label="sqrt(R_ocean)")
+
+  plist += [oerr_a, oerr_o]
+  ax.legend(plist, [i.get_label() for i in plist], loc="upper left")
+  plt.savefig("./image/true/rmse_bar.png")
+
+  return 0
 
 plot_all()

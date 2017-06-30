@@ -4,12 +4,12 @@ import numpy as np
 from scipy.linalg import sqrtm
 from const import *
 
-def etkf(fcst, h_nda, r_nda, yo_nda, inf, nmem):
+def etkf(fcst, h_nda, r_nda, yo_nda, rho, nmem):
   # fcst   <- np.array[nmem, dimc]
   # h_nda  <- np.array[DIMO, dimc]
   # r_nda  <- np.array[DIMO, DIMO]
   # yo_nda <- np.array[DIMO, 1]
-  # inf    <- float
+  # rho    <- float
   # nmem   <- int
   # return -> np.array[dimc, nmem], np.array[dimc, dimc], np.array[dimc, dimc]
 
@@ -49,7 +49,7 @@ def etkf(fcst, h_nda, r_nda, yo_nda, inf, nmem):
   xfpt = xfm - xf * I_1m
   ybpt = h * xfpt
   yb   = h * xf
-  pa   = (((nmem-1.0)/inf**2) * I_mm + ybpt.T * r.I * ybpt).I
+  pa   = (((nmem-1.0)/rho) * I_mm + ybpt.T * r.I * ybpt).I
   wam  = np.matrix(sqrtm((nmem-1.0) * pa))
   wa   = pa * ybpt.T * r.I * (yo - yb)
   xapt = (xfm - xf * I_1m) * wam
