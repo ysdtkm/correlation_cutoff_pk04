@@ -8,7 +8,7 @@ DIMM = 9    # dimension of model variable n
 DIMO = DIMM # dimension of observation variable m
 
 DT = 0.01
-TMAX = 100
+TMAX = 1
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 FCST_LT = 5
@@ -21,13 +21,13 @@ AINT = 8
 EXPLIST = [ \
   {"name":"etkf_non_6mem", "rho":1.1, "nmem":6, "method":"etkf", "couple":"none", "bc":"persistent"}, \
   {"name":"etkf_weak_6mem", "rho":1.1, "nmem":6, "method":"etkf", "couple":"weak"}, \
-  {"name":"etkf_strong_6mem", "rho":1.1, "nmem":6, "method":"etkf", "couple":"strong"} \
-  # {"name":"tdvar_non_b5", "amp_b":5.0, "nmem":1, "method":"3dvar", "couple":"none", "bc":"persistent"}, \
-  # {"name":"tdvar_weak_b5", "amp_b":5.0, "nmem":1, "method":"3dvar", "couple":"weak"}, \
-  # {"name":"tdvar_strong_b5", "amp_b":5.0, "nmem":1, "method":"3dvar", "couple":"strong"}, \
-  # {"name":"fdvar_non_b3", "amp_b":3.0, "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
-  # {"name":"fdvar_weak_b3", "amp_b":3.0, "nmem":1, "method":"4dvar", "couple":"weak"}, \
-  # {"name":"fdvar_strong_b3", "amp_b":3.0, "nmem":1, "method":"4dvar", "couple":"strong"} \
+  {"name":"etkf_strong_6mem", "rho":1.1, "nmem":6, "method":"etkf", "couple":"strong"}, \
+  {"name":"tdvar_non_b5", "amp_b":5.0, "nmem":1, "method":"3dvar", "couple":"none", "bc":"persistent"}, \
+  {"name":"tdvar_weak_b5", "amp_b":5.0, "nmem":1, "method":"3dvar", "couple":"weak"}, \
+  {"name":"tdvar_strong_b5", "amp_b":5.0, "nmem":1, "method":"3dvar", "couple":"strong"}, \
+  {"name":"fdvar_non_b3", "amp_b":3.0, "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
+  {"name":"fdvar_weak_b3", "amp_b":3.0, "nmem":1, "method":"4dvar", "couple":"weak"}, \
+  {"name":"fdvar_strong_b3", "amp_b":3.0, "nmem":1, "method":"4dvar", "couple":"strong"} \
 ]
 
 Calc_lv = False
