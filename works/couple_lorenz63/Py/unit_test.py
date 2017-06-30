@@ -254,7 +254,7 @@ def compare_coupled_vs_persistent_bc():
   true = np.random.normal(0.0, FERR_INI, DIMM)
   fcst_cp = np.empty((DIMM))
   fcst_bc = np.empty((DIMM))
-  msd_extro = np.zeros((leadtime))
+  msd_extra = np.zeros((leadtime))
   msd_trop = np.zeros((leadtime))
   msd_ocean = np.zeros((leadtime))
 
@@ -274,18 +274,18 @@ def compare_coupled_vs_persistent_bc():
       fcst_bc[0:6] = timestep(fcst_bc[0:6], DT, 0, 6, persis_bc)
       fcst_bc[6:9] = timestep(fcst_bc[6:9], DT, 6, 9, persis_bc)
 
-      msd_extro[j] += np.mean((fcst_cp[0:3] - fcst_bc[0:3])**2)
+      msd_extra[j] += np.mean((fcst_cp[0:3] - fcst_bc[0:3])**2)
       msd_trop[j]  += np.mean((fcst_cp[3:6] - fcst_bc[3:6])**2)
       msd_ocean[j] += np.mean((fcst_cp[6:9] - fcst_bc[6:9])**2)
 
-  msd_extro /= (nstep / fcst_interval)
+  msd_extra /= (nstep / fcst_interval)
   msd_trop  /= (nstep / fcst_interval)
   msd_ocean /= (nstep / fcst_interval)
 
   for j in range(leadtime):
-    print(j+1, msd_extro[j]**0.5, msd_trop[j]**0.5, msd_ocean[j]**0.5)
+    print(j+1, msd_extra[j]**0.5, msd_trop[j]**0.5, msd_ocean[j]**0.5)
 
-  plt.plot(range(1, leadtime+1), msd_extro[:]**0.5, label="extro")
+  plt.plot(range(1, leadtime+1), msd_extra[:]**0.5, label="extra")
   plt.plot(range(1, leadtime+1), msd_trop[:]**0.5, label="trop")
   plt.plot(range(1, leadtime+1), msd_ocean[:]**0.5, label="ocean")
   plt.xlim(0, leadtime)

@@ -76,7 +76,7 @@ def tendency(x_in, i_s=0, i_e=DIMM, bc=None):
     dx[3] =           -sigma * x[3] + sigma * x[4] - c  * (s * x[6] + k2) - ce * (s * x[0] + k1)
     dx[4] = -x[3] * x[5] + r * x[3] -         x[4] + c  * (s * x[7] + k2) + ce * (s * x[1] + k1)
     dx[5] =  x[3] * x[4] - b * x[5]                + cz * x[8]
-    # tropic ocn
+    # tropic ocean
     dx[6] = tau * (              -sigma * x[6] + sigma * x[7]) - c  * (x[3] + k2)
     dx[7] = tau * (-s * x[6] * x[8] + r * x[6] -         x[7]) + c  * (x[4] + k2)
     dx[8] = tau * ( s * x[6] * x[7] - b * x[8]               ) - cz * x[5]
@@ -155,7 +155,7 @@ def tangent_linear(x, dt):
     dx[5,5] = -b
     dx[5,8] = cz
 
-    # tropic ocn
+    # tropic ocean
     dx[6,3] = - c
     dx[6,6] = tau * (-sigma)
     dx[6,7] = tau * sigma

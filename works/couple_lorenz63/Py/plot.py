@@ -157,7 +157,7 @@ def plot_trajectory_lv(hist_true, hist_lv, name):
     return 0
   for i_component in range(DIMM//3):
     i_adjust = i_component * 3
-    name_component = ["extro", "trop", "ocn"][i_component]
+    name_component = ["extra", "trop", "ocean"][i_component]
 
     if (DIMM == 9):
       colors = ["#008000", "#0000ff", "#8080ff", \
@@ -224,7 +224,7 @@ def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
     rmse_component = []
     for i_component in range(DIMM//3):
       grid_from = 3 * i_component
-      name_component = ["extro", "trop", "ocn"][i_component]
+      name_component = ["extra", "trop", "ocean"][i_component]
 
       # MSE and Spread_square time series (grid average)
       mse_time   = np.mean(hist_err[:,grid_from:grid_from+3]**2,     axis=1)
@@ -293,7 +293,7 @@ def plot_time_value(hist_true, hist_fcst, hist_obs, name, nmem):
   if (DIMM == 3 or DIMM == 9):
     for i_component in range(DIMM//3):
       i_adjust = i_component * 3
-      name_component = ["extro", "trop", "ocn"][i_component]
+      name_component = ["extra", "trop", "ocean"][i_component]
 
       # xyz time series
       plt.rcParams["font.size"] = 12
@@ -346,7 +346,7 @@ def plot_3d_trajectory(hist_true, hist_fcst, name, nmem):
     return 0
   for i_component in range(DIMM//3):
     i_adjust = i_component * 3
-    name_component = ["extro", "trop", "ocn"][i_component]
+    name_component = ["extra", "trop", "ocean"][i_component]
 
     # 3D trajectory
     plt.rcParams["font.size"] = 16
@@ -453,7 +453,7 @@ def plot_rmse_bar(hist_true):
 
   ax.set_ylim(0, OERR_O*3.0)
   ax.set_xticks([(i + width * (nexp - 1) * 0.5) for i in range(3)])
-  ax.set_xticklabels(["extro", "trop", "ocean"], rotation = 0)
+  ax.set_xticklabels(["extra", "trop", "ocean"], rotation = 0)
   ax.set_ylabel("RMSE")
   oerr_a = ax.axhline(y=OERR_A, label="sqrt(R_atmos)")
   oerr_o = ax.axhline(y=OERR_O, label="sqrt(R_ocean)")

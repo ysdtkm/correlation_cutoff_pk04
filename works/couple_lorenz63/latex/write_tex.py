@@ -19,7 +19,7 @@ def main():
   txt_out += write_txt(date_for_tex, last_commit, "../data/lyapunov.txt", "5.4pt", "lyapunov exponents")
 
   # rmse-spread comparison
-  for strx in ["extro", "trop", "ocn"]:
+  for strx in ["extra", "trop", "ocean"]:
     filelist = []
     for exp in const.EXPLIST:
       filelist.append("../image/%s/%s_%s_time.png" % (exp["name"], exp["name"], strx))
@@ -32,9 +32,9 @@ def main():
   for exp in const.EXPLIST:
     filelist = []
     imglist = ["anl_covar_logrms", "back_covar_logrms", "anl_covar_mean", "back_covar_mean", \
-               "extro_traj", "trop_traj", "ocn_traj", "", \
-               "extro_val", "trop_val", "ocn_val", "", \
-               "extro_time", "trop_time", "ocn_time", ""]
+               "extra_traj", "trop_traj", "ocean_traj", "", \
+               "extra_val", "trop_val", "ocean_val", "", \
+               "extra_time", "trop_time", "ocean_time", ""]
     for imgname in imglist:
       filelist.append("../image/%s/%s_%s.png" % (exp["name"], exp["name"], imgname))
     txt_out += figure_table(exp["name"], filelist, 4, 4, date_for_tex, last_commit)
