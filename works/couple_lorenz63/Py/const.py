@@ -13,7 +13,7 @@ STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 FCST_LT = 5
 
-OERR_A = 5.0
+OERR_A = 1.0
 OERR_O = 5.0
 FERR_INI = 10.0
 AINT = 8
