@@ -56,7 +56,7 @@ def etkf(fcst, h_nda, r_nda, yo_nda, rho, nmem, localization=False):
     xapt = np.copy(xfpt)
 
     for j in range(dimc):
-      # step 3: need elaboration for real localization
+      # step 3
       localization_weight = obtain_localization_weight(dimc, j)
       yol = yo[:,:]
       ybl = yb[:,:]
@@ -96,9 +96,9 @@ def obtain_localization_weight(dimc, j):
   if dimc == DIMM: # strongly coupled
     # weight_table[iy, ix] is weight of iy-th obs for ix-th grid
     weight_table_components = np.array(
-      [[1, 1, 0],
-       [1, 1, 1],
-       [0, 1, 1]])
+      [[1.0, 0.5, 0.0],
+       [0.5, 1.0, 0.5],
+       [0.0, 0.5, 1.0]])
 
     weight_table = np.ones((DIMM, DIMM))
     for iyc in range(3):
