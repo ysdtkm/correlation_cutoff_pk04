@@ -99,7 +99,7 @@ def obtain_localization_weight(dimc, j):
       for i in range(6, 9):
         localization_weight[i, :] = weight_outside
         localization_weight[:, i] = weight_outside
-    elif j >= 3: # tropics
+    elif j >= 6: # tropics
       for i in range(0, 3):
         localization_weight[i, :] = weight_outside
         localization_weight[:, i] = weight_outside
