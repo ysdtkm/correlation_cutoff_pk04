@@ -16,6 +16,7 @@ def etkf(fcst, h_nda, r_nda, yo_nda, rho, nmem, localization=False):
   h  = np.asmatrix(h_nda)
   r  = np.asmatrix(r_nda)
   yo = np.asmatrix(yo_nda)
+  dimc = fcst.shape[1]
 
   ### DA variables (np.matrix)
   # - model space
@@ -50,16 +51,17 @@ def etkf(fcst, h_nda, r_nda, yo_nda, rho, nmem, localization=False):
   ybpt = h * xfpt
   yb   = h * xf
 
+  print(dimc)
   if localization:
-    xai = np.matrix(np.zeros((DIMM, nmem)))
+    xai = np.matrix(np.zeros((dimc, nmem)))
     xapt = np.copy(xfpt)
 
-    for j in range(DIMM):
+    for j in range(dimc):
       # step 3: need elaboration for real localization
-      localization_weight = np.matrix(np.identity(DIMM))
-      for ix in range(DIMM):
+      localization_weight = np.matrix(np.identity(dimc))
+      for ix in range(dimc):
         if ix != j:
-          localization_weight[ix, ix] *= 0.5
+          localization_weight[ix, ix] *= 1.0 # ttk
       yol = yo[:,:]
       ybl = yb[:,:]
       ybptl = ybpt[:,:]
