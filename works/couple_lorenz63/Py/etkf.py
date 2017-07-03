@@ -96,7 +96,7 @@ def obtain_localization_weight(dimc, j):
 
   if dimc == DIMM: # strongly coupled
     if j < 3: # extratropics
-      for i in range(3, 9):
+      for i in range(6, 9):
         localization_weight[i, :] = weight_outside
         localization_weight[:, i] = weight_outside
     elif j >= 3: # tropics
