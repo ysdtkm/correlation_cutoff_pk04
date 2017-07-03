@@ -19,6 +19,12 @@ FERR_INI = 10.0
 AINT = 8
 
 EXPLIST = [ \
+  {"name":"etkf_non_2mem", "rho":1.1, "nmem":2, "method":"etkf", "couple":"none", "bc":"persistent"}, \
+  {"name":"etkf_weak_2mem", "rho":1.1, "nmem":2, "method":"etkf", "couple":"weak"}, \
+  {"name":"etkf_strong_2mem", "rho":1.1, "nmem":2, "method":"etkf", "couple":"strong"}, \
+  {"name":"etkf_non_3mem", "rho":1.1, "nmem":3, "method":"etkf", "couple":"none", "bc":"persistent"}, \
+  {"name":"etkf_weak_3mem", "rho":1.1, "nmem":3, "method":"etkf", "couple":"weak"}, \
+  {"name":"etkf_strong_3mem", "rho":1.1, "nmem":3, "method":"etkf", "couple":"strong"}, \
   {"name":"etkf_non_4mem", "rho":1.1, "nmem":4, "method":"etkf", "couple":"none", "bc":"persistent"}, \
   {"name":"etkf_weak_4mem", "rho":1.1, "nmem":4, "method":"etkf", "couple":"weak"}, \
   {"name":"etkf_strong_4mem", "rho":1.1, "nmem":4, "method":"etkf", "couple":"strong"}, \
