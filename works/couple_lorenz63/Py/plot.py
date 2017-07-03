@@ -88,7 +88,7 @@ def plot_le():
   ax1.set_ylabel("1 / Time")
   ax1.set_xlabel("LE index")
   ax1.legend()
-  plt.savefig("./image/true/le.png")
+  plt.savefig("./image/true/le.pdf")
   plt.clf()
   plt.close()
 
@@ -103,7 +103,7 @@ def plot_lv_time(hist_lv, name):
   ax1.plot(hist_lv[:,2,0], label="3")
   ax1.set_ylabel("value")
   ax1.legend()
-  plt.savefig("./image/true/lv_%s.png" % name)
+  plt.savefig("./image/true/lv_%s.pdf" % name)
   plt.clf()
   plt.close()
 
@@ -144,7 +144,7 @@ def plot_lv_projection(hist_lv, hist_fcst, name, title, nmem, is_oblique):
   cbar = plt.colorbar(map1)
   plt.title(title)
   plt.gca().invert_yaxis()
-  plt.savefig("./image/%s/%s.png" % (name, title))
+  plt.savefig("./image/%s/%s.pdf" % (name, title))
   plt.close()
   return 0
 
@@ -194,12 +194,12 @@ def plot_trajectory_lv(hist_true, hist_lv, name):
                     hist_lv[it,k,1+i_adjust], hist_lv[it,k,2+i_adjust]]
           vec_len = np.sqrt(np.sum(hist_lv[it,k,0+i_adjust:3+i_adjust]**2))
           ax.quiver(*vector, length=(10.0/1.0e-9*vec_len), pivot="tail", color=colors[k])
-      plt.savefig("./image/true/tmp_%s_%s_traj_%04d.png" % (name, name_component, it))
+      plt.savefig("./image/true/tmp_%s_%s_traj_%04d.pdf" % (name, name_component, it))
       plt.close()
 
-    os.system("convert -delay 5 -loop 0 ./image/true/tmp_*.png \
+    os.system("convert -delay 5 -loop 0 ./image/true/tmp_*.pdf \
       ./image/true/%s_lv_%s_traj.gif" % (name, name_component))
-    os.system("rm -f image/true/tmp_*.png")
+    os.system("rm -f image/true/tmp_*.pdf")
   return 0
 
 def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
@@ -249,7 +249,7 @@ def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
       plt.xlabel("timestep")
       plt.ylim([0.01, 100])
       plt.title("[%s %s] RMSE:%6.4g Spread:%6.4g" % (name, name_component, rmse, sprd))
-      plt.savefig("./image/%s/%s_%s_%s.png" % (name, name, name_component, "time"), dpi=80)
+      plt.savefig("./image/%s/%s_%s_%s.pdf" % (name, name, name_component, "time"), dpi=80)
       plt.clf()
       plt.close()
     f = open("./image/true/rmse.txt", "a")
@@ -276,7 +276,7 @@ def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
     plt.legend()
     plt.xlabel("timestep")
     plt.title("[%s] RMSE:%6g Spread:%6g" % (name, rmse, sprd))
-    plt.savefig("./image/%s/%s_%s.png" % (name, name, "time"))
+    plt.savefig("./image/%s/%s_%s.pdf" % (name, name, "time"))
     plt.clf()
     plt.close()
   return 0
@@ -316,7 +316,7 @@ def plot_time_value(hist_true, hist_fcst, hist_obs, name, nmem):
         ax3.plot(hist_obs[:,2+i_adjust], label="obs", linestyle='None', marker=".")
       ax3.set_ylabel("z")
       plt.xlabel("timestep")
-      plt.savefig("./image/%s/%s_%s_%s.png" % (name, name, name_component, "val"))
+      plt.savefig("./image/%s/%s_%s_%s.pdf" % (name, name, name_component, "val"))
       plt.clf()
       plt.close()
   else:
@@ -329,7 +329,7 @@ def plot_time_value(hist_true, hist_fcst, hist_obs, name, nmem):
     ax1.set_ylabel("0th element")
     ax1.legend(loc="upper right")
     plt.xlabel("timestep")
-    plt.savefig("./image/%s/%s_%s.png" % (name, name, "val"))
+    plt.savefig("./image/%s/%s_%s.pdf" % (name, name, "val"))
     plt.clf()
     plt.close()
   return 0
@@ -366,7 +366,7 @@ def plot_3d_trajectory(hist_true, hist_fcst, name, nmem):
     ax.set_xlabel("x")
     ax.set_ylabel("y")
     ax.set_zlabel("z")
-    plt.savefig("./image/%s/%s_%s_traj.png" % (name, name, name_component))
+    plt.savefig("./image/%s/%s_%s_traj.pdf" % (name, name, name_component))
     plt.clf()
     plt.close()
   return 0
@@ -405,7 +405,7 @@ def plot_matrix(data, name, title, color=plt.cm.bwr):
   cbar = plt.colorbar(map1)
   plt.title(title)
   plt.gca().invert_yaxis()
-  plt.savefig("./image/%s/%s.png" % (name, title))
+  plt.savefig("./image/%s/%s.pdf" % (name, title))
   plt.close()
   return 0
 
@@ -460,7 +460,7 @@ def plot_rmse_bar(hist_true):
 
   plist += [oerr_a, oerr_o]
   ax.legend(plist, [i.get_label() for i in plist], loc="upper left")
-  plt.savefig("./image/true/rmse_bar.png")
+  plt.savefig("./image/true/rmse_bar.pdf")
 
   return 0
 
