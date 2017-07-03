@@ -106,6 +106,20 @@ def obtain_localization_weight(dimc, j):
         weight_table[iyc*3:iyc*3+3, ixc*3:ixc*3+3] = \
           weight_table_components[iyc, ixc]
 
+    # symmetric version of a38p35
+    weight_table = np.array(
+      [[1.0,1.0,1.0,  1.0,0.0,0.0,  0.0,0.0,0.0],
+       [1.0,1.0,1.0,  0.0,1.0,0.0,  0.0,0.0,0.0],
+       [1.0,1.0,1.0,  0.0,0.0,0.0,  0.0,0.0,0.0],
+
+       [1.0,0.0,0.0,  1.0,1.0,1.0,  1.0,0.0,0.0],
+       [0.0,1.0,0.0,  1.0,1.0,1.0,  0.0,1.0,0.0],
+       [0.0,0.0,0.0,  1.0,1.0,1.0,  0.0,0.0,1.0],
+
+       [0.0,0.0,0.0,  1.0,0.0,0.0,  1.0,1.0,1.0],
+       [0.0,0.0,0.0,  0.0,1.0,0.0,  1.0,1.0,1.0],
+       [0.0,0.0,0.0,  0.0,0.0,1.0,  1.0,1.0,1.0]])
+
     for iy in range(DIMM):
       localization_weight[iy, :] = weight_table[iy, j]
       localization_weight[:, iy] = weight_table[iy, j]
