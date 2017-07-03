@@ -19,9 +19,15 @@ FERR_INI = 10.0
 AINT = 8
 
 EXPLIST = [ \
-  {"name":"etkf_non_5mem", "rho":1.1, "nmem":5, "method":"etkf", "couple":"none", "bc":"persistent"}, \
-  {"name":"etkf_weak_5mem", "rho":1.1, "nmem":5, "method":"etkf", "couple":"weak"}, \
-  {"name":"etkf_strong_5mem", "rho":1.1, "nmem":5, "method":"etkf", "couple":"strong"} \
+  {"name":"etkf_non_4mem", "rho":1.1, "nmem":4, "method":"etkf", "couple":"none", "bc":"persistent"}, \
+  {"name":"etkf_weak_4mem", "rho":1.1, "nmem":4, "method":"etkf", "couple":"weak"}, \
+  {"name":"etkf_strong_4mem", "rho":1.1, "nmem":4, "method":"etkf", "couple":"strong"}, \
+  {"name":"etkf_non_6mem", "rho":1.1, "nmem":6, "method":"etkf", "couple":"none", "bc":"persistent"}, \
+  {"name":"etkf_weak_6mem", "rho":1.1, "nmem":6, "method":"etkf", "couple":"weak"}, \
+  {"name":"etkf_strong_6mem", "rho":1.1, "nmem":6, "method":"etkf", "couple":"strong"}, \
+  {"name":"etkf_non_10mem", "rho":1.1, "nmem":10, "method":"etkf", "couple":"none", "bc":"persistent"}, \
+  {"name":"etkf_weak_10mem", "rho":1.1, "nmem":10, "method":"etkf", "couple":"weak"}, \
+  {"name":"etkf_strong_10mem", "rho":1.1, "nmem":10, "method":"etkf", "couple":"strong"} \
   # {"name":"tdvar_non_b5", "amp_b":5.0, "nmem":1, "method":"3dvar", "couple":"none", "bc":"persistent"}, \
   # {"name":"tdvar_weak_b5", "amp_b":5.0, "nmem":1, "method":"3dvar", "couple":"weak"}, \
   # {"name":"tdvar_strong_b5", "amp_b":5.0, "nmem":1, "method":"3dvar", "couple":"strong"}, \
