@@ -1,12 +1,13 @@
-topt = --halt-on-error --no-pdf
+# topt = --halt-on-error --no-pdf
+topt = --halt-on-error
 src  = temp.tex
 obj  = out.pdf
 
 all: $(obj)
 
 $(obj): $(src)
-	xelatex $(topt) $(src)
-	xelatex $(topt) $(src)
+	pdflatex $(topt) $(src)
+	pdflatex $(topt) $(src)
 	echo $(src) | sed -e 's/.tex/.xdv/g' | xargs -i xdvipdfmx -o $(obj) {}
 	echo $(src) | sed -e 's/.tex/.xdv/g' | xargs rm -f
 	echo $(src) | sed -e 's/.tex/.aux/g' | xargs rm -f
