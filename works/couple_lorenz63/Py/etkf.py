@@ -51,17 +51,13 @@ def etkf(fcst, h_nda, r_nda, yo_nda, rho, nmem, localization=False):
   ybpt = h * xfpt
   yb   = h * xf
 
-  print(dimc)
   if localization:
     xai = np.matrix(np.zeros((dimc, nmem)))
     xapt = np.copy(xfpt)
 
     for j in range(dimc):
       # step 3: need elaboration for real localization
-      localization_weight = np.matrix(np.identity(dimc))
-      for ix in range(dimc):
-        if ix != j:
-          localization_weight[ix, ix] *= 1.0 # ttk
+      localization_weight = obtain_localization_weight(dimc, j)
       yol = yo[:,:]
       ybl = yb[:,:]
       ybptl = ybpt[:,:]
@@ -87,3 +83,28 @@ def etkf(fcst, h_nda, r_nda, yo_nda, rho, nmem, localization=False):
     xam  = xapt + xa * I_1m
     return np.real(xam.T.A), (xfpt * xfpt.T).A, (xapt * xapt.T).A
 
+def obtain_localization_weight(dimc, j):
+  # dimc   <- int : cimension of analyzed component
+  # j      <- int : index of analyzed grid
+  # return -> R-inverse localizaiton weight matrix
+
+  weight_outside = 0.0
+  localization_weight = np.matrix(np.ones((dimc, dimc)))
+
+  if DIMM != 9:
+    return localization_weight
+
+  if dimc == DIMM: # strongly coupled
+    if j < 3: # extratropics
+      for i in range(6, 9):
+        localization_weight[i, :] = weight_outside
+        localization_weight[:, i] = weight_outside
+    elif j >= 3: # ocean
+      for i in range(0, 3):
+        localization_weight[i, :] = weight_outside
+        localization_weight[:, i] = weight_outside
+
+  elif dimc == 3 or dimc == 6: # non / weakly coupled
+    pass
+
+  return localization_weight
