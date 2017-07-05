@@ -447,8 +447,8 @@ def plot_rmse_bar(hist_true):
 
   fig, ax = plt.subplots()
   fig.subplots_adjust(top=0.85, bottom=0.2, right=0.67)
-  oerr_a = ax.axhline(y=OERR_A, label="sqrt(R_atmos)", alpha=0.5)
-  oerr_o = ax.axhline(y=OERR_O, label="sqrt(R_ocean)", alpha=0.5)
+  oerr_a = ax.axhline(y=OERR_A, label="sqrt(R_atmos)", alpha=0.5, color="red")
+  oerr_o = ax.axhline(y=OERR_O, label="sqrt(R_ocean)", alpha=0.5, color="blue")
 
   plist = []
   j = 0
@@ -459,7 +459,7 @@ def plot_rmse_bar(hist_true):
     plist.append(p)
     j += 1
 
-  ax.set_ylim(0, OERR_O*3.0)
+  ax.set_ylim(0, max(OERR_O, OERR_A)*3.0)
   ax.set_xticks([(i + width * (nexp - 1) * 0.5) for i in range(3)])
   ax.set_xticklabels(["extra", "trop", "ocean"], rotation = 0)
   ax.set_ylabel("RMSE")
