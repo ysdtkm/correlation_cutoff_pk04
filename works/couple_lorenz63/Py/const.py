@@ -27,14 +27,26 @@ EXPLIST = [ \
   # {"name":"etkf_non_4mem", "rho":1.1, "nmem":4, "method":"etkf", "couple":"none", "bc":"persistent"}, \
   # {"name":"etkf_weak_4mem", "rho":1.1, "nmem":4, "method":"etkf", "couple":"weak"}, \
   # {"name":"etkf_strong_4mem", "rho":1.1, "nmem":4, "method":"etkf", "couple":"strong"}, \
+  {"name":"tdvar_non_b1_ind", "amp_b":1.0, "nmem":1, "method":"3dvar", "couple":"none", "bc":"independent"}, \
+  {"name":"tdvar_non_b1", "amp_b":1.0, "nmem":1, "method":"3dvar", "couple":"none", "bc":"persistent"}, \
+  {"name":"tdvar_weak_b1", "amp_b":1.0, "nmem":1, "method":"3dvar", "couple":"weak"}, \
+  {"name":"tdvar_strong_b1", "amp_b":1.0, "nmem":1, "method":"3dvar", "couple":"strong"}, \
+  {"name":"tdvar_non_b15_ind", "amp_b":1.5, "nmem":1, "method":"3dvar", "couple":"none", "bc":"independent"}, \
+  {"name":"tdvar_non_b15", "amp_b":1.5, "nmem":1, "method":"3dvar", "couple":"none", "bc":"persistent"}, \
+  {"name":"tdvar_weak_b15", "amp_b":1.5, "nmem":1, "method":"3dvar", "couple":"weak"}, \
+  {"name":"tdvar_strong_b15", "amp_b":1.5, "nmem":1, "method":"3dvar", "couple":"strong"}, \
   {"name":"tdvar_non_b2_ind", "amp_b":2.0, "nmem":1, "method":"3dvar", "couple":"none", "bc":"independent"}, \
   {"name":"tdvar_non_b2", "amp_b":2.0, "nmem":1, "method":"3dvar", "couple":"none", "bc":"persistent"}, \
   {"name":"tdvar_weak_b2", "amp_b":2.0, "nmem":1, "method":"3dvar", "couple":"weak"}, \
   {"name":"tdvar_strong_b2", "amp_b":2.0, "nmem":1, "method":"3dvar", "couple":"strong"}, \
-  {"name":"fdvar_non_b15_ind", "amp_b":1.5, "nmem":1, "method":"4dvar", "couple":"none", "bc":"independent"}, \
-  {"name":"fdvar_non_b15", "amp_b":1.5, "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
-  {"name":"fdvar_weak_b15", "amp_b":1.5, "nmem":1, "method":"4dvar", "couple":"weak"}, \
-  {"name":"fdvar_strong_b15", "amp_b":1.5, "nmem":1, "method":"4dvar", "couple":"strong"}, \
+  {"name":"tdvar_non_b25_ind", "amp_b":2.5, "nmem":1, "method":"3dvar", "couple":"none", "bc":"independent"}, \
+  {"name":"tdvar_non_b25", "amp_b":2.5, "nmem":1, "method":"3dvar", "couple":"none", "bc":"persistent"}, \
+  {"name":"tdvar_weak_b25", "amp_b":2.5, "nmem":1, "method":"3dvar", "couple":"weak"}, \
+  {"name":"tdvar_strong_b25", "amp_b":2.5, "nmem":1, "method":"3dvar", "couple":"strong"}, \
+  # {"name":"fdvar_non_b15_ind", "amp_b":1.5, "nmem":1, "method":"4dvar", "couple":"none", "bc":"independent"}, \
+  # {"name":"fdvar_non_b15", "amp_b":1.5, "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
+  # {"name":"fdvar_weak_b15", "amp_b":1.5, "nmem":1, "method":"4dvar", "couple":"weak"}, \
+  # {"name":"fdvar_strong_b15", "amp_b":1.5, "nmem":1, "method":"4dvar", "couple":"strong"}, \
 ]
 
 Calc_lv = False
