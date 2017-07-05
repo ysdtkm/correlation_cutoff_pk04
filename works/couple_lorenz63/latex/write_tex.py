@@ -32,8 +32,8 @@ def main():
   for exp in const.EXPLIST:
     filelist = []
     imglist = ["anl_covar_logrms", "back_covar_logrms", "anl_covar_mean", "back_covar_mean", \
-               "extra_traj", "trop_traj", "ocean_traj", "", \
-               "extra_val", "trop_val", "ocean_val", "", \
+               "extra_traj", "trop_traj", "ocean_traj", "back_cosine_mean", \
+               "extra_val", "trop_val", "ocean_val", "anl_cosine_mean", \
                "extra_time", "trop_time", "ocean_time", ""]
     for imgname in imglist:
       filelist.append("../image/%s/%s_%s.pdf" % (exp["name"], exp["name"], imgname))

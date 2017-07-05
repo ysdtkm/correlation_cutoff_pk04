@@ -19,17 +19,17 @@ FERR_INI = 10.0
 AINT = 8
 
 EXPLIST = [ \
-  # {"name":"etkf_non_3mem_ind", "rho":1.1, "nmem":3, "method":"etkf", "couple":"none", "bc":"independent"}, \
-  # {"name":"etkf_non_3mem", "rho":1.1, "nmem":3, "method":"etkf", "couple":"none", "bc":"persistent"}, \
-  # {"name":"etkf_weak_3mem", "rho":1.1, "nmem":3, "method":"etkf", "couple":"weak"}, \
+  {"name":"etkf_non_3mem_ind", "rho":1.1, "nmem":3, "method":"etkf", "couple":"none", "bc":"independent"}, \
+  {"name":"etkf_non_3mem", "rho":1.1, "nmem":3, "method":"etkf", "couple":"none", "bc":"persistent"}, \
+  {"name":"etkf_weak_3mem", "rho":1.1, "nmem":3, "method":"etkf", "couple":"weak"}, \
   {"name":"etkf_strong_3mem", "rho":1.1, "nmem":3, "method":"etkf", "couple":"strong"}, \
-  # {"name":"etkf_non_4mem_ind", "rho":1.1, "nmem":4, "method":"etkf", "couple":"none", "bc":"independent"}, \
-  # {"name":"etkf_non_4mem", "rho":1.1, "nmem":4, "method":"etkf", "couple":"none", "bc":"persistent"}, \
-  # {"name":"etkf_weak_4mem", "rho":1.1, "nmem":4, "method":"etkf", "couple":"weak"}, \
+  {"name":"etkf_non_4mem_ind", "rho":1.1, "nmem":4, "method":"etkf", "couple":"none", "bc":"independent"}, \
+  {"name":"etkf_non_4mem", "rho":1.1, "nmem":4, "method":"etkf", "couple":"none", "bc":"persistent"}, \
+  {"name":"etkf_weak_4mem", "rho":1.1, "nmem":4, "method":"etkf", "couple":"weak"}, \
   {"name":"etkf_strong_4mem", "rho":1.1, "nmem":4, "method":"etkf", "couple":"strong"}, \
-  # {"name":"etkf_non_6mem_ind", "rho":1.1, "nmem":6, "method":"etkf", "couple":"none", "bc":"independent"}, \
-  # {"name":"etkf_non_6mem", "rho":1.1, "nmem":6, "method":"etkf", "couple":"none", "bc":"persistent"}, \
-  # {"name":"etkf_weak_6mem", "rho":1.1, "nmem":6, "method":"etkf", "couple":"weak"}, \
+  {"name":"etkf_non_6mem_ind", "rho":1.1, "nmem":6, "method":"etkf", "couple":"none", "bc":"independent"}, \
+  {"name":"etkf_non_6mem", "rho":1.1, "nmem":6, "method":"etkf", "couple":"none", "bc":"persistent"}, \
+  {"name":"etkf_weak_6mem", "rho":1.1, "nmem":6, "method":"etkf", "couple":"weak"}, \
   {"name":"etkf_strong_6mem", "rho":1.1, "nmem":6, "method":"etkf", "couple":"strong"}, \
   # {"name":"tdvar_non_b2_ind", "amp_b":2.0, "nmem":1, "method":"3dvar", "couple":"none", "bc":"independent"}, \
   # {"name":"tdvar_non_b2", "amp_b":2.0, "nmem":1, "method":"3dvar", "couple":"none", "bc":"persistent"}, \
