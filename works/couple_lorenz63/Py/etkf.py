@@ -98,8 +98,8 @@ def obtain_localization_weight(dimc, j):
   if dimc == DIMM: # strongly coupled
     # weight_table[iy, ix] is weight of iy-th obs for ix-th grid
     weight_table_components = np.array(
-      [[1.0, 1.0, 0.0],
-       [1.0, 1.0, 0.0],
+      [[1.0, 1.0, 1.0],
+       [1.0, 1.0, 1.0],
        [0.0, 0.0, 1.0]])
 
     weight_table = np.ones((DIMM, DIMM))
