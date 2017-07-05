@@ -12,9 +12,10 @@ def main():
   datestr = "%04d%02d%02d" % (date.year, date.month, date.day)
   date_for_tex = datestr.replace("_", "\\_")
   txt_out = header(date_for_tex, last_commit)
+  expname = os.environ.get("BATCH_JOB_NAME", "")
 
   # rmse and lyapunov exponents
-  txt_out += figure_table("", ["../image/true/rmse_bar.pdf"], 1, 1, date_for_tex, last_commit)
+  txt_out += figure_table(expname, ["../image/true/rmse_bar.pdf"], 1, 1, date_for_tex, last_commit)
   txt_out += write_txt(date_for_tex, last_commit, "../image/true/rmse.txt", "9pt", "rmse")
   txt_out += write_txt(date_for_tex, last_commit, "../data/lyapunov.txt", "5.4pt", "lyapunov exponents")
 
