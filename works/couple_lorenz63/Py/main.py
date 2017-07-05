@@ -89,7 +89,7 @@ def exec_assim_cycle(settings, all_fcst, all_obs):
     if settings["couple"] == "none" and settings["bc"] == "climatology":
       persis_bc = None
     elif settings["couple"] == "none" and settings["bc"] == "independent":
-      persis_bc = all_obs[i,:]
+      persis_bc = all_obs[i-1,:]
     else:
       persis_bc = np.mean(all_fcst[i-1,:,:], axis=0)
 
