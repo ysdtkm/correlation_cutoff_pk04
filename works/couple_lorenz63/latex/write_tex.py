@@ -13,12 +13,13 @@ def main():
   date_for_tex = datestr.replace("_", "\\_")
   txt_out = header(date_for_tex, last_commit)
   expname = os.environ.get("BATCH_JOB_NAME", "")
+  commit_name = last_commit + "\ " + expname
 
   # rmse and lyapunov exponents
-  txt_out += figure_table("", ["../image/true/rmse_bar.pdf"], 1, 1, date_for_tex, last_commit + " " + expname)
-  txt_out += write_txt(date_for_tex, last_commit + " " + expname,
+  txt_out += figure_table("", ["../image/true/rmse_bar.pdf"], 1, 1, date_for_tex, commit_name)
+  txt_out += write_txt(date_for_tex, commit_name,
                         "../image/true/rmse.txt", "9pt", "rmse")
-  txt_out += write_txt(date_for_tex, last_commit + " " + expname,
+  txt_out += write_txt(date_for_tex, commit_name,
                         "../data/lyapunov.txt", "5.4pt", "lyapunov exponents")
 
   # rmse-spread comparison
@@ -27,9 +28,9 @@ def main():
     for exp in const.EXPLIST:
       filelist.append("../image/%s/%s_%s_time.pdf" % (exp["name"], exp["name"], strx))
     if len(filelist) <= 9:
-      txt_out += figure_table(strx, filelist, 3, 3, date_for_tex, last_commit + " " + expname)
+      txt_out += figure_table(strx, filelist, 3, 3, date_for_tex, commit_name)
     else:
-      txt_out += figure_table(strx, filelist, 4, 4, date_for_tex, last_commit + " " + expname)
+      txt_out += figure_table(strx, filelist, 4, 4, date_for_tex, commit_name)
 
   # all figures
   for exp in const.EXPLIST:
@@ -40,10 +41,10 @@ def main():
                "extra_time", "trop_time", "ocean_time", ""]
     for imgname in imglist:
       filelist.append("../image/%s/%s_%s.pdf" % (exp["name"], exp["name"], imgname))
-    txt_out += figure_table(exp["name"], filelist, 4, 4, date_for_tex, last_commit + " " + expname)
+    txt_out += figure_table(exp["name"], filelist, 4, 4, date_for_tex, commit_name)
 
   # conditions
-  txt_out += write_txt(date_for_tex, last_commit + " " + expname, "../Py/const.py", "6pt", "settings")
+  txt_out += write_txt(date_for_tex, commit_name, "../Py/const.py", "6pt", "settings")
   md_raw = subprocess.getoutput('md5sum ../data/*').split("\n")
   md_raw.sort()
   md_txt = ""
@@ -56,7 +57,7 @@ def main():
   f.write(md_txt)
   f.close()
 
-  txt_out += write_txt(date_for_tex, last_commit + " " + expname, "./md5sum.txt", "9pt", "checksum")
+  txt_out += write_txt(date_for_tex, commit_name, "./md5sum.txt", "9pt", "checksum")
 
   # footer, output and compile
   txt_out += footer()
