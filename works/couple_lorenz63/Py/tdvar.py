@@ -67,7 +67,7 @@ def tdvar_b():
   # return -> np.array[DIMM,DIMM] : background error covariance
 
   if DIMM == 9:
-    # obtained by unit_test.py/obtain_tdvar_b(), a66aa31, 100000 timesteps
+    # obtained by unit_test.py/obtain_tdvar_b(), 8a66120, 100000 timesteps
     b = np.array([
     [ 0.151366652,  0.217993747, 0.00074922173, 0.000654576057, 0.00266310433, -0.00218875723, 0.000794892471, 0.00598052358, -0.00862711731],
     [ 0.217993747,  0.407210895, 0.00539653061, 0.0013996398, 0.00445064454, -0.00249628423, 0.00109589198, 0.00926521126, -0.0124801346],
