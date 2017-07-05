@@ -440,7 +440,7 @@ def plot_rmse_bar(hist_true):
   width = 1.0 / (nexp + 1)
 
   fig, ax = plt.subplots()
-  fig.subplots_adjust(bottom=0.2)
+  fig.subplots_adjust(top=0.85, bottom=0.2, right=0.67)
 
   plist = []
   j = 0
@@ -459,7 +459,7 @@ def plot_rmse_bar(hist_true):
   oerr_o = ax.axhline(y=OERR_O, label="sqrt(R_ocean)")
 
   plist += [oerr_a, oerr_o]
-  ax.legend(plist, [i.get_label() for i in plist], loc="upper left")
+  ax.legend(plist, [i.get_label() for i in plist], bbox_to_anchor=(1.03,1), loc="upper left")
   plt.savefig("./image/true/rmse_bar.pdf")
 
   return 0
