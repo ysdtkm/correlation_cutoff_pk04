@@ -161,6 +161,8 @@ def obtain_tdvar_b():
   hist_bf = np.fromfile("data/%s_covr_back.bin" % settings["name"], np.float64)
   hist_bf = hist_bf.reshape((STEPS, DIMM, DIMM))
   mean_bf = np.nanmean(hist_bf[STEPS//2:, :, :], axis=0)
+  trace = np.trace(mean_bf)
+  mean_bf *= (DIMM / trace)
 
   print("[ \\")
   for i in range(DIMM):
@@ -298,4 +300,4 @@ def compare_coupled_vs_persistent_bc():
   plt.ylabel("RMSD, coupled vs persistent BC forecasts")
   plt.savefig("./rmsd_coupled_vs_persistentbc.png")
 
-compare_coupled_vs_persistent_bc()
+obtain_tdvar_b()
