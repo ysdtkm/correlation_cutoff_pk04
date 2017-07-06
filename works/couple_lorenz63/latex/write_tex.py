@@ -175,4 +175,25 @@ def footer():
   """
   return textwrap.dedent(footer[1:-1])
 
+def sanitize(txt):
+  txt = txt.replace('\\', '\\textbackslash{}')
+  txt = txt.replace('{', '\\{')
+  txt = txt.replace('}', '\\}')
+  txt = txt.replace('$', '\\$')
+  txt = txt.replace('[', '［')
+  txt = txt.replace(']', '］')
+  txt = txt.replace('&', '\\&')
+  txt = txt.replace('#', '\\#')
+  txt = txt.replace('%', '\\%')
+  txt = txt.replace('^', '\\textasciicircum{}')
+  txt = txt.replace('_', '\\_')
+  txt = txt.replace('~', '\\textasciitilde{}')
+  txt = txt.replace('>', '\\textless{}')
+  txt = txt.replace('<', '\\textgreater{}')
+  txt = txt.replace('|', '\\textbar{}')
+  txt = txt.replace('"', '\\textquotedbl{}')
+  txt = txt.replace("'", '\\textquotesingle{}')
+  txt = txt.replace('`', '\\textasciigrave{}')
+  return txt
+
 main()
