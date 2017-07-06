@@ -238,13 +238,13 @@ def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
       # RMSE-Spread time series
       plt.rcParams["font.size"] = 14
       plt.yscale('log')
+      if i_component == 2:
+        plt.axhline(y=OERR_O, label="sqrt(R)", alpha=0.5)
+      else:
+        plt.axhline(y=OERR_A, label="sqrt(R)", alpha=0.5)
       plt.plot(np.sqrt(mse_time), label="RMSE")
       if (nmem > 1):
         plt.plot(np.sqrt(sprd2_time), label="Spread")
-      if i_component == 2:
-        plt.axhline(y=OERR_O, label="sqrt(R)")
-      else:
-        plt.axhline(y=OERR_A, label="sqrt(R)")
       plt.legend()
       plt.xlabel("timestep")
       plt.ylim([0.01, 100])
@@ -381,10 +381,16 @@ def plot_covariance_matr(hist_covar, name, sel):
     rms_covar  = np.sqrt(np.nan_to_num(np.nanmean(hist_covar[STEPS//2:STEPS,:,:]**2, axis=0)))
     mean_covar = np.nan_to_num(np.nanmean(hist_covar, axis=0))
     rms_log = np.log(rms_covar)
+    mean_cosine = np.copy(mean_covar)
+    for i in range(DIMM):
+      mean_cosine[i,:] /= np.sqrt(mean_covar[i,i])
+      mean_cosine[:,i] /= np.sqrt(mean_covar[i,i])
+
   rms_log[np.isneginf(rms_log)] = 0
   plot_matrix(rms_covar , name, "%s_%s_covar_rms"  % (name, sel))
   plot_matrix(rms_log , name, "%s_%s_covar_logrms"  % (name, sel), plt.cm.Reds)
   plot_matrix(mean_covar, name, "%s_%s_covar_mean" % (name, sel))
+  plot_matrix(mean_cosine, name, "%s_%s_cosine_mean" % (name, sel))
 
 def plot_matrix(data, name, title, color=plt.cm.bwr):
   # data  <- np.array[n,n]
@@ -441,6 +447,8 @@ def plot_rmse_bar(hist_true):
 
   fig, ax = plt.subplots()
   fig.subplots_adjust(top=0.85, bottom=0.2, right=0.67)
+  oerr_a = ax.axhline(y=OERR_A, label="sqrt(R_atmos)", alpha=0.5, color="red")
+  oerr_o = ax.axhline(y=OERR_O, label="sqrt(R_ocean)", alpha=0.5, color="blue")
 
   plist = []
   j = 0
@@ -451,12 +459,10 @@ def plot_rmse_bar(hist_true):
     plist.append(p)
     j += 1
 
-  ax.set_ylim(0, OERR_O*3.0)
+  ax.set_ylim(0, max(OERR_O, OERR_A)*3.0)
   ax.set_xticks([(i + width * (nexp - 1) * 0.5) for i in range(3)])
   ax.set_xticklabels(["extra", "trop", "ocean"], rotation = 0)
   ax.set_ylabel("RMSE")
-  oerr_a = ax.axhline(y=OERR_A, label="sqrt(R_atmos)")
-  oerr_o = ax.axhline(y=OERR_O, label="sqrt(R_ocean)")
 
   plist += [oerr_a, oerr_o]
   ax.legend(plist, [i.get_label() for i in plist], bbox_to_anchor=(1.03,1), loc="upper left")

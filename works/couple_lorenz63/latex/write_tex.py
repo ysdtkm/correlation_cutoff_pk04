@@ -10,13 +10,16 @@ def main():
   last_commit = git_output.split()[1][:7]
   date = datetime.datetime.now()
   datestr = "%04d%02d%02d" % (date.year, date.month, date.day)
-  date_for_tex = datestr.replace("_", "\\_")
-  txt_out = header(date_for_tex, last_commit)
+  txt_out = header(datestr, last_commit)
+  expname = os.environ.get("BATCH_JOB_NAME", "")
+  commit_name = last_commit + " " + expname
 
   # rmse and lyapunov exponents
-  txt_out += figure_table("", ["../image/true/rmse_bar.pdf"], 1, 1, date_for_tex, last_commit)
-  txt_out += write_txt(date_for_tex, last_commit, "../image/true/rmse.txt", "9pt", "rmse")
-  txt_out += write_txt(date_for_tex, last_commit, "../data/lyapunov.txt", "5.4pt", "lyapunov exponents")
+  txt_out += figure_table("", ["../image/true/rmse_bar.pdf"], 1, 1, datestr, commit_name)
+  txt_out += write_txt(datestr, commit_name,
+                        "../image/true/rmse.txt", "9pt", "rmse")
+  txt_out += write_txt(datestr, commit_name,
+                        "../data/lyapunov.txt", "5.4pt", "lyapunov exponents")
 
   # rmse-spread comparison
   for strx in ["extra", "trop", "ocean"]:
@@ -24,23 +27,23 @@ def main():
     for exp in const.EXPLIST:
       filelist.append("../image/%s/%s_%s_time.pdf" % (exp["name"], exp["name"], strx))
     if len(filelist) <= 9:
-      txt_out += figure_table(strx, filelist, 3, 3, date_for_tex, last_commit)
+      txt_out += figure_table(strx, filelist, 3, 3, datestr, commit_name)
     else:
-      txt_out += figure_table(strx, filelist, 4, 4, date_for_tex, last_commit)
+      txt_out += figure_table(strx, filelist, 4, 4, datestr, commit_name)
 
   # all figures
   for exp in const.EXPLIST:
     filelist = []
     imglist = ["anl_covar_logrms", "back_covar_logrms", "anl_covar_mean", "back_covar_mean", \
-               "extra_traj", "trop_traj", "ocean_traj", "", \
-               "extra_val", "trop_val", "ocean_val", "", \
+               "extra_traj", "trop_traj", "ocean_traj", "back_cosine_mean", \
+               "extra_val", "trop_val", "ocean_val", "anl_cosine_mean", \
                "extra_time", "trop_time", "ocean_time", ""]
     for imgname in imglist:
       filelist.append("../image/%s/%s_%s.pdf" % (exp["name"], exp["name"], imgname))
-    txt_out += figure_table(exp["name"], filelist, 4, 4, date_for_tex, last_commit)
+    txt_out += figure_table(exp["name"], filelist, 4, 4, datestr, commit_name)
 
   # conditions
-  txt_out += write_txt(date_for_tex, last_commit, "../Py/const.py", "6pt", "settings")
+  txt_out += write_txt(datestr, commit_name, "../Py/const.py", "6pt", "settings")
   md_raw = subprocess.getoutput('md5sum ../data/*').split("\n")
   md_raw.sort()
   md_txt = ""
@@ -53,7 +56,7 @@ def main():
   f.write(md_txt)
   f.close()
 
-  txt_out += write_txt(date_for_tex, last_commit, "./md5sum.txt", "9pt", "checksum")
+  txt_out += write_txt(datestr, commit_name, "./md5sum.txt", "9pt", "checksum")
 
   # footer, output and compile
   txt_out += footer()
@@ -62,7 +65,6 @@ def main():
   f.close()
   os.system("make")
   os.system("mkdir -p ./archive")
-  os.system("cp -f ./out.pdf ./archive/%s_%s_%dsteps.pdf" % (datestr, last_commit, const.STEPS))
   return 0
 
 def header(date, last_commit):
@@ -93,8 +95,8 @@ def header(date, last_commit):
     \\begin{document}
     % \\maketitle
   """
-  header = header.replace('@@date@@', date)
-  header = header.replace('@@title@@', last_commit)
+  header = header.replace('@@date@@', sanitize(date))
+  header = header.replace('@@title@@', sanitize(last_commit))
   return textwrap.dedent(header[1:-1])
 
 def figure_table(expname, file_list, nx, ny, date, commit):
@@ -121,7 +123,7 @@ def figure_table(expname, file_list, nx, ny, date, commit):
     \\begin{figure}[h]
       \\flushleft
   """[1:-1]
-  content = content.replace('@@expname@@', date + " " + commit + " "  + expname.replace("_", "\\_"))
+  content = content.replace('@@expname@@', sanitize(date + " " + commit + " "  + expname))
 
   for iy in range(ny):
     for ix in range(nx):
@@ -129,11 +131,9 @@ def figure_table(expname, file_list, nx, ny, date, commit):
         \\begin{minipage}[b]{@@widthcell@@\\linewidth}
           \\centering
           \\includegraphicsmaybe[width=@@widthimg@@]{@@filename@@}
-          % \\subcaption{@@num@@}
         \\end{minipage}
         """[1:-1]
       tex_figure = tex_figure.replace('@@filename@@', file_list[ix + iy * nx])
-      tex_figure = tex_figure.replace('@@expname@@', expname)
       tex_figure = tex_figure.replace('@@widthcell@@', width_cell)
       tex_figure = tex_figure.replace('@@widthimg@@', width_img)
       content += tex_figure
@@ -160,7 +160,7 @@ def write_txt(date, commit, path, size, title):
     }
     \\end{frame}
   """[1:-1]
-  content = content.replace('@@expname@@', date + " " + commit + " " + title)
+  content = content.replace('@@expname@@', sanitize(date + " " + commit + " " + title))
   content = content.replace('@@filepath@@', path)
   content = content.replace('@@size@@', size)
 
@@ -171,5 +171,26 @@ def footer():
     \\end{document}
   """
   return textwrap.dedent(footer[1:-1])
+
+def sanitize(txt):
+  txt = txt.replace('\\', '\\textbackslash{}')
+  txt = txt.replace('{', '\\{')
+  txt = txt.replace('}', '\\}')
+  txt = txt.replace('$', '\\$')
+  txt = txt.replace('[', '［')
+  txt = txt.replace(']', '］')
+  txt = txt.replace('&', '\\&')
+  txt = txt.replace('#', '\\#')
+  txt = txt.replace('%', '\\%')
+  txt = txt.replace('^', '\\textasciicircum{}')
+  txt = txt.replace('_', '\\_')
+  txt = txt.replace('~', '\\textasciitilde{}')
+  txt = txt.replace('>', '\\textless{}')
+  txt = txt.replace('<', '\\textgreater{}')
+  txt = txt.replace('|', '\\textbar{}')
+  txt = txt.replace('"', '\\textquotedbl{}')
+  txt = txt.replace("'", '\\textquotesingle{}')
+  txt = txt.replace('`', '\\textasciigrave{}')
+  return txt
 
 main()

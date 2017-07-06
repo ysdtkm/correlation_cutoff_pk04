@@ -88,6 +88,8 @@ def exec_assim_cycle(settings, all_fcst, all_obs):
   for i in range(STEP_FREE, STEPS):
     if settings["couple"] == "none" and settings["bc"] == "climatology":
       persis_bc = None
+    elif settings["couple"] == "none" and settings["bc"] == "independent":
+      persis_bc = all_obs[i-1,:]
     else:
       persis_bc = np.mean(all_fcst[i-1,:,:], axis=0)
 
@@ -153,7 +155,7 @@ def analyze_one_window(fcst, fcst_pre, obs, h, r, settings, i_s=0, i_e=DIMM, bc=
 
   if (settings["method"] == "etkf"):
     anl[:,:], bf[:,:], ba[:,:] = \
-        etkf(fcst[:,:], h[:,:], r[:,:], yo[:,:], settings["rho"], settings["nmem"], True)
+        etkf(fcst[:,:], h[:,:], r[:,:], yo[:,:], settings["rho"], settings["nmem"], True, settings["r_local"])
   elif (settings["method"] == "3dvar"):
     anl[0,:] = tdvar(fcst[0,:].T, h[:,:], r[:,:], yo[:,:], i_s, i_e, settings["amp_b"])
   elif (settings["method"] == "4dvar"):
