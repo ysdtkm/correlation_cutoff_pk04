@@ -68,7 +68,7 @@ def etkf(fcst, h_nda, r_nda, yo_nda, rho, nmem, localization=False, r_local=""):
       # step 4-9
       cl = ybptl.T * np.asmatrix(rl.I.A * localization_weight.A)
       pal = (((nmem-1.0)/rho) * I_mm + cl * ybptl).I
-      waptl = np.matrix(sqrtm((nmem-1.0) * pal))
+      waptl = np.matrix(np.real(sqrtm((nmem-1.0) * pal)))
       wal = pal * cl * (yol - ybl)
       xail = xfl * I_1m + xfptl * (wal * I_1m + waptl)
       xai[j,:] = xail[:,:]
@@ -123,19 +123,36 @@ def obtain_localization_weight(dimc, j, r_local):
         [[1.0, 1.0, 1.0],
          [1.0, 1.0, 1.0],
          [0.0, 0.0, 1.0]])
-    elif r_local == "none":
+    elif r_local == "full":
       weight_table_components = np.array(
         [[1.0, 1.0, 1.0],
          [1.0, 1.0, 1.0],
          [1.0, 1.0, 1.0]])
+    elif r_local == "dynamical":
+      pass
     else:
       raise Exception("r_local: %s is not correct choice" % r_local)
 
-    weight_table = np.ones((DIMM, DIMM))
-    for iyc in range(3):
-      for ixc in range(3):
-        weight_table[iyc*3:iyc*3+3, ixc*3:ixc*3+3] = \
-          weight_table_components[iyc, ixc]
+    if r_local == "dynamical": # a38p35
+      weight_table = np.array([
+        [1.0,1.0,1.0,  1.0,0.0,0.0,  0.0,0.0,0.0],
+        [1.0,1.0,1.0,  0.0,1.0,0.0,  0.0,0.0,0.0],
+        [1.0,1.0,1.0,  0.0,0.0,0.0,  0.0,0.0,0.0],
+
+        [1.0,0.0,0.0,  1.0,1.0,1.0,  1.0,0.0,0.0],
+        [0.0,1.0,0.0,  1.0,1.0,1.0,  0.0,1.0,0.0],
+        [0.0,0.0,0.0,  1.0,1.0,1.0,  0.0,0.0,1.0],
+
+        [0.0,0.0,0.0,  1.0,0.0,0.0,  1.0,1.0,1.0],
+        [0.0,0.0,0.0,  0.0,1.0,0.0,  1.0,1.0,1.0],
+        [0.0,0.0,0.0,  0.0,0.0,1.0,  1.0,1.0,1.0]])
+
+    else:
+      weight_table = np.ones((DIMM, DIMM))
+      for iyc in range(3):
+        for ixc in range(3):
+          weight_table[iyc*3:iyc*3+3, ixc*3:ixc*3+3] = \
+            weight_table_components[iyc, ixc]
 
     for iy in range(dimc):
       localization_weight[iy, :] *= weight_table[iy, j]
