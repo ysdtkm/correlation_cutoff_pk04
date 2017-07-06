@@ -13,7 +13,7 @@ def main():
   date_for_tex = datestr.replace("_", "\\_")
   txt_out = header(date_for_tex, last_commit)
   expname = os.environ.get("BATCH_JOB_NAME", "")
-  commit_name = last_commit + "\\_" + expname
+  commit_name = last_commit + " " + expname
 
   # rmse and lyapunov exponents
   txt_out += figure_table("", ["../image/true/rmse_bar.pdf"], 1, 1, date_for_tex, commit_name)
