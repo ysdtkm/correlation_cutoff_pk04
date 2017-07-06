@@ -459,7 +459,7 @@ def plot_rmse_bar(hist_true):
     plist.append(p)
     j += 1
 
-  ax.set_ylim(0, max(OERR_O, OERR_A)*3.0)
+  ax.set_ylim(0, max(OERR_O, OERR_A)*1.5)
   ax.set_xticks([(i + width * (nexp - 1) * 0.5) for i in range(3)])
   ax.set_xticklabels(["extra", "trop", "ocean"], rotation = 0)
   ax.set_ylabel("RMSE")
