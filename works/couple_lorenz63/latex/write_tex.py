@@ -86,6 +86,7 @@ def header(date, last_commit):
     \\setbeamertemplate{footline}[frame number]{}
     \\setbeamertemplate{navigation symbols}{}
     \\setbeamertemplate{footline}{}
+    \\setbeamerfont{frametitle}{size=\\small}
 
     \\newcommand{\\includegraphicsmaybe}[2][width=10mm]{
       \\IfFileExists{#2}{\\includegraphics[#1]{#2}}{\\includegraphics[#1]{dummy.png}
