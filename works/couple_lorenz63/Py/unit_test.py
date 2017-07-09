@@ -321,17 +321,22 @@ def obtain_r2_etkf():
   r2_ijt[:,:,:] = np.nan
   for it in range(STEPS//2, STEPS):
     if it % AINT == 0:
+      # reproduce background
+      fcst = hist_fcst[it-AINT, :, :]
+      for jt in range(AINT):
+        for k in range(nmem):
+          fcst[k, :] = timestep(fcst[k,:], DT)
+
       for i in range(DIMM):
         for j in range(DIMM):
           # a38p40
-          vector_i = hist_fcst[it, :, i]
-          vector_j = hist_fcst[it, :, j]
+          vector_i = fcst[:, i]
+          vector_j = fcst[:, j]
           vector_i[:] -= np.mean(vector_i)
           vector_j[:] -= np.mean(vector_j)
           numera = np.sum(vector_i * vector_j) ** 2
           denomi = np.sum(vector_i ** 2) * np.sum(vector_j ** 2)
           r2 = numera / denomi
-          # r2_adjusted = (nmem - 1.0) / (nmem - 2.0) * r2 - 1.0 / (nmem  - 2.0)
           r2_ijt[it, i, j] = r2
   r2_ij = np.nanmean(r2_ijt, axis=0)
   print(r2_ij)
