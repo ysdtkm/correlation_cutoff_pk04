@@ -312,13 +312,22 @@ def obtain_r2_etkf():
   free = exec_free_run(settings)
   anl  = exec_assim_cycle(settings, free, obs)
 
-  hist_bf = np.fromfile("data/%s_cycle.bin" % settings["name"], np.float64)
+  nmem = settings["nmem"]
+  hist_fcst = np.fromfile("data/%s_cycle.bin" % settings["name"], np.float64)
+  hist_fcst = hist_fcst.reshape((STEPS, nmem, DIMM))
+
   r2_ijt = np.empty((STEPS, DIMM, DIMM))
   r2_ijt[:,:,:] = np.nan
   for it in range(STEPS//2, STEPS):
     if it % AINT == 0:
       for i in range(DIMM):
         for j in range(DIMM):
+          # a38p40
+          vector_i = hist_fcst[it, :, i]
+          vector_j = hist_fcst[it, :, j]
+          vector_i[:] -= np.mean(vector_i)
+          vector_j[:] -= np.mean(vector_j)
+          print(vector_i); raise Exception
           r2_ijt[it, i, j] = 1.0  #ttk
   r2_ij = np.nanmean(r2_ijt, axis=0)
   print(r2_ij)
