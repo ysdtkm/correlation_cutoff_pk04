@@ -8,7 +8,7 @@ DIMM = 9    # dimension of model variable n
 DIMO = DIMM # dimension of observation variable m
 
 DT = 0.01
-TMAX = 100
+TMAX = 1000
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 FCST_LT = 5
@@ -29,14 +29,14 @@ EXPLIST = [ \
   # {"name":"etkf_strong_4mem", "rho":1.1, "nmem":4, "method":"etkf", "couple":"strong"}, \
   # {"name":"etkf_non_10mem", "rho":1.1, "nmem":10, "method":"etkf", "couple":"none", "bc":"persistent"}, \
   # {"name":"etkf_weak_10mem", "rho":1.1, "nmem":10, "method":"etkf", "couple":"weak"}, \
-  {"name":"non_coupled", "rho":1.1, "nmem":10, "method":"etkf", "couple":"none", "bc":"independent"}, \
-  {"name":"full", "rho":1.1, "nmem":10, "method":"etkf", "couple":"strong", "r_local":"full"}, \
-  {"name":"vertical", "rho":1.1, "nmem":10, "method":"etkf", "couple":"strong", "r_local":"vertical"}, \
-  {"name":"horizontal", "rho":1.1, "nmem":10, "method":"etkf", "couple":"strong", "r_local":"horizontal"}, \
-  {"name":"3-components", "rho":1.1, "nmem":10, "method":"etkf", "couple":"strong", "r_local":"3-components"}, \
-  {"name":"ocean_to_atmos", "rho":1.1, "nmem":10, "method":"etkf", "couple":"strong", "r_local":"ocean_to_atmos"}, \
-  {"name":"atmos_to_ocean", "rho":1.1, "nmem":10, "method":"etkf", "couple":"strong", "r_local":"atmos_to_ocean"}, \
-  {"name":"dynamical", "rho":1.1, "nmem":10, "method":"etkf", "couple":"strong", "r_local":"dynamical"}, \
+  # {"name":"non_coupled", "rho":1.1, "nmem":10, "method":"etkf", "couple":"none", "bc":"independent"}, \
+  # {"name":"full", "rho":1.1, "nmem":10, "method":"etkf", "couple":"strong", "r_local":"full"}, \
+  # {"name":"vertical", "rho":1.1, "nmem":10, "method":"etkf", "couple":"strong", "r_local":"vertical"}, \
+  # {"name":"horizontal", "rho":1.1, "nmem":10, "method":"etkf", "couple":"strong", "r_local":"horizontal"}, \
+  # {"name":"3-components", "rho":1.1, "nmem":10, "method":"etkf", "couple":"strong", "r_local":"3-components"}, \
+  # {"name":"ocean_to_atmos", "rho":1.1, "nmem":10, "method":"etkf", "couple":"strong", "r_local":"ocean_to_atmos"}, \
+  # {"name":"atmos_to_ocean", "rho":1.1, "nmem":10, "method":"etkf", "couple":"strong", "r_local":"atmos_to_ocean"}, \
+  # {"name":"dynamical", "rho":1.1, "nmem":10, "method":"etkf", "couple":"strong", "r_local":"dynamical"}, \
   # {"name":"tdvar_non_b2_ind", "amp_b":2.0, "nmem":1, "method":"3dvar", "couple":"none", "bc":"independent"}, \
   # {"name":"tdvar_non_b2", "amp_b":2.0, "nmem":1, "method":"3dvar", "couple":"none", "bc":"persistent"}, \
   # {"name":"tdvar_weak_b2", "amp_b":2.0, "nmem":1, "method":"3dvar", "couple":"weak"}, \

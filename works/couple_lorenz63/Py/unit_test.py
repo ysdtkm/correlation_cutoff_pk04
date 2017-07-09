@@ -195,7 +195,7 @@ def print_two_dim_nparray(data, format="%12.9g"):
       print("]  \\")
       print("]")
 
-def plot_matrix(data, name="", title="", color=plt.cm.bwr):
+def plot_matrix(data, name="", title="", color=plt.cm.bwr, xlabel="", ylabel=""):
   fig, ax = plt.subplots(1)
   fig.subplots_adjust(left=0.12, right=0.95, bottom=0.12, top=0.92)
   cmax = np.max(np.abs(data))
@@ -205,7 +205,8 @@ def plot_matrix(data, name="", title="", color=plt.cm.bwr):
   x0,x1 = ax.get_xlim()
   y0,y1 = ax.get_ylim()
   ax.set_aspect(abs(x1-x0)/abs(y1-y0))
-  ax.set_xlabel("x")
+  ax.set_xlabel(xlabel)
+  ax.set_ylabel(ylabel)
   cbar = plt.colorbar(map1)
   plt.title(title)
   plt.gca().invert_yaxis()
@@ -327,10 +328,14 @@ def obtain_r2_etkf():
           vector_j = hist_fcst[it, :, j]
           vector_i[:] -= np.mean(vector_i)
           vector_j[:] -= np.mean(vector_j)
-          print(vector_i); raise Exception
-          r2_ijt[it, i, j] = 1.0  #ttk
+          numera = np.sum(vector_i * vector_j) ** 2
+          denomi = np.sum(vector_i ** 2) * np.sum(vector_j ** 2)
+          r2 = numera / denomi
+          # r2_adjusted = (nmem - 1.0) / (nmem - 2.0) * r2 - 1.0 / (nmem  - 2.0)
+          r2_ijt[it, i, j] = r2
   r2_ij = np.nanmean(r2_ijt, axis=0)
   print(r2_ij)
+  plot_matrix(r2_ij, title="R_squared", xlabel="grid index i", ylabel="grid index j")
   return 0
 
 obtain_r2_etkf()
