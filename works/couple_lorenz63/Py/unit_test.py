@@ -177,6 +177,8 @@ def obtain_tdvar_b():
       print("]  \\")
       print("]")
 
+  return 0
+
 def print_two_dim_nparray(data, format="%12.9g"):
   n = data.shape[0]
   m = data.shape[1]
@@ -300,4 +302,26 @@ def compare_coupled_vs_persistent_bc():
   plt.ylabel("RMSD, coupled vs persistent BC forecasts")
   plt.savefig("./rmsd_coupled_vs_persistentbc.png")
 
-obtain_tdvar_b()
+def obtain_r2_etkf():
+  np.random.seed(100000007*2)
+  nature = exec_nature()
+  obs = exec_obs(nature)
+  settings = {"name":"etkf_strong_int8",  "rho":1.1, "nmem":10,
+              "method":"etkf", "couple":"strong", "r_local": "full"}
+  np.random.seed(100000007*3)
+  free = exec_free_run(settings)
+  anl  = exec_assim_cycle(settings, free, obs)
+
+  hist_bf = np.fromfile("data/%s_cycle.bin" % settings["name"], np.float64)
+  r2_ijt = np.empty((STEPS, DIMM, DIMM))
+  r2_ijt[:,:,:] = np.nan
+  for it in range(STEPS//2, STEPS):
+    if it % AINT == 0:
+      for i in range(DIMM):
+        for j in range(DIMM):
+          r2_ijt[it, i, j] = 1.0  #ttk
+  r2_ij = np.nanmean(r2_ijt, axis=0)
+  print(r2_ij)
+  return 0
+
+obtain_r2_etkf()
