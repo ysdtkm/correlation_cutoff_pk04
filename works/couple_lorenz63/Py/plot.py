@@ -88,7 +88,7 @@ def plot_le():
   ax1.set_ylabel("1 / Time")
   ax1.set_xlabel("LE index")
   ax1.legend()
-  plt.savefig("./image/true/le.png")
+  plt.savefig("./image/true/le.pdf")
   plt.clf()
   plt.close()
 
@@ -103,7 +103,7 @@ def plot_lv_time(hist_lv, name):
   ax1.plot(hist_lv[:,2,0], label="3")
   ax1.set_ylabel("value")
   ax1.legend()
-  plt.savefig("./image/true/lv_%s.png" % name)
+  plt.savefig("./image/true/lv_%s.pdf" % name)
   plt.clf()
   plt.close()
 
@@ -144,7 +144,7 @@ def plot_lv_projection(hist_lv, hist_fcst, name, title, nmem, is_oblique):
   cbar = plt.colorbar(map1)
   plt.title(title)
   plt.gca().invert_yaxis()
-  plt.savefig("./image/%s/%s.png" % (name, title))
+  plt.savefig("./image/%s/%s.pdf" % (name, title))
   plt.close()
   return 0
 
@@ -194,12 +194,12 @@ def plot_trajectory_lv(hist_true, hist_lv, name):
                     hist_lv[it,k,1+i_adjust], hist_lv[it,k,2+i_adjust]]
           vec_len = np.sqrt(np.sum(hist_lv[it,k,0+i_adjust:3+i_adjust]**2))
           ax.quiver(*vector, length=(10.0/1.0e-9*vec_len), pivot="tail", color=colors[k])
-      plt.savefig("./image/true/tmp_%s_%s_traj_%04d.png" % (name, name_component, it))
+      plt.savefig("./image/true/tmp_%s_%s_traj_%04d.pdf" % (name, name_component, it))
       plt.close()
 
-    os.system("convert -delay 5 -loop 0 ./image/true/tmp_*.png \
+    os.system("convert -delay 5 -loop 0 ./image/true/tmp_*.pdf \
       ./image/true/%s_lv_%s_traj.gif" % (name, name_component))
-    os.system("rm -f image/true/tmp_*.png")
+    os.system("rm -f image/true/tmp_*.pdf")
   return 0
 
 def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
@@ -238,18 +238,18 @@ def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
       # RMSE-Spread time series
       plt.rcParams["font.size"] = 14
       plt.yscale('log')
+      if i_component == 2:
+        plt.axhline(y=OERR_O, label="sqrt(R)", alpha=0.5)
+      else:
+        plt.axhline(y=OERR_A, label="sqrt(R)", alpha=0.5)
       plt.plot(np.sqrt(mse_time), label="RMSE")
       if (nmem > 1):
         plt.plot(np.sqrt(sprd2_time), label="Spread")
-      if i_component == 2:
-        plt.axhline(y=OERR_O, label="sqrt(R)")
-      else:
-        plt.axhline(y=OERR_A, label="sqrt(R)")
       plt.legend()
       plt.xlabel("timestep")
       plt.ylim([0.01, 100])
       plt.title("[%s %s] RMSE:%6.4g Spread:%6.4g" % (name, name_component, rmse, sprd))
-      plt.savefig("./image/%s/%s_%s_%s.png" % (name, name, name_component, "time"), dpi=80)
+      plt.savefig("./image/%s/%s_%s_%s.pdf" % (name, name, name_component, "time"), dpi=80)
       plt.clf()
       plt.close()
     f = open("./image/true/rmse.txt", "a")
@@ -276,7 +276,7 @@ def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
     plt.legend()
     plt.xlabel("timestep")
     plt.title("[%s] RMSE:%6g Spread:%6g" % (name, rmse, sprd))
-    plt.savefig("./image/%s/%s_%s.png" % (name, name, "time"))
+    plt.savefig("./image/%s/%s_%s.pdf" % (name, name, "time"))
     plt.clf()
     plt.close()
   return 0
@@ -316,7 +316,7 @@ def plot_time_value(hist_true, hist_fcst, hist_obs, name, nmem):
         ax3.plot(hist_obs[:,2+i_adjust], label="obs", linestyle='None', marker=".")
       ax3.set_ylabel("z")
       plt.xlabel("timestep")
-      plt.savefig("./image/%s/%s_%s_%s.png" % (name, name, name_component, "val"))
+      plt.savefig("./image/%s/%s_%s_%s.pdf" % (name, name, name_component, "val"))
       plt.clf()
       plt.close()
   else:
@@ -329,7 +329,7 @@ def plot_time_value(hist_true, hist_fcst, hist_obs, name, nmem):
     ax1.set_ylabel("0th element")
     ax1.legend(loc="upper right")
     plt.xlabel("timestep")
-    plt.savefig("./image/%s/%s_%s.png" % (name, name, "val"))
+    plt.savefig("./image/%s/%s_%s.pdf" % (name, name, "val"))
     plt.clf()
     plt.close()
   return 0
@@ -366,7 +366,7 @@ def plot_3d_trajectory(hist_true, hist_fcst, name, nmem):
     ax.set_xlabel("x")
     ax.set_ylabel("y")
     ax.set_zlabel("z")
-    plt.savefig("./image/%s/%s_%s_traj.png" % (name, name, name_component))
+    plt.savefig("./image/%s/%s_%s_traj.pdf" % (name, name, name_component))
     plt.clf()
     plt.close()
   return 0
@@ -381,10 +381,16 @@ def plot_covariance_matr(hist_covar, name, sel):
     rms_covar  = np.sqrt(np.nan_to_num(np.nanmean(hist_covar[STEPS//2:STEPS,:,:]**2, axis=0)))
     mean_covar = np.nan_to_num(np.nanmean(hist_covar, axis=0))
     rms_log = np.log(rms_covar)
+    mean_cosine = np.copy(mean_covar)
+    for i in range(DIMM):
+      mean_cosine[i,:] /= np.sqrt(mean_covar[i,i])
+      mean_cosine[:,i] /= np.sqrt(mean_covar[i,i])
+
   rms_log[np.isneginf(rms_log)] = 0
   plot_matrix(rms_covar , name, "%s_%s_covar_rms"  % (name, sel))
   plot_matrix(rms_log , name, "%s_%s_covar_logrms"  % (name, sel), plt.cm.Reds)
   plot_matrix(mean_covar, name, "%s_%s_covar_mean" % (name, sel))
+  plot_matrix(mean_cosine, name, "%s_%s_cosine_mean" % (name, sel))
 
 def plot_matrix(data, name, title, color=plt.cm.bwr):
   # data  <- np.array[n,n]
@@ -405,7 +411,7 @@ def plot_matrix(data, name, title, color=plt.cm.bwr):
   cbar = plt.colorbar(map1)
   plt.title(title)
   plt.gca().invert_yaxis()
-  plt.savefig("./image/%s/%s.png" % (name, title))
+  plt.savefig("./image/%s/%s.pdf" % (name, title))
   plt.close()
   return 0
 
@@ -440,7 +446,9 @@ def plot_rmse_bar(hist_true):
   width = 1.0 / (nexp + 1)
 
   fig, ax = plt.subplots()
-  fig.subplots_adjust(bottom=0.2)
+  fig.subplots_adjust(top=0.85, bottom=0.2, right=0.67)
+  oerr_a = ax.axhline(y=OERR_A, label="sqrt(R_atmos)", alpha=0.5, color="red")
+  oerr_o = ax.axhline(y=OERR_O, label="sqrt(R_ocean)", alpha=0.5, color="blue")
 
   plist = []
   j = 0
@@ -451,16 +459,14 @@ def plot_rmse_bar(hist_true):
     plist.append(p)
     j += 1
 
-  ax.set_ylim(0, OERR_O*3.0)
+  ax.set_ylim(0, max(OERR_O, OERR_A)*1.5)
   ax.set_xticks([(i + width * (nexp - 1) * 0.5) for i in range(3)])
   ax.set_xticklabels(["extra", "trop", "ocean"], rotation = 0)
   ax.set_ylabel("RMSE")
-  oerr_a = ax.axhline(y=OERR_A, label="sqrt(R_atmos)")
-  oerr_o = ax.axhline(y=OERR_O, label="sqrt(R_ocean)")
 
   plist += [oerr_a, oerr_o]
-  ax.legend(plist, [i.get_label() for i in plist], loc="upper left")
-  plt.savefig("./image/true/rmse_bar.png")
+  ax.legend(plist, [i.get_label() for i in plist], bbox_to_anchor=(1.03,1), loc="upper left")
+  plt.savefig("./image/true/rmse_bar.pdf")
 
   return 0
 

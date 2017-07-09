@@ -4,18 +4,20 @@ import numpy as np
 from scipy.linalg import sqrtm
 from const import *
 
-def etkf(fcst, h_nda, r_nda, yo_nda, rho, nmem):
+def etkf(fcst, h_nda, r_nda, yo_nda, rho, nmem, localization=False, r_local=""):
   # fcst   <- np.array[nmem, dimc]
   # h_nda  <- np.array[DIMO, dimc]
   # r_nda  <- np.array[DIMO, DIMO]
   # yo_nda <- np.array[DIMO, 1]
   # rho    <- float
   # nmem   <- int
+  # r_local (string): localization pattern of R
   # return -> np.array[dimc, nmem], np.array[dimc, dimc], np.array[dimc, dimc]
 
   h  = np.asmatrix(h_nda)
   r  = np.asmatrix(r_nda)
   yo = np.asmatrix(yo_nda)
+  dimc = fcst.shape[1]
 
   ### DA variables (np.matrix)
   # - model space
@@ -49,11 +51,128 @@ def etkf(fcst, h_nda, r_nda, yo_nda, rho, nmem):
   xfpt = xfm - xf * I_1m
   ybpt = h * xfpt
   yb   = h * xf
-  pa   = (((nmem-1.0)/rho) * I_mm + ybpt.T * r.I * ybpt).I
-  wam  = np.matrix(sqrtm((nmem-1.0) * pa))
-  wa   = pa * ybpt.T * r.I * (yo - yb)
-  xapt = (xfm - xf * I_1m) * wam
-  xa   = xf + xfm * wa
-  xam  = xapt + xa * I_1m
-  return np.real(xam.T.A), (xfpt * xfpt.T).A, (xapt * xapt.T).A
+
+  if localization:
+    xai = np.matrix(np.zeros((dimc, nmem)))
+
+    for j in range(dimc):
+      # step 3
+      localization_weight = obtain_localization_weight(dimc, j, r_local)
+      yol = yo[:,:]
+      ybl = yb[:,:]
+      ybptl = ybpt[:,:]
+      xfl = xf[j,:]
+      xfptl = xfpt[j,:]
+      rl = r[:,:]
+
+      # step 4-9
+      cl = ybptl.T * np.asmatrix(rl.I.A * localization_weight.A)
+      pal = (((nmem-1.0)/rho) * I_mm + cl * ybptl).I
+      waptl = np.matrix(np.real(sqrtm((nmem-1.0) * pal)))
+      wal = pal * cl * (yol - ybl)
+      xail = xfl * I_1m + xfptl * (wal * I_1m + waptl)
+      xai[j,:] = xail[:,:]
+
+    xapt = xai - np.mean(xai[:,:], axis=1) * I_1m
+    return np.real(xai.T.A), (xfpt * xfpt.T).A, (xapt * xapt.T).A
+
+  else:
+    pa   = (((nmem-1.0)/rho) * I_mm + ybpt.T * r.I * ybpt).I
+    wam  = np.matrix(sqrtm((nmem-1.0) * pa))
+    wa   = pa * ybpt.T * r.I * (yo - yb)
+    xapt = (xfm - xf * I_1m) * wam
+    xa   = xf + xfm * wa
+    xam  = xapt + xa * I_1m
+    return np.real(xam.T.A), (xfpt * xfpt.T).A, (xapt * xapt.T).A
+
+def obtain_localization_weight(dimc, j, r_local):
+  # dimc   <- int : cimension of analyzed component
+  # j      <- int : index of analyzed grid
+  # r_local (string): localization pattern of R
+  # return -> np.matrix : R-inverse localizaiton weight matrix
+
+  localization_weight = np.ones((dimc, dimc))
+
+  if DIMM != 9:
+    return localization_weight
+
+  if dimc == DIMM: # strongly coupled
+    # weight_table[iy, ix] is weight of iy-th obs for ix-th grid
+    if r_local == "3-components":
+      weight_table_components = np.array(
+        [[1.0, 0.0, 0.0],
+         [0.0, 1.0, 0.0],
+         [0.0, 0.0, 1.0]])
+    elif r_local == "vertical":
+      weight_table_components = np.array(
+        [[1.0, 1.0, 0.0],
+         [1.0, 1.0, 0.0],
+         [0.0, 0.0, 1.0]])
+    elif r_local == "horizontal":
+      weight_table_components = np.array(
+        [[1.0, 0.0, 0.0],
+         [0.0, 1.0, 1.0],
+         [0.0, 1.0, 1.0]])
+    elif r_local == "ocean_to_atmos":
+      weight_table_components = np.array(
+        [[1.0, 1.0, 0.0],
+         [1.0, 1.0, 0.0],
+         [1.0, 1.0, 1.0]])
+    elif r_local == "atmos_to_ocean":
+      weight_table_components = np.array(
+        [[1.0, 1.0, 1.0],
+         [1.0, 1.0, 1.0],
+         [0.0, 0.0, 1.0]])
+    elif r_local == "full":
+      weight_table_components = np.array(
+        [[1.0, 1.0, 1.0],
+         [1.0, 1.0, 1.0],
+         [1.0, 1.0, 1.0]])
+    elif r_local == "dynamical":
+      pass
+    else:
+      raise Exception("r_local: %s is not correct choice" % r_local)
+
+    if r_local == "dynamical": # a38p35
+      weight_table = np.array([
+        [1.0,1.0,1.0,  1.0,0.0,0.0,  0.0,0.0,0.0],
+        [1.0,1.0,1.0,  0.0,1.0,0.0,  0.0,0.0,0.0],
+        [1.0,1.0,1.0,  0.0,0.0,0.0,  0.0,0.0,0.0],
+
+        [1.0,0.0,0.0,  1.0,1.0,1.0,  1.0,0.0,0.0],
+        [0.0,1.0,0.0,  1.0,1.0,1.0,  0.0,1.0,0.0],
+        [0.0,0.0,0.0,  1.0,1.0,1.0,  0.0,0.0,1.0],
+
+        [0.0,0.0,0.0,  1.0,0.0,0.0,  1.0,1.0,1.0],
+        [0.0,0.0,0.0,  0.0,1.0,0.0,  1.0,1.0,1.0],
+        [0.0,0.0,0.0,  0.0,0.0,1.0,  1.0,1.0,1.0]])
+
+    else:
+      weight_table = np.ones((DIMM, DIMM))
+      for iyc in range(3):
+        for ixc in range(3):
+          weight_table[iyc*3:iyc*3+3, ixc*3:ixc*3+3] = \
+            weight_table_components[iyc, ixc]
+
+    for iy in range(dimc):
+      localization_weight[iy, :] *= weight_table[iy, j]
+      localization_weight[:, iy] *= weight_table[iy, j]
+
+  elif dimc == 3:
+    pass
+
+  elif dimc == 6:
+    pass
+    # weight_table = np.array(
+    #   [[1.0, 1.0, 1.0, 0.0, 0.0, 0.0],
+    #    [1.0, 1.0, 1.0, 0.0, 0.0, 0.0],
+    #    [1.0, 1.0, 1.0, 0.0, 0.0, 0.0],
+    #    [0.0, 0.0, 0.0, 1.0, 1.0, 1.0],
+    #    [0.0, 0.0, 0.0, 1.0, 1.0, 1.0],
+    #    [0.0, 0.0, 0.0, 1.0, 1.0, 1.0]])
+    # for iy in range(dimc):
+    #   localization_weight[iy, :] *= weight_table[iy, j]
+    #   localization_weight[:, iy] *= weight_table[iy, j]
+
+  return np.asmatrix(localization_weight)
 
