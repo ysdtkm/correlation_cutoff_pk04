@@ -334,15 +334,13 @@ def obtain_r2_etkf():
           vector_j = fcst[:, j]
           vector_i[:] -= np.mean(vector_i)
           vector_j[:] -= np.mean(vector_j)
-          # numera = np.sum(vector_i * vector_j) ** 2
-          # denomi = np.sum(vector_i ** 2) * np.sum(vector_j ** 2)
-          numera = np.sum(vector_i * vector_j) # ttk
-          denomi = np.sqrt(np.sum(vector_i ** 2) * np.sum(vector_j ** 2))
+          numera = np.sum(vector_i * vector_j) ** 2
+          denomi = np.sum(vector_i ** 2) * np.sum(vector_j ** 2)
           r2 = numera / denomi
           r2_ijt[it, i, j] = r2
   r2_ij = np.nanmean(r2_ijt, axis=0)
   print(r2_ij)
-  plot_matrix(r2_ij, title="R", xlabel="grid index i", ylabel="grid index j") # ttk
+  plot_matrix(r2_ij, title="R_squared", xlabel="grid index i", ylabel="grid index j")
   return 0
 
 obtain_r2_etkf()
