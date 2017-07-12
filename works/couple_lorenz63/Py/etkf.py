@@ -113,12 +113,12 @@ def obtain_localization_weight(dimc, j, r_local):
         [[1.0, 0.0, 0.0],
          [0.0, 1.0, 1.0],
          [0.0, 1.0, 1.0]])
-    elif r_local == "ocean_to_atmos":
+    elif r_local == "atmos_sees_ocean":
       weight_table_components = np.array(
         [[1.0, 1.0, 0.0],
          [1.0, 1.0, 0.0],
          [1.0, 1.0, 1.0]])
-    elif r_local == "atmos_to_ocean":
+    elif r_local == "ocean_sees_atmos":
       weight_table_components = np.array(
         [[1.0, 1.0, 1.0],
          [1.0, 1.0, 1.0],
