@@ -18,7 +18,7 @@ def calc_blv(all_true):
   all_ble = np.zeros((STEPS, DIMM))
 
   for i in range(1, STEPS):
-    true = all_true[i-1,:]
+    true = all_true[i-1,:].copy()
     m = finite_time_tangent_using_nonlinear(true, DT, 1)
     blv = np.dot(m, blv)
     if (i % orth_int == 0):
@@ -43,7 +43,7 @@ def calc_flv(all_true):
   all_fle = np.zeros((STEPS, DIMM))
 
   for i in range(STEPS, 0, -1):
-    true = all_true[i-1,:]
+    true = all_true[i-1,:].copy()
     m = finite_time_tangent_using_nonlinear(true, DT, 1)
     flv = np.dot(m.T, flv)
     if (i % orth_int == 0):
@@ -89,7 +89,7 @@ def calc_fsv(all_true):
   all_fse = np.zeros((STEPS, DIMM))
   window = 1
   for i in range(window, STEPS):
-    true = all_true[i-window,:]
+    true = all_true[i-window,:].copy()
     m = finite_time_tangent_using_nonlinear(true, DT, window)
     u, s, vh = np.linalg.svd(m)
     all_fsv[i,:,:] = u[:,:]
@@ -108,7 +108,7 @@ def calc_isv(all_true):
   all_ise = np.zeros((STEPS, DIMM))
   window = 1
   for i in range(STEPS, window-1, -1):
-    true = all_true[i-window,:]
+    true = all_true[i-window,:].copy()
     m = finite_time_tangent_using_nonlinear(true, DT, window)
     u, s, vh = np.linalg.svd(m)
     all_isv[i-window,:,:] = vh.T[:,:]
@@ -151,7 +151,7 @@ def orth_norm_vectors(lv):
     if (inner_prod < 0):
       q[:,i] *= -1.0
 
-  lv_orth = q
+  lv_orth = q.copy()
   le = np.log(eigvals)
   return lv_orth, le
 
@@ -174,7 +174,7 @@ def nullspace(a):
   # a      <- np.array[DIMM,DIMM+1]
   # return <- np.array[DIMM]
   u, s, vh = np.linalg.svd(a)
-  return vh.T[:,-1]
+  return vh.T[:,-1].copy()
 
 def str_vector(arr):
   # arr    <- np.array[n]

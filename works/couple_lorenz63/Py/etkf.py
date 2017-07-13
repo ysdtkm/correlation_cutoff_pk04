@@ -58,12 +58,12 @@ def etkf(fcst, h_nda, r_nda, yo_nda, rho, nmem, localization=False, r_local=""):
     for j in range(dimc):
       # step 3
       localization_weight = obtain_localization_weight(dimc, j, r_local)
-      yol = yo[:,:]
-      ybl = yb[:,:]
-      ybptl = ybpt[:,:]
-      xfl = xf[j,:]
-      xfptl = xfpt[j,:]
-      rl = r[:,:]
+      yol = yo[:,:].copy()
+      ybl = yb[:,:].copy()
+      ybptl = ybpt[:,:].copy()
+      xfl = xf[j,:].copy()
+      xfptl = xfpt[j,:].copy()
+      rl = r[:,:].copy()
 
       # step 4-9
       cl = ybptl.T * np.asmatrix(rl.I.A * localization_weight.A)
