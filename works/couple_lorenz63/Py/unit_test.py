@@ -322,7 +322,7 @@ def obtain_r2_etkf():
   for it in range(STEPS//2, STEPS):
     if it % AINT == 0:
       # reproduce background
-      fcst = hist_fcst[it-AINT, :, :]
+      fcst = np.copy(hist_fcst[it-AINT, :, :])
       for jt in range(AINT):
         for k in range(nmem):
           fcst[k, :] = timestep(fcst[k,:], DT)
@@ -330,14 +330,16 @@ def obtain_r2_etkf():
       for i in range(DIMM):
         for j in range(DIMM):
           # a38p40
-          vector_i = fcst[:, i]
-          vector_j = fcst[:, j]
+          vector_i = np.copy(fcst[:, i])
+          vector_j = np.copy(fcst[:, j])
           vector_i[:] -= np.mean(vector_i)
           vector_j[:] -= np.mean(vector_j)
-          numera = np.sum(vector_i * vector_j) ** 2
-          denomi = np.sum(vector_i ** 2) * np.sum(vector_j ** 2)
+          # numera = np.sum(vector_i * vector_j) ** 2
+          # denomi = np.sum(vector_i ** 2) * np.sum(vector_j ** 2)
+          numera = np.sum(vector_i * vector_j)
+          denomi = (np.sum(vector_i ** 2) * np.sum(vector_j ** 2)) ** 0.5
           r2 = numera / denomi
-          r2_ijt[it, i, j] = r2
+          r2_ijt[it, i, j] = np.copy(r2)
   r2_ij = np.nanmean(r2_ijt, axis=0)
   print(r2_ij)
   plot_matrix(r2_ij, title="R_squared", xlabel="grid index i", ylabel="grid index j")
