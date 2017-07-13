@@ -342,7 +342,7 @@ def obtain_r2_etkf():
           r2_ijt[it, i, j] = np.copy(r2)
   r2_ij = np.nanmean(r2_ijt, axis=0)
   print(r2_ij)
-  plot_matrix(r2_ij, title="R_squared", xlabel="grid index i", ylabel="grid index j")
+  plot_matrix(r2_ij, title="cosine", xlabel="grid index i", ylabel="grid index j")
   return 0
 
 obtain_r2_etkf()
