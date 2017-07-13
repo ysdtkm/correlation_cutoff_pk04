@@ -270,7 +270,7 @@ def compare_coupled_vs_persistent_bc():
 
   fcst_interval = 100
   for i in range(nstep // fcst_interval):
-    persis_bc = all_true[i*fcst_interval,:]
+    persis_bc = all_true[i*fcst_interval,:].copy()
     fcst_cp[:] = all_true[i*fcst_interval,:]
     fcst_bc[:] = all_true[i*fcst_interval,:]
 
