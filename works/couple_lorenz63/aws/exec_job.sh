@@ -3,12 +3,12 @@ set -e
 
 git status --short --branch
 if [ $# -lt 1 ]; then
-  echo -e "Type (Ctrl-C) to stop."
+  echo "Type (Ctrl-C) to stop."
   echo ""
-  echo -ne "input JOB NAME: "
+  echo -n "input JOB NAME: "
   read JOBNAME
 else
-  echo -e "Type Enter to continue. Type (Ctrl-C) to stop."
+  echo "Type Enter to continue. Type (Ctrl-C) to stop."
   read DUMMY
   JOBNAME=$1
 fi
