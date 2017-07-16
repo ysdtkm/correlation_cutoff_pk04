@@ -39,14 +39,14 @@ EXPLIST = [ \
   {"name":"ocean_sees_trop", "rho":1.05, "nmem":6, "method":"etkf", "couple":"strong", "r_local":"ocean_sees_trop"}, \
   {"name":"band", "rho":1.05, "nmem":6, "method":"etkf", "couple":"strong", "r_local":"band"}, \
   # {"name":"dynamical", "rho":1.05, "nmem":10, "method":"etkf", "couple":"strong", "r_local":"dynamical"}, \
-  # {"name":"tdvar_non_b2_ind", "amp_b":2.0, "nmem":1, "method":"3dvar", "couple":"none", "bc":"independent"}, \
+  {"name":"tdvar_non_b2_ind", "amp_b":2.0, "nmem":1, "method":"3dvar", "couple":"none", "bc":"independent"}, \
   # {"name":"tdvar_non_b2", "amp_b":2.0, "nmem":1, "method":"3dvar", "couple":"none", "bc":"persistent"}, \
-  # {"name":"tdvar_weak_b2", "amp_b":2.0, "nmem":1, "method":"3dvar", "couple":"weak"}, \
-  # {"name":"tdvar_strong_b2", "amp_b":2.0, "nmem":1, "method":"3dvar", "couple":"strong"}, \
-  # {"name":"fdvar_non_b15_ind", "amp_b":1.5, "nmem":1, "method":"4dvar", "couple":"none", "bc":"independent"}, \
+  {"name":"tdvar_weak_b2", "amp_b":2.0, "nmem":1, "method":"3dvar", "couple":"weak"}, \
+  {"name":"tdvar_strong_b2", "amp_b":2.0, "nmem":1, "method":"3dvar", "couple":"strong"}, \
+  {"name":"fdvar_non_b15_ind", "amp_b":1.5, "nmem":1, "method":"4dvar", "couple":"none", "bc":"independent"}, \
   # {"name":"fdvar_non_b15", "amp_b":1.5, "nmem":1, "method":"4dvar", "couple":"none", "bc":"persistent"}, \
-  # {"name":"fdvar_weak_b15", "amp_b":1.5, "nmem":1, "method":"4dvar", "couple":"weak"}, \
-  # {"name":"fdvar_strong_b15", "amp_b":1.5, "nmem":1, "method":"4dvar", "couple":"strong"}, \
+  {"name":"fdvar_weak_b15", "amp_b":1.5, "nmem":1, "method":"4dvar", "couple":"weak"}, \
+  {"name":"fdvar_strong_b15", "amp_b":1.5, "nmem":1, "method":"4dvar", "couple":"strong"}, \
 ]
 
 Calc_lv = False
@@ -63,6 +63,7 @@ def geth():
   h = np.zeros((DIMO,DIMM))
   for i in range(0, DIMM):
     h[i,i] = 1.0
+  h[3, 3] = 0.0
   h[4, 4] = 0.0 # ttk
   h[5, 5] = 0.0
   return h
