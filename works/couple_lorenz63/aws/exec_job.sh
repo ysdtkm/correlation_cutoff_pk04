@@ -24,7 +24,7 @@ git add .
 git commit -m "${JOBNAME}"
 set -e
 
-git pull; git push
+git pull && git push
 echo ""
 COMMIT=`git show HEAD | head -n1 | cut -c8-14`
 
