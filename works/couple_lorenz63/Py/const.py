@@ -13,8 +13,8 @@ STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 FCST_LT = 5
 
-OERR_A = 5.0
-OERR_O = 1.0 # ttk
+OERR_A = 1.0
+OERR_O = 5.0
 FERR_INI = 10.0
 AINT = 8
 
@@ -30,14 +30,14 @@ EXPLIST = [ \
   # {"name":"etkf_non_10mem", "rho":1.1, "nmem":10, "method":"etkf", "couple":"none", "bc":"persistent", "r_local":None}, \
   # {"name":"etkf_weak_10mem", "rho":1.1, "nmem":10, "method":"etkf", "couple":"weak", "r_local":None}, \
   {"name":"full", "rho":1.05, "nmem":10, "method":"etkf", "couple":"strong", "r_local":"full"}, \
-  {"name":"vertical", "rho":1.05, "nmem":10, "method":"etkf", "couple":"strong", "r_local":"vertical"}, \
-  {"name":"horizontal", "rho":1.05, "nmem":10, "method":"etkf", "couple":"strong", "r_local":"horizontal"}, \
-  {"name":"3-components", "rho":1.05, "nmem":10, "method":"etkf", "couple":"strong", "r_local":"3-components"}, \
-  {"name":"atmos_sees_ocean", "rho":1.05, "nmem":10, "method":"etkf", "couple":"strong", "r_local":"atmos_sees_ocean"}, \
-  {"name":"trop_sees_ocean", "rho":1.05, "nmem":10, "method":"etkf", "couple":"strong", "r_local":"trop_sees_ocean"}, \
-  {"name":"ocean_sees_atmos", "rho":1.05, "nmem":10, "method":"etkf", "couple":"strong", "r_local":"ocean_sees_atmos"}, \
-  {"name":"ocean_sees_trop", "rho":1.05, "nmem":10, "method":"etkf", "couple":"strong", "r_local":"ocean_sees_trop"}, \
   {"name":"band", "rho":1.05, "nmem":10, "method":"etkf", "couple":"strong", "r_local":"band"}, \
+  {"name":"horizontal", "rho":1.05, "nmem":10, "method":"etkf", "couple":"strong", "r_local":"horizontal"}, \
+  {"name":"vertical", "rho":1.05, "nmem":10, "method":"etkf", "couple":"strong", "r_local":"vertical"}, \
+  {"name":"3-components", "rho":1.05, "nmem":10, "method":"etkf", "couple":"strong", "r_local":"3-components"}, \
+  # {"name":"atmos_sees_ocean", "rho":1.05, "nmem":10, "method":"etkf", "couple":"strong", "r_local":"atmos_sees_ocean"}, \
+  # {"name":"trop_sees_ocean", "rho":1.05, "nmem":10, "method":"etkf", "couple":"strong", "r_local":"trop_sees_ocean"}, \
+  # {"name":"ocean_sees_atmos", "rho":1.05, "nmem":10, "method":"etkf", "couple":"strong", "r_local":"ocean_sees_atmos"}, \
+  # {"name":"ocean_sees_trop", "rho":1.05, "nmem":10, "method":"etkf", "couple":"strong", "r_local":"ocean_sees_trop"}, \
   # {"name":"dynamical", "rho":1.05, "nmem":10, "method":"etkf", "couple":"strong", "r_local":"dynamical"}, \
   # {"name":"tdvar_non_b2_ind", "amp_b":2.0, "nmem":1, "method":"3dvar", "couple":"none", "bc":"independent"}, \
   # {"name":"tdvar_non_b2", "amp_b":2.0, "nmem":1, "method":"3dvar", "couple":"none", "bc":"persistent"}, \
