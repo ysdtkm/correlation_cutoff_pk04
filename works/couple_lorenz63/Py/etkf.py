@@ -118,16 +118,31 @@ def obtain_localization_weight(dimc, j, r_local):
         [[1.0, 1.0, 0.0],
          [1.0, 1.0, 0.0],
          [1.0, 1.0, 1.0]])
+    elif r_local == "trop_sees_ocean":
+      weight_table_components = np.array(
+        [[1.0, 0.0, 0.0],
+         [0.0, 1.0, 0.0],
+         [0.0, 1.0, 1.0]])
     elif r_local == "ocean_sees_atmos":
       weight_table_components = np.array(
         [[1.0, 1.0, 1.0],
          [1.0, 1.0, 1.0],
+         [0.0, 0.0, 1.0]])
+    elif r_local == "ocean_sees_trop":
+      weight_table_components = np.array(
+        [[1.0, 0.0, 0.0],
+         [0.0, 1.0, 1.0],
          [0.0, 0.0, 1.0]])
     elif r_local == "full":
       weight_table_components = np.array(
         [[1.0, 1.0, 1.0],
          [1.0, 1.0, 1.0],
          [1.0, 1.0, 1.0]])
+    elif r_local == "band":
+      weight_table_components = np.array(
+        [[1.0, 1.0, 0.0],
+         [1.0, 1.0, 1.0],
+         [0.0, 1.0, 1.0]])
     elif r_local == "dynamical":
       pass
     else:
