@@ -63,8 +63,8 @@ def geth():
   h = np.zeros((DIMO,DIMM))
   for i in range(0, DIMM):
     h[i,i] = 1.0
-  h[7, 7] = 0.0 # ttk
-  h[8, 8] = 0.0
+  h[4, 4] = 0.0 # ttk
+  h[5, 5] = 0.0
   return h
 
 def debug_obj_print(obj, scope):
