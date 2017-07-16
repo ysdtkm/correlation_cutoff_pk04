@@ -29,10 +29,10 @@ EXPLIST = [ \
   # {"name":"etkf_strong_4mem", "rho":1.1, "nmem":4, "method":"etkf", "couple":"strong"}, \
   # {"name":"etkf_non_10mem", "rho":1.1, "nmem":10, "method":"etkf", "couple":"none", "bc":"persistent", "r_local":None}, \
   # {"name":"etkf_weak_10mem", "rho":1.1, "nmem":10, "method":"etkf", "couple":"weak", "r_local":None}, \
-  {"name":"full", "rho":1.05, "nmem":4, "method":"etkf", "couple":"strong", "r_local":"full"}, \
-  {"name":"atmos_sees_ocean", "rho":1.05, "nmem":4, "method":"etkf", "couple":"strong", "r_local":"atmos_sees_ocean"}, \
-  {"name":"ocean_sees_atmos", "rho":1.05, "nmem":4, "method":"etkf", "couple":"strong", "r_local":"ocean_sees_atmos"}, \
-  {"name":"vertical", "rho":1.05, "nmem":4, "method":"etkf", "couple":"strong", "r_local":"vertical"}, \
+  {"name":"full", "rho":1.05, "nmem":6, "method":"etkf", "couple":"strong", "r_local":"full"}, \
+  {"name":"atmos_sees_ocean", "rho":1.05, "nmem":6, "method":"etkf", "couple":"strong", "r_local":"atmos_sees_ocean"}, \
+  {"name":"ocean_sees_atmos", "rho":1.05, "nmem":6, "method":"etkf", "couple":"strong", "r_local":"ocean_sees_atmos"}, \
+  {"name":"vertical", "rho":1.05, "nmem":6, "method":"etkf", "couple":"strong", "r_local":"vertical"}, \
   # {"name":"band", "rho":1.05, "nmem":4, "method":"etkf", "couple":"strong", "r_local":"band"}, \
   # {"name":"horizontal", "rho":1.05, "nmem":4, "method":"etkf", "couple":"strong", "r_local":"horizontal"}, \
   # {"name":"3-components", "rho":1.05, "nmem":4, "method":"etkf", "couple":"strong", "r_local":"3-components"}, \
