@@ -365,8 +365,11 @@ def obtain_r2_etkf():
   plot_matrix(cov_ij, title="Cov", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-3)
   plot_matrix(cov2_ij, title="Cov2", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-6)
 
+  print("r-squared")
   matrix_nondiagonal_order(r2_ij)
+  print("covariance-squared")
   matrix_nondiagonal_order(cov2_ij)
+  print("random")
   mat_rand = np.random.randn(DIMM, DIMM)
   matrix_nondiagonal_order(mat_rand)
   return 0
