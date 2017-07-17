@@ -8,7 +8,7 @@ DIMM = 9    # dimension of model variable n
 DIMO = DIMM # dimension of observation variable m
 
 DT = 0.01
-TMAX = 100
+TMAX = 1000
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 FCST_LT = 5
@@ -36,10 +36,10 @@ EXPLIST = [ \
   # {"name":"horizontal", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"horizontal"}, \
   # {"name":"trop_sees_ocean", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"trop_sees_ocean"}, \
   # {"name":"ocean_sees_trop", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"ocean_sees_trop"}, \
-  {"name":"dynamical", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"dynamical"}, \
+  # {"name":"dynamical", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"dynamical"}, \
   {"name":"correlation", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"correlation"}, \
   {"name":"covariance", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance"}, \
-  {"name":"random", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"random"}, \
+  # {"name":"random", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"random"}, \
   # {"name":"tdvar_non_b2_ind", "amp_b":amp_b_tdvar, "nmem":1, "method":"3dvar", "couple":"none", "bc":"independent"}, \
   # {"name":"tdvar_non_b2", "amp_b":amp_b_tdvar, "nmem":1, "method":"3dvar", "couple":"none", "bc":"persistent"}, \
   # {"name":"tdvar_weak_b2", "amp_b":amp_b_tdvar, "nmem":1, "method":"3dvar", "couple":"weak"}, \
