@@ -9,6 +9,7 @@ from main import exec_nature, exec_obs, exec_free_run, exec_assim_cycle
 import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
+import matplotlib.colors as colors
 
 def test_fdvar_overflow():
   exp = EXPLIST[1]
@@ -199,7 +200,7 @@ def plot_matrix(data, name="", title="", color=plt.cm.bwr, xlabel="", ylabel="")
   fig, ax = plt.subplots(1)
   fig.subplots_adjust(left=0.12, right=0.95, bottom=0.12, top=0.92)
   cmax = np.max(np.abs(data))
-  map1 = ax.pcolor(data, cmap=color)
+  map1 = ax.pcolor(data, cmap=color, norm=colors.SymLogNorm(linthresh=0.0004*cmax))
   if (color == plt.cm.bwr):
     map1.set_clim(-1.0 * cmax, cmax)
   x0,x1 = ax.get_xlim()
@@ -304,6 +305,8 @@ def compare_coupled_vs_persistent_bc():
   plt.savefig("./rmsd_coupled_vs_persistentbc.png")
 
 def obtain_r2_etkf():
+  use_posterior = False
+
   np.random.seed(100000007*2)
   nature = exec_nature()
   obs = exec_obs(nature)
@@ -317,16 +320,24 @@ def obtain_r2_etkf():
   hist_fcst = np.fromfile("data/%s_cycle.bin" % settings["name"], np.float64)
   hist_fcst = hist_fcst.reshape((STEPS, nmem, DIMM))
 
+  r_ijt = np.empty((STEPS, DIMM, DIMM))
+  r_ijt[:,:,:] = np.nan
   r2_ijt = np.empty((STEPS, DIMM, DIMM))
   r2_ijt[:,:,:] = np.nan
+  cov_ijt = np.empty((STEPS, DIMM, DIMM))
+  cov_ijt[:,:,:] = np.nan
+  cov2_ijt = np.empty((STEPS, DIMM, DIMM))
+  cov2_ijt[:,:,:] = np.nan
+
   for it in range(STEPS//2, STEPS):
     if it % AINT == 0:
-      # reproduce background
-      fcst = np.copy(hist_fcst[it-AINT, :, :])
-      for jt in range(AINT):
-        for k in range(nmem):
-          fcst[k, :] = timestep(fcst[k,:], DT)
-
+      if use_posterior:
+        fcst = hist_fcst[it, :, :].copy()
+      else:
+        fcst = hist_fcst[it-AINT, :, :].copy()
+        for jt in range(AINT):
+          for k in range(nmem):
+            fcst[k, :] = timestep(fcst[k,:], DT)
       for i in range(DIMM):
         for j in range(DIMM):
           # a38p40
@@ -334,15 +345,22 @@ def obtain_r2_etkf():
           vector_j = np.copy(fcst[:, j])
           vector_i[:] -= np.mean(vector_i)
           vector_j[:] -= np.mean(vector_j)
-          # numera = np.sum(vector_i * vector_j) ** 2
-          # denomi = np.sum(vector_i ** 2) * np.sum(vector_j ** 2)
           numera = np.sum(vector_i * vector_j)
           denomi = (np.sum(vector_i ** 2) * np.sum(vector_j ** 2)) ** 0.5
-          r2 = numera / denomi
-          r2_ijt[it, i, j] = np.copy(r2)
+          r_ijt[it, i, j] = numera / denomi
+          r2_ijt[it, i, j] = numera ** 2 / denomi ** 2
+          cov_ijt[it, i, j] = numera
+          cov2_ijt[it, i, j] = numera **2
+
+  r_ij = np.nanmean(r_ijt, axis=0)
   r2_ij = np.nanmean(r2_ijt, axis=0)
-  print(r2_ij)
-  plot_matrix(r2_ij, title="cosine", xlabel="grid index i", ylabel="grid index j")
+  cov_ij = np.nanmean(cov_ijt, axis=0)
+  cov2_ij = np.nanmean(cov2_ijt, axis=0)
+
+  plot_matrix(r_ij, title="R", xlabel="grid index i", ylabel="grid index j")
+  plot_matrix(r2_ij, title="R2", xlabel="grid index i", ylabel="grid index j")
+  plot_matrix(cov_ij, title="Cov", xlabel="grid index i", ylabel="grid index j")
+  plot_matrix(cov2_ij, title="Cov2", xlabel="grid index i", ylabel="grid index j")
   return 0
 
 obtain_r2_etkf()
