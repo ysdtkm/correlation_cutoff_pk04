@@ -364,6 +364,45 @@ def obtain_r2_etkf():
   plot_matrix(r2_ij, title="R2", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
   plot_matrix(cov_ij, title="Cov", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-3)
   plot_matrix(cov2_ij, title="Cov2", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-6)
+
+  matrix_nondiagonal_order(r2_ij)
+  matrix_nondiagonal_order(cov2_ij)
+  mat_rand = np.random.randn(DIMM, DIMM)
+  matrix_nondiagonal_order(mat_rand)
+  return 0
+
+def matrix_nondiagonal_order(mat_ij):
+  n = len(mat_ij)
+  if len(mat_ij[0]) != n:
+    raise Exception("input matrix non-square")
+
+  nondiagonal_components = []
+  for i in range(n):
+    for j in range(i+1, n):
+      nondiagonal_components.append((i, j, mat_ij[i,j]))
+  order = sorted(nondiagonal_components, key=lambda x: x[2], reverse=True)
+
+  def find_order(k, l):
+    i = min(k, l)
+    j = max(k, l)
+    for io, cmp in enumerate(order):
+      if cmp[0] == i and cmp[1] == j:
+        return io
+    raise Exception("find_order overflow")
+
+  for i in range(n):
+    for j in range(n):
+      if i == j:
+        print("-- ", end="")
+      else:
+        odr = find_order(i, j)
+        if odr < 14:
+          print("%02d " % odr, end="")
+        else:
+          print("** ", end="")
+    print("")
+  print("")
+
   return 0
 
 obtain_r2_etkf()
