@@ -19,7 +19,7 @@ FERR_INI = 10.0
 AINT = 8
 
 rho = 1.1
-nmem = 6
+nmem = 10
 amp_b_tdvar = 2.0
 amp_b_fdvar = 1.5
 
