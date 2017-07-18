@@ -4,14 +4,17 @@ import numpy as np
 from scipy.linalg import sqrtm
 from const import *
 
-def etkf(fcst, h_nda, r_nda, yo_nda, rho, nmem, localization=False, r_local=""):
+def etkf(fcst, h_nda, r_nda, yo_nda, rho, nmem, obj_adaptive, localization=False, r_local=""):
   # fcst   <- np.array[nmem, dimc]
   # h_nda  <- np.array[DIMO, dimc]
   # r_nda  <- np.array[DIMO, DIMO]
   # yo_nda <- np.array[DIMO, 1]
   # rho    <- float
   # nmem   <- int
-  # r_local (string): localization pattern of R
+  # obj_adaptive
+  #        <- object created by etkf/init_etkf_adaptive_inflation(), or None
+  # r_local
+  #        <- (string): localization pattern of R
   # return -> np.array[dimc, nmem], np.array[dimc, dimc], np.array[dimc, dimc]
 
   h  = np.asmatrix(h_nda)
@@ -221,4 +224,35 @@ def obtain_localization_weight(dimc, j, r_local):
     pass
 
   return np.asmatrix(localization_weight)
+
+def init_etkf_adaptive_inflation():
+  # return : np.array([[delta_extra, delta_trop, delta_ocean],
+  #                    [var_extra, var_trop, var_ocean]])
+
+  if DIMM != 9:
+    raise Exception("adaptive inflation is only for 9-variable coupled model")
+
+  obj_adaptive = np.array([[1.05, 1.05, 1.05],
+                           [1.0,  1.0,  1.0]])
+  return obj_adaptive
+
+def update_adaptive_inflation(obj_adaptive, delta_this_step):
+  # obj_adaptive (in, out):
+  #   np.array([[delta_extra, delta_trop, delta_ocean],
+  #             [var_extra, var_trop, var_ocean]])
+  # delta_this_step:
+  #   np.array([delta_extra, delta_trop, delta_ocean])
+
+  vo = 1.0
+  kappa = 1.03
+
+  for i in range(3): # extra, trop, ocean
+    vf = obj_adaptive[1,i]
+    delta_new = (obj_adaptive[0,i] * vo + delta_this_step[i] * vf) / (vo + vf)
+    va = (vf * vo) / (vf + vo) * kappa # todo: check timing of multiplying kappa
+
+    obj_adaptive[0,i] = delta_new
+    obj_adaptive[1,i] = va
+
+  return obj_adaptive
 

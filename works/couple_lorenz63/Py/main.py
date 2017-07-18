@@ -83,6 +83,10 @@ def exec_assim_cycle(settings, all_fcst, all_obs):
   all_bf[:,:,:] = np.nan
   obs_used = np.empty((STEPS, DIMO))
   obs_used[:,:] = np.nan
+  if settings["method"] == "etkf" and settings["rho"] == "adaptive":
+    obj_adaptive = init_etkf_adaptive_inflation()
+  else:
+    obj_adaptive = None
 
   # forecast-analysis cycle
   for i in range(STEP_FREE, STEPS):
@@ -105,22 +109,20 @@ def exec_assim_cycle(settings, all_fcst, all_obs):
       fcst_pre = all_fcst[i-AINT,:,:].copy()
 
       if (settings["couple"] == "strong"):
-        fcst[:,:], all_bf[i,:,:], all_ba[i,:,:] = \
-          analyze_one_window(fcst, fcst_pre, all_obs[i,:], h, r, settings)
+        fcst[:,:], all_bf[i,:,:], all_ba[i,:,:], obj_adaptive = \
+          analyze_one_window(fcst, fcst_pre, all_obs[i,:], h, r, settings, obj_adaptive)
       elif (settings["couple"] == "weak" or settings["couple"] == "none"):
         dim_atm = 6
         # atmospheric assimilation
-        fcst[:, :dim_atm], \
-          all_bf[i, :dim_atm, :dim_atm], \
-          all_ba[i, :dim_atm, :dim_atm]  \
-          = analyze_one_window(fcst[:, :dim_atm], fcst_pre[:, :dim_atm], \
-            all_obs[i, :dim_atm], h[:dim_atm, :dim_atm], r[:dim_atm, :dim_atm], settings, 0, 6, persis_bc)
+        fcst[:, :dim_atm], all_bf[i, :dim_atm, :dim_atm], all_ba[i, :dim_atm, :dim_atm], obj_adaptive \
+            = analyze_one_window(fcst[:, :dim_atm], fcst_pre[:, :dim_atm],
+                                 all_obs[i, :dim_atm], h[:dim_atm, :dim_atm],
+                                 r[:dim_atm, :dim_atm], settings, obj_adaptive, 0, 6, persis_bc)
         # oceanic assimilation
-        fcst[:, dim_atm:], \
-          all_bf[i, dim_atm:, dim_atm:], \
-          all_ba[i, dim_atm:, dim_atm:]  \
-          = analyze_one_window(fcst[:, dim_atm:], fcst_pre[:, dim_atm:], \
-            all_obs[i, dim_atm:], h[dim_atm:, dim_atm:], r[dim_atm:, dim_atm:], settings, 6, 9, persis_bc)
+        fcst[:, dim_atm:], all_bf[i, dim_atm:, dim_atm:], all_ba[i, dim_atm:, dim_atm:], obj_adaptive  \
+            = analyze_one_window(fcst[:, dim_atm:], fcst_pre[:, dim_atm:],
+                                 all_obs[i, dim_atm:], h[dim_atm:, dim_atm:],
+                                 r[dim_atm:, dim_atm:], settings, obj_adaptive, 6, 9, persis_bc)
 
     all_fcst[i,:,:] = fcst[:,:]
 
@@ -131,13 +133,15 @@ def exec_assim_cycle(settings, all_fcst, all_obs):
   all_ba.tofile("data/%s_covr_anl.bin" % settings["name"])
   return all_fcst
 
-def analyze_one_window(fcst, fcst_pre, obs, h, r, settings, i_s=0, i_e=DIMM, bc=None):
+def analyze_one_window(fcst, fcst_pre, obs, h, r, settings, obj_adaptive, i_s=0, i_e=DIMM, bc=None):
   # fcst     <- np.array[nmem, dimc]
   # fcst_pre <- np.array[nmem, dimc]
   # obs      <- np.array[DIMO]
   # h        <- np.array[DIMO, dimc]
   # r        <- np.array[DIMO, DIMO]
   # settings <- hash
+  # obj_adaptive
+  #          <- object created by etkf/init_etkf_adaptive_inflation(), or None
   # i_s      <- int                  : model grid number, assimilate only [i_s, i_e)
   # i_e      <- int
   # bc       <- np.array[DIMM]
@@ -154,14 +158,15 @@ def analyze_one_window(fcst, fcst_pre, obs, h, r, settings, i_s=0, i_e=DIMM, bc=
   yo = np.dot(h[:,:], obs[:, np.newaxis])
 
   if (settings["method"] == "etkf"):
-    anl[:,:], bf[:,:], ba[:,:] = \
-        etkf(fcst[:,:], h[:,:], r[:,:], yo[:,:], settings["rho"], settings["nmem"], True, settings["r_local"])
+    anl[:,:], bf[:,:], ba[:,:], obj_adaptive = \
+        etkf(fcst[:,:], h[:,:], r[:,:], yo[:,:], settings["rho"],
+             ettings["nmem"], obj_adaptive, True, settings["r_local"])
   elif (settings["method"] == "3dvar"):
     anl[0,:] = tdvar(fcst[0,:].T, h[:,:], r[:,:], yo[:,:], i_s, i_e, settings["amp_b"])
   elif (settings["method"] == "4dvar"):
     anl[0,:] = fdvar(fcst_pre[0,:], h[:,:], r[:,:], yo[:,:], AINT, i_s, i_e, settings["amp_b"], bc)
 
-  return anl[:,:], bf[:,:], ba[:,:]
+  return anl[:,:], bf[:,:], ba[:,:], obj_adaptive
 
 def exec_deterministic_fcst(settings, anl):
   # settings <- hash
