@@ -83,7 +83,7 @@ def exec_assim_cycle(settings, all_fcst, all_obs):
   all_bf[:,:,:] = np.nan
   obs_used = np.empty((STEPS, DIMO))
   obs_used[:,:] = np.nan
-  if settings["method"] == "etkf" and settings["rho"] == "adaptive":
+  if True or (settings["method"] == "etkf" and settings["rho"] == "adaptive"):
     obj_adaptive = init_etkf_adaptive_inflation()
   else:
     obj_adaptive = None
@@ -160,7 +160,7 @@ def analyze_one_window(fcst, fcst_pre, obs, h, r, settings, obj_adaptive, i_s=0,
   if (settings["method"] == "etkf"):
     anl[:,:], bf[:,:], ba[:,:], obj_adaptive = \
         etkf(fcst[:,:], h[:,:], r[:,:], yo[:,:], settings["rho"],
-             ettings["nmem"], obj_adaptive, True, settings["r_local"])
+             settings["nmem"], obj_adaptive, True, settings["r_local"])
   elif (settings["method"] == "3dvar"):
     anl[0,:] = tdvar(fcst[0,:].T, h[:,:], r[:,:], yo[:,:], i_s, i_e, settings["amp_b"])
   elif (settings["method"] == "4dvar"):

@@ -4,6 +4,8 @@ import numpy as np
 from scipy.linalg import sqrtm
 from const import *
 
+ttk_list = []
+
 def etkf(fcst, h_nda, r_nda, yo_nda, rho, nmem, obj_adaptive, localization=False, r_local=""):
   # fcst   <- np.array[nmem, dimc]
   # h_nda  <- np.array[DIMO, dimc]
@@ -58,6 +60,13 @@ def etkf(fcst, h_nda, r_nda, yo_nda, rho, nmem, obj_adaptive, localization=False
   if localization:
     xai = np.matrix(np.zeros((dimc, nmem)))
 
+    # adaptive inflation
+    delta_this = obtain_delta_this_step(yo, yb, ybpt, r, nmem)
+    obj_adaptive = update_adaptive_inflation(obj_adaptive, delta_this)
+    ttk_list.append(obj_adaptive[0])
+    if len(ttk_list) % 100 == 0:
+      print(np.mean(ttk_list, axis=0))
+
     for j in range(dimc):
       # step 3
       localization_weight = obtain_localization_weight(dimc, j, r_local)
@@ -68,6 +77,10 @@ def etkf(fcst, h_nda, r_nda, yo_nda, rho, nmem, obj_adaptive, localization=False
       xfptl = xfpt[j,:].copy()
       rl = r[:,:].copy()
 
+      # adaptive inflation
+      component = [0,0,0,1,1,1,2,2,2]
+      rho = obj_adaptive[0,component[j]]
+
       # step 4-9
       cl = ybptl.T * np.asmatrix(rl.I.A * localization_weight.A)
       pal = (((nmem-1.0)/rho) * I_mm + cl * ybptl).I
@@ -77,7 +90,7 @@ def etkf(fcst, h_nda, r_nda, yo_nda, rho, nmem, obj_adaptive, localization=False
       xai[j,:] = xail[:,:]
 
     xapt = xai - np.mean(xai[:,:], axis=1) * I_1m
-    return np.real(xai.T.A), (xfpt * xfpt.T).A, (xapt * xapt.T).A
+    return np.real(xai.T.A), (xfpt * xfpt.T).A, (xapt * xapt.T).A, obj_adaptive
 
   else:
     pa   = (((nmem-1.0)/rho) * I_mm + ybpt.T * r.I * ybpt).I
@@ -86,7 +99,7 @@ def etkf(fcst, h_nda, r_nda, yo_nda, rho, nmem, obj_adaptive, localization=False
     xapt = (xfm - xf * I_1m) * wam
     xa   = xf + xfm * wa
     xam  = xapt + xa * I_1m
-    return np.real(xam.T.A), (xfpt * xfpt.T).A, (xapt * xapt.T).A
+    return np.real(xam.T.A), (xfpt * xfpt.T).A, (xapt * xapt.T).A, obj_adaptive
 
 def obtain_localization_weight(dimc, j, r_local):
   # dimc   <- int : cimension of analyzed component
@@ -246,13 +259,32 @@ def update_adaptive_inflation(obj_adaptive, delta_this_step):
   vo = 1.0
   kappa = 1.03
 
-  for i in range(3): # extra, trop, ocean
-    vf = obj_adaptive[1,i]
-    delta_new = (obj_adaptive[0,i] * vo + delta_this_step[i] * vf) / (vo + vf)
-    va = (vf * vo) / (vf + vo) * kappa # todo: check timing of multiplying kappa
+  # limit delta_this_step
+  delta_max = np.array([1.2, 1.2, 1.2])
+  delta_min = np.array([0.9, 0.9, 0.9])
+  delta_this_step = np.max(np.row_stack((delta_min, delta_this_step)), axis=0)
+  delta_this_step = np.min(np.row_stack((delta_max, delta_this_step)), axis=0)
 
-    obj_adaptive[0,i] = delta_new
-    obj_adaptive[1,i] = va
+  vf = obj_adaptive[1,:].copy()
+  delta_new = (obj_adaptive[0,:] * vo + delta_this_step[:] * vf[:]) / (vo + vf[:])
+  va = (vf[:] * vo) / (vf[:] + vo) * kappa # todo: check timing of multiplying kappa
+
+  obj_adaptive[0,:] = delta_new[:]
+  obj_adaptive[1,:] = va[:]
 
   return obj_adaptive
 
+def obtain_delta_this_step(yo, yb, ybpt, r, nmem):
+
+  if DIMM != 9:
+    raise Exception("this method is only used when DIMM == 9")
+
+  delta = np.empty(3)
+  for i in range(3):
+    yol = yo[i*3:i*3+3]
+    ybl = yb[i*3:i*3+3]
+    ybptl = ybpt[i*3:i*3+3,:]
+    rl = r[i*3:i*3+3,i*3:i*3+3]
+    dob = yol - ybl
+    delta[i] = (dob.T.dot(dob) - np.trace(rl)) / np.trace(ybptl.dot(ybptl.T) / (nmem-1))
+  return delta
