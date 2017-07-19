@@ -260,7 +260,7 @@ def update_adaptive_inflation(obj_adaptive, delta_this_step):
   #   np.array([delta_extra, delta_trop, delta_ocean])
 
   vo = 1.0
-  kappa = 1.03
+  kappa = 1.01
   # limit delta_this_step
   delta_max = np.array([1.2, 1.2, 1.2])
   delta_min = np.array([0.9, 0.9, 0.9])

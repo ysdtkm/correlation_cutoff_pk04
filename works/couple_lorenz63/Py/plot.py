@@ -482,6 +482,7 @@ def plot_adaptive_inflation(name):
 
   plt.xlim(0, STEPS)
   plt.ylim(0.9, 1.2)
+  plt.axhline(y=1.0, color="black", alpha=0.5)
   plt.title("adaptive inflation")
   plt.legend()
   plt.savefig("./image/%s/%s_inflation.pdf" % (name, name))
