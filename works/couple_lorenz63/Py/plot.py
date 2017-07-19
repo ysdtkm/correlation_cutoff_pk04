@@ -47,6 +47,7 @@ def plot_all():
 
     plot_rmse_spread(hist_true, hist_fcst, name, nmem)
     plot_time_value(hist_true, hist_fcst, hist_obs, name, nmem)
+    plot_adaptive_inflation(name)
     if Plot_3d:
       plot_3d_trajectory(hist_true, hist_fcst, name, nmem)
 
@@ -469,5 +470,21 @@ def plot_rmse_bar(hist_true):
   plt.savefig("./image/true/rmse_bar.pdf")
 
   return 0
+
+def plot_adaptive_inflation(name):
+  hist_infl = np.fromfile("data/%s_inflation.bin" % name, np.float64)
+  hist_infl = hist_infl.reshape((STEPS, 3))
+
+  for i in range(3):
+    name_component = ["extra", "trop", "ocean"][i]
+    color = ["r", "g", "b"][i]
+    plt.plot(hist_infl[:,i], color=color, label=name_component)
+
+  plt.xlim(0, STEPS)
+  plt.ylim(0.9, 1.2)
+  plt.title("adaptive inflation")
+  plt.legend()
+  plt.savefig("./image/%s/%s_inflation.pdf" % (name, name))
+  plt.close()
 
 plot_all()
