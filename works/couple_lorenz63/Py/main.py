@@ -86,7 +86,7 @@ def exec_assim_cycle(settings, all_fcst, all_obs):
 
   all_inflation = np.empty((STEPS, 3))
   all_inflation[:,:] = np.nan
-  if True or (settings["method"] == "etkf" and settings["rho"] == "adaptive"):
+  if settings["method"] == "etkf" and (settings["rho"] == "adaptive" or settings["rho"] == "adaptive_each"):
     obj_adaptive = init_etkf_adaptive_inflation()
   else:
     obj_adaptive = None
@@ -128,7 +128,7 @@ def exec_assim_cycle(settings, all_fcst, all_obs):
                                  r[dim_atm:, dim_atm:], settings, obj_adaptive, 6, 9, persis_bc)
 
     all_fcst[i,:,:] = fcst[:,:]
-    if settings["method"] == "etkf" and settings["rho"] == "adaptive":
+    if settings["method"] == "etkf" and (settings["rho"] == "adaptive" or settings["rho"] == "adaptive_each"):
       all_inflation[i,:] = obj_adaptive[0,:]
 
   # save to files
@@ -136,7 +136,7 @@ def exec_assim_cycle(settings, all_fcst, all_obs):
   all_fcst.tofile("data/%s_cycle.bin" % settings["name"])
   all_bf.tofile("data/%s_covr_back.bin" % settings["name"])
   all_ba.tofile("data/%s_covr_anl.bin" % settings["name"])
-  if settings["method"] == "etkf" and settings["rho"] == "adaptive":
+  if settings["method"] == "etkf" and (settings["rho"] == "adaptive" or settings["rho"] == "adaptive_each"):
     all_inflation.tofile("data/%s_inflation.bin" % settings["name"])
 
   return all_fcst

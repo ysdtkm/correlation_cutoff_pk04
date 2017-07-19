@@ -59,7 +59,10 @@ def etkf(fcst, h_nda, r_nda, yo_nda, rho_in, nmem, obj_adaptive, localization=Fa
     xai = np.matrix(np.zeros((dimc, nmem)))
 
     if rho_in == "adaptive":
-      delta_this = obtain_delta_this_step(yo, yb, ybpt, r, nmem)
+      delta_this = obtain_delta_this_step(yo, yb, ybpt, r, nmem, True)
+      obj_adaptive = update_adaptive_inflation(obj_adaptive, delta_this)
+    elif rho_in == "adaptive_each":
+      delta_this = obtain_delta_this_step(yo, yb, ybpt, r, nmem, False)
       obj_adaptive = update_adaptive_inflation(obj_adaptive, delta_this)
 
     for j in range(dimc):
@@ -72,7 +75,7 @@ def etkf(fcst, h_nda, r_nda, yo_nda, rho_in, nmem, obj_adaptive, localization=Fa
       xfptl = xfpt[j,:].copy()
       rl = r[:,:].copy()
 
-      if rho_in == "adaptive":
+      if rho_in == "adaptive" or rho_in == "adaptive_each":
         component = [0,0,0,1,1,1,2,2,2]
         rho = obj_adaptive[0,component[j]]
       else:
@@ -91,7 +94,7 @@ def etkf(fcst, h_nda, r_nda, yo_nda, rho_in, nmem, obj_adaptive, localization=Fa
 
   else:
 
-    if rho_in == "adaptive":
+    if rho_in == "adaptive" or rho_in == "adaptive_each":
       raise Exception("non-localized ETKF cannot handle adaptive inflation")
     else:
       rho = rho_in
@@ -261,29 +264,29 @@ def update_adaptive_inflation(obj_adaptive, delta_this_step):
 
   vo = 1.0
   kappa = 1.01
+
   # limit delta_this_step
   delta_max = np.array([1.2, 1.2, 1.2])
   delta_min = np.array([0.9, 0.9, 0.9])
   delta_this_step = np.max(np.row_stack((delta_min, delta_this_step)), axis=0)
   delta_this_step = np.min(np.row_stack((delta_max, delta_this_step)), axis=0)
 
-  vf = obj_adaptive[1,:].copy()
+  vf = obj_adaptive[1,:].copy() * kappa
   delta_new = (obj_adaptive[0,:] * vo + delta_this_step[:] * vf[:]) / (vo + vf[:])
-  va = (vf[:] * vo) / (vf[:] + vo) * kappa # todo: check timing of multiplying kappa
+  va = (vf[:] * vo) / (vf[:] + vo)
 
   obj_adaptive[0,:] = delta_new[:]
   obj_adaptive[1,:] = va[:]
 
   return obj_adaptive
 
-def obtain_delta_this_step(yo, yb, ybpt, r, nmem):
+def obtain_delta_this_step(yo, yb, ybpt, r, nmem, common):
 
-  if DIMM != 9:
+  if DIMM != 9 or yo.shape[0] != 9:
     raise Exception("this method is only used when DIMM == 9")
 
   delta = np.empty(3)
 
-  common = False
   if common:
     dob = yo - yb
     delta[:] = (dob.T.dot(dob) - np.trace(r)) / np.trace(ybpt.dot(ybpt.T) / (nmem-1))
