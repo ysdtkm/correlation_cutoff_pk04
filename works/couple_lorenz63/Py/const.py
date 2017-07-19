@@ -31,11 +31,11 @@ EXPLIST = [ \
   {"name":"horizontal", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"horizontal"}, \
   {"name":"vertical", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"vertical"}, \
   {"name":"3-components", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"3-components"}, \
-  {"name":"atmos_sees_ocean", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"atmos_sees_ocean"}, \
-  {"name":"ocean_sees_atmos", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"ocean_sees_atmos"}, \
+  # {"name":"atmos_sees_ocean", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"atmos_sees_ocean"}, \
+  # {"name":"ocean_sees_atmos", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"ocean_sees_atmos"}, \
   # {"name":"horizontal", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"horizontal"}, \
-  {"name":"trop_sees_ocean", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"trop_sees_ocean"}, \
-  {"name":"ocean_sees_trop", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"ocean_sees_trop"}, \
+  # {"name":"trop_sees_ocean", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"trop_sees_ocean"}, \
+  # {"name":"ocean_sees_trop", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"ocean_sees_trop"}, \
   # {"name":"dynamical", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"dynamical"}, \
   # {"name":"correlation", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"correlation"}, \
   # {"name":"covariance", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance"}, \
