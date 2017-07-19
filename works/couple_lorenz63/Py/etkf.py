@@ -283,7 +283,7 @@ def obtain_delta_this_step(yo, yb, ybpt, r, nmem):
 
   delta = np.empty(3)
 
-  common = True
+  common = False
   if common:
     dob = yo - yb
     delta[:] = (dob.T.dot(dob) - np.trace(r)) / np.trace(ybpt.dot(ybpt.T) / (nmem-1))
