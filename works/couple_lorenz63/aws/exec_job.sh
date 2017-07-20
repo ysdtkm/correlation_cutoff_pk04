@@ -27,6 +27,7 @@ set -e
 git pull && git push
 echo ""
 COMMIT=`git show HEAD | head -n1 | cut -c8-14`
+DATE=`date "+%Y%m%d_%H%M"`
 
 cat <<EOF > ./aws/env.json
 {
@@ -44,7 +45,7 @@ cat <<EOF > ./aws/env.json
     },
     {
       "name": "BATCH_JOB_NAME",
-      "value": "${JOBNAME}"
+      "value": "${DATE}_${COMMIT}_${JOBNAME}"
     },
     {
       "name": "BATCH_COMMIT",
@@ -55,9 +56,8 @@ cat <<EOF > ./aws/env.json
 EOF
 
 aws s3 cp aws/myjob.sh s3://ysdtkm-bucket-1/
-DATE=`date "+%Y%m%d_%H%M"`
 id=`aws batch submit-job \
-  --job-name ${DATE}_${JOBNAME} \
+  --job-name ${DATE}_${COMMIT}_${JOBNAME} \
   --job-queue ${queue} \
   --job-definition def-with-other-image:9 \
   --container-overrides file://aws/env.json | grep jobId`
