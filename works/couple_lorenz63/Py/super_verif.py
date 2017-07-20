@@ -21,6 +21,11 @@ def verif(param1s, param2s, param3s):
       rf.close()
 
   plot(rmse_all, param1s, param2s, param3s)
+  try:
+    plot_min3(rmse_all, param1s, param2s, param3s)
+  except:
+    print("if param1s is not number, plot_min3 is skipped")
+
   return 0
 
 def plot(rmse_all, param1s, param2s, param3s):
@@ -33,6 +38,20 @@ def plot(rmse_all, param1s, param2s, param3s):
         plt.plot(x, rmse_all[i,j,:,ic], color=colors[ic], linestyle=styles[j], label=(["extra", "trop", "ocean"][ic] + "_" + param2))
     plt.legend()
     plt.savefig("verif/verif_%s.pdf" % param1)
+    plt.clf()
+    plt.close()
+  return 0
+
+def plot_min3(rmse_all, param1s, param2s, param3s):
+  x = list(map(float, param1s))
+  colors = ["r", "g", "b"]
+  styles = ["solid", "dotted", "dashed", "dashdot"]
+  rmse_min = np.mean(rmse_all, axis=2)
+  for ic in range(lenc):
+    for j, param2 in enumerate(param2s):
+      plt.plot(x, rmse_min[:,j,ic], color=colors[ic], linestyle=styles[j], label=(["extra", "trop", "ocean"][ic] + "_" + param2))
+    plt.legend()
+    plt.savefig("verif/verif_min.pdf")
     plt.clf()
     plt.close()
   return 0
