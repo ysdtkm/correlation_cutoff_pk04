@@ -8,9 +8,9 @@ import numpy as np
 
 from_template = True
 flag_test = False
-param1s = ["4", "6"]
+param1s = ["4", "5", "6"]
 param2s = ["full", "3-components"]
-param3s = list(map(str, np.linspace(1.00, 1.05, 2)))
+param3s = list(map(str, np.linspace(1.00, 1.05, 3)))
 # ====================================
 
 if flag_test:
