@@ -54,10 +54,10 @@ def plot_min3(rmse_all, param1s, param2s, param3s):
     for j, param2 in enumerate(param2s):
       plt.plot(x, rmse_min[:,j,ic], color=colors[ic], linestyle=styles[j],
                label=(["extra", "trop", "ocean"][ic] + "_" + param2))
-    plt.legend()
-    plt.savefig("verif/verif_min.pdf")
-    plt.clf()
-    plt.close()
+  plt.legend()
+  plt.savefig("verif/verif_min.pdf")
+  plt.clf()
+  plt.close()
   return 0
 
 if __name__ == "__main__":
