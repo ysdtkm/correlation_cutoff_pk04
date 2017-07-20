@@ -256,7 +256,7 @@ def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
       plt.clf()
       plt.close()
     f = open("./image/true/rmse.txt", "a")
-    f.write(("%-25s" % name) + str(["%5g" % x for x in rmse_component]) + "\n")
+    f.write(("%-25s" % name) + " ".join(map(str, rmse_component)) + "\n")
     print("%-25s" % name, ["%5g" % x for x in rmse_component])
     f.close()
     rmse_hash[name] = rmse_component

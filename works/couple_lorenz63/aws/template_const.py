@@ -24,7 +24,7 @@ amp_b_tdvar = 2.0
 amp_b_fdvar = 1.5
 
 EXPLIST = [ \
-  {"name":"horizontal", "rho":<<param1>>, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"horizontal"}, \
+  {"name":"<<param1>>", "rho":<<param2>>, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"<<param1>>"}, \
 ]
 
 Calc_lv = False
