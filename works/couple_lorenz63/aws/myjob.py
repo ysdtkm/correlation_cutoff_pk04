@@ -10,7 +10,7 @@ from_template = True
 flag_test = (socket.gethostname()[:7] == "DESKTOP")
 param1s = ["4", "5", "6"]
 param2s = ["full", "band", "horizontal", "3-components"]
-param3s = list(map(str, np.linspace(1.00, 1.05, 6))) + ["adaptive"]
+param3s = list(map(str, np.linspace(1.00, 1.05, 6))) + ['"adaptive"']
 # ====================================
 
 def main():
