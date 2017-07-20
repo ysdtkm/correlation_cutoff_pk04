@@ -10,7 +10,7 @@ from_template = True
 flag_test = False
 param1s = ["4", "6"]
 param2s = ["full", "3-components", "band"]
-param3s = list(map(str, np.linspace(1.00, 1.05, 11)))
+param3s = list(map(str, np.linspace(1.00, 1.05, 5)))
 # ====================================
 
 if flag_test:
