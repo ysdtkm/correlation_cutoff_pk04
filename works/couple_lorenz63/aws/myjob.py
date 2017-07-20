@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 
 import os, subprocess, sys, re
+import numpy as np
 
 # ====================================
 # largest param is innermost paramter
 
 from_template = True
 flag_test = False
-param1s = ["full", "3-components"]
-param2s = ["1.05", "1.1"]
+param1s = ["full", "3-components", "band"]
+param2s = listnp.linspace(1.01, 1.10, 11))
 # ====================================
 
 if flag_test:
@@ -38,8 +39,8 @@ if from_template:
 
       os.system("cp -f data/lyapunov.txt image/true/")
       os.system("cp -f latex/out.pdf image/")
-      os.system("aws s3 cp image s3://ysdtkm-bucket-1/couple_lorenz63/tar/%s_%s_%s --recursive" % (job_name, param1, param2))
-      os.system("aws s3 cp latex/out.pdf s3://ysdtkm-bucket-1/couple_lorenz63/%s_%s_%s.pdf" % (job_name, param1, param2))
+      os.system("aws s3 cp image s3://ysdtkm-bucket-1/couple_lorenz63/tar/%s/%s_%s --recursive" % (job_name, param1, param2))
+      os.system("aws s3 cp latex/out.pdf s3://ysdtkm-bucket-1/couple_lorenz63/%s/%s_%s.pdf" % (job_name, param1, param2))
       os.system("rm -rf image_%s_%s" % (param1, param2))
       os.system("mv image image_%s_%s" % (param1, param2))
 
@@ -47,7 +48,7 @@ if from_template:
   import super_verif
   os.system("mkdir -p verif")
   super_verif.verif(param1s, param2s)
-  os.system("aws s3 cp verif s3://ysdtkm-bucket-1/couple_lorenz63/%s_all --recursive" % job_name)
+  os.system("aws s3 cp verif s3://ysdtkm-bucket-1/couple_lorenz63/%s --recursive" % job_name)
 
 else:
   subprocess.check_call("make")
