@@ -22,7 +22,8 @@ commit = os.getenv("BATCH_COMMIT", "dummy")
 job_name = os.getenv("BATCH_JOB_NAME", "dummy_job")
 
 subprocess.check_call(["git", "pull"])
-# subprocess.check_call(["git", "checkout", commit])
+if not flag_test:
+  subprocess.check_call(["git", "checkout", commit])
 
 if from_template:
   for param1 in param1s:
@@ -53,7 +54,7 @@ if from_template:
   import super_verif
   os.system("mkdir -p verif")
   super_verif.verif(param1s, param2s, param3s)
-  os.system("aws s3 cp verif s3://ysdtkm-bucket-1/couple_lorenz63/%s --recursive" % job_name)
+  os.system("aws s3 sync verif s3://ysdtkm-bucket-1/couple_lorenz63/%s" % job_name)
 
 else:
   subprocess.check_call("make")
