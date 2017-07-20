@@ -29,6 +29,7 @@ def verif(param1s, param2s, param3s):
   return 0
 
 def plot(rmse_all, param1s, param2s, param3s):
+  lenc = 3 # extra, trop, ocean
   x = list(map(float, param3s))
   colors = ["r", "g", "b"]
   styles = ["solid", "dotted", "dashed", "dashdot"]
@@ -43,13 +44,16 @@ def plot(rmse_all, param1s, param2s, param3s):
   return 0
 
 def plot_min3(rmse_all, param1s, param2s, param3s):
+  # take minimum along param3s, and plot it on param1s-param2s
+  lenc = 3 # extra, trop, ocean
   x = list(map(float, param1s))
   colors = ["r", "g", "b"]
   styles = ["solid", "dotted", "dashed", "dashdot"]
   rmse_min = np.mean(rmse_all, axis=2)
   for ic in range(lenc):
     for j, param2 in enumerate(param2s):
-      plt.plot(x, rmse_min[:,j,ic], color=colors[ic], linestyle=styles[j], label=(["extra", "trop", "ocean"][ic] + "_" + param2))
+      plt.plot(x, rmse_min[:,j,ic], color=colors[ic], linestyle=styles[j],
+               label=(["extra", "trop", "ocean"][ic] + "_" + param2))
     plt.legend()
     plt.savefig("verif/verif_min.pdf")
     plt.clf()
