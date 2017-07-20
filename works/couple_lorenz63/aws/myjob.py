@@ -9,7 +9,7 @@ import numpy as np
 from_template = True
 flag_test = False
 param1s = ["full", "3-components", "band"]
-param2s = list(map(str, np.linspace(1.01, 1.10, 11)))
+param2s = list(map(str, np.linspace(1.00, 1.05, 11)))
 # ====================================
 
 if flag_test:
