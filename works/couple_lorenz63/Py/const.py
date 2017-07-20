@@ -8,7 +8,7 @@ DIMM = 9    # dimension of model variable n
 DIMO = DIMM # dimension of observation variable m
 
 DT = 0.01
-TMAX = 100
+TMAX = 1
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 FCST_LT = 5
@@ -32,9 +32,9 @@ EXPLIST = [ \
   # {"name":"vertical", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"vertical"}, \
   # {"name":"atmos_sees_ocean", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"atmos_sees_ocean"}, \
   # {"name":"ocean_sees_atmos", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"ocean_sees_atmos"}, \
-  {"name":"trop_sees_ocean", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"trop_sees_ocean"}, \
-  {"name":"ocean_sees_trop", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"ocean_sees_trop"}, \
-  {"name":"3-components", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"3-components"}, \
+  # {"name":"trop_sees_ocean", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"trop_sees_ocean"}, \
+  # {"name":"ocean_sees_trop", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"ocean_sees_trop"}, \
+  # {"name":"3-components", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"3-components"}, \
   # {"name":"dynamical", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"dynamical"}, \
   # {"name":"correlation", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"correlation"}, \
   # {"name":"covariance", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance"}, \
