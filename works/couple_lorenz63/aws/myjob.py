@@ -66,6 +66,9 @@ def main():
     os.system("aws s3 cp latex/out.pdf s3://ysdtkm-bucket-1/couple_lorenz63/%s.pdf" % job_name)
 
 def sanitize_num(strin):
-  return re.sub("\.", "", strin)
+  tmp = strin
+  tmp = re.sub("\"", "", tmp)
+  tmp = re.sub("\.", "", tmp)
+  return tmp
 
 main()
