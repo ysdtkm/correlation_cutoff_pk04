@@ -8,9 +8,9 @@ import numpy as np
 
 from_template = True
 flag_test = (socket.gethostname()[:7] == "DESKTOP")
-param1s = ["4", "5"]
-param2s = ["full", "3-components"]
-param3s = list(map(str, np.linspace(1.00, 1.05, 3)))
+param1s = ["4", "5", "6"]
+param2s = ["full", "band", "horizontal", "3-components"]
+param3s = list(map(str, np.linspace(1.00, 1.05, 6)))
 # ====================================
 
 def main():

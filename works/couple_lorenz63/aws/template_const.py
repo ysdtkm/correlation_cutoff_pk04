@@ -8,7 +8,7 @@ DIMM = 9    # dimension of model variable n
 DIMO = DIMM # dimension of observation variable m
 
 DT = 0.01
-TMAX = 10
+TMAX = 100
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 FCST_LT = 5
@@ -18,7 +18,7 @@ OERR_O = 5.0
 FERR_INI = 10.0
 AINT = 8
 
-rho = "adaptive"
+# rho = "adaptive"
 nmem = <<param1>>
 amp_b_tdvar = 2.0
 amp_b_fdvar = 1.5
