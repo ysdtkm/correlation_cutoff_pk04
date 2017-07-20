@@ -5,28 +5,36 @@ import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
 
-def verif(param1s, param2s):
+def verif(param1s, param2s, param3s):
   len1 = len(param1s)
   len2 = len(param2s)
+  len3 = len(param3s)
   lenc = 3 # extra, trop, ocean
 
-  rmse_all = np.zeros((len1, len2, lenc))
+  rmse_all = np.zeros((len1, len2, len3, lenc))
   for i, param1 in enumerate(param1s):
     for j, param2 in enumerate(param2s):
       rf = open("image_%s_%s/true/rmse.txt" % (param1, param2), "r")
-      for line in rf:
+      for k, line in enumerate(rf):
         rmse = list(map(float, line.split()[1:]))
-        rmse_all[i,j,:] = np.array(rmse)
+        rmse_all[i,j,k:] = np.array(rmse)
       rf.close()
 
-  x = list(map(float, param2s))
+  plot(rmse_all, param1s, param2s, param3s)
+  return 0
+
+def plot(rmse_all, param1s, param2s, param3s):
+  x = list(map(float, param3s))
   colors = ["r", "g", "b"]
   styles = ["solid", "dotted", "dashed", "dashdot"]
-  for ic in range(lenc):
-    for i, param1 in enumerate(param1s):
-      plt.plot(x, rmse_all[i,:,ic], color=colors[ic], linestyle=styles[i], label=(["extra", "trop", "ocean"][ic] + "_" + param1))
-  plt.legend()
-  plt.savefig("verif/verif.pdf")
+  for i, param1 in enumerate(param1s):
+    for ic in range(lenc):
+      for j, param2 in enumerate(param2s):
+        plt.plot(x, rmse_all[i,j,:,ic], color=colors[ic], linestyle=styles[j], label=(["extra", "trop", "ocean"][ic] + "_" + param2))
+    plt.legend()
+    plt.savefig("verif/verif_%s.pdf" % param1)
+    plt.clf()
+    plt.close()
   return 0
 
 if __name__ == "__main__":

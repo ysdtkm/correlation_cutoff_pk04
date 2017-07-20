@@ -8,8 +8,9 @@ import numpy as np
 
 from_template = True
 flag_test = False
-param1s = ["full", "3-components", "band"]
-param2s = list(map(str, np.linspace(1.00, 1.05, 11)))
+param1s = ["4", "6"]
+param2s = ["full", "3-components", "band"]
+param3s = list(map(str, np.linspace(1.00, 1.05, 11)))
 # ====================================
 
 if flag_test:
@@ -31,7 +32,11 @@ if from_template:
       for line in rf:
         tmp = re.sub("<<param1>>", param1, line)
         tmp = re.sub("<<param2>>", param2, tmp)
-        wf.write(tmp)
+        if "<<param3>>" in tmp:
+          for param3 in param3s:
+            wf.write(re.sub("<<param3>>", param3, tmp))
+        else:
+          wf.write(tmp)
       rf.close()
       wf.close()
 
@@ -47,7 +52,7 @@ if from_template:
   sys.path.append('Py')
   import super_verif
   os.system("mkdir -p verif")
-  super_verif.verif(param1s, param2s)
+  super_verif.verif(param1s, param2s, param3s)
   os.system("aws s3 cp verif s3://ysdtkm-bucket-1/couple_lorenz63/%s --recursive" % job_name)
 
 else:
