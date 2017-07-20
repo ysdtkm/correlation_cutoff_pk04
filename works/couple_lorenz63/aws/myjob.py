@@ -43,7 +43,8 @@ if from_template:
       os.system("rm -rf image_%s_%s" % (param1, param2))
       os.system("mv image image_%s_%s" % (param1, param2))
 
-  from Py import super_verif
+  sys.path.append('Py')
+  import super_verif
   os.system("mkdir -p verif")
   super_verif.verif(param1s, param2s)
   os.system("aws s3 cp verif s3://ysdtkm-bucket-1/couple_lorenz63/%s_all --recursive" % job_name)
