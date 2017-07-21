@@ -120,17 +120,17 @@ def obtain_localization_weight(dimc, j, r_local):
 
   if dimc == DIMM: # strongly coupled
     # weight_table[iy, ix] is weight of iy-th obs for ix-th grid
-    if r_local == "3-components":
+    if r_local == "individual":
       weight_table_components = np.array(
         [[1.0, 0.0, 0.0],
          [0.0, 1.0, 0.0],
          [0.0, 0.0, 1.0]])
-    elif r_local == "vertical":
+    elif r_local == "extra_trop_couple":
       weight_table_components = np.array(
         [[1.0, 1.0, 0.0],
          [1.0, 1.0, 0.0],
          [0.0, 0.0, 1.0]])
-    elif r_local == "horizontal":
+    elif r_local == "trop_ocean_couple":
       weight_table_components = np.array(
         [[1.0, 0.0, 0.0],
          [0.0, 1.0, 1.0],
@@ -160,14 +160,16 @@ def obtain_localization_weight(dimc, j, r_local):
         [[1.0, 1.0, 1.0],
          [1.0, 1.0, 1.0],
          [1.0, 1.0, 1.0]])
-    elif r_local == "band":
+    elif r_local == "see_adjacent":
       weight_table_components = np.array(
         [[1.0, 1.0, 0.0],
          [1.0, 1.0, 1.0],
          [0.0, 1.0, 1.0]])
     elif (r_local == "dynamical" or
-          r_local == "correlation" or
-          r_local == "covariance" or
+          r_local == "rms_correlation" or
+          r_local == "rms_covariance" or
+          r_local == "mean_correlation" or
+          r_local == "mean_covariance" or
           r_local == "random"):
       pass
     else:
@@ -186,7 +188,7 @@ def obtain_localization_weight(dimc, j, r_local):
         [0,0,0,  1,0,0,  1,1,1],
         [0,0,0,  0,1,0,  1,1,1],
         [0,0,0,  0,0,1,  1,1,1]], dtype=np.float64)
-    elif r_local == "correlation": # commit:9104078
+    elif r_local == "rms_correlation": # commit:9104078
       weight_table = np.array([
         [1,1,1,  0,0,0,  0,0,0],
         [1,1,1,  0,0,0,  0,0,0],
@@ -199,7 +201,7 @@ def obtain_localization_weight(dimc, j, r_local):
         [0,0,0,  0,1,1,  1,1,1],
         [0,0,0,  0,0,1,  1,1,1],
         [0,0,0,  1,1,1,  1,1,1]], dtype=np.float64)
-    elif r_local == "covariance":
+    elif r_local == "rms_covariance":
       weight_table = np.array([
         [1,1,1,  0,0,0,  0,0,0],
         [1,1,1,  0,0,0,  0,0,0],

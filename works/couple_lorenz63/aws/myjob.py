@@ -9,7 +9,7 @@ import numpy as np
 from_template = True
 flag_test = (socket.gethostname()[:7] == "DESKTOP")
 param1s = ["4", "6"]
-param2s = ["full", "3-components"]
+param2s = ["full", "individual"]
 param3s = ['1.02', '"adaptive"']
 # ====================================
 
