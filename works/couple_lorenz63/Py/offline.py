@@ -108,7 +108,7 @@ def obtain_r2_etkf():
   np.random.seed(100000007*2)
   nature = exec_nature()
   obs = exec_obs(nature)
-  settings = {"name":"etkf_strong_int8",  "rho":1.1, "nmem":10,
+  settings = {"name":"etkf_strong_int8",  "rho":"adaptive", "nmem":10,
               "method":"etkf", "couple":"strong", "r_local": "full"}
   np.random.seed(100000007*3)
   free = exec_free_run(settings)
@@ -173,18 +173,12 @@ def obtain_r2_etkf():
   matrix_nondiagonal_order(mat_rand)
   return 0
 
-def matrix_nondiagonal_order(mat_ij):
+def matrix_nondiagonal_order(mat_ij, prioritize_diag=True, max_odr=81):
   n = len(mat_ij)
   if len(mat_ij[0]) != n:
     raise Exception("input matrix non-square")
 
-  nondiagonal_components = []
-  for i in range(n):
-    for j in range(i+1, n):
-      nondiagonal_components.append((i, j, mat_ij[i,j]))
-  order = sorted(nondiagonal_components, key=lambda x: x[2], reverse=True)
-
-  def find_order(k, l):
+  def find_order(k, l, order):
     i = min(k, l)
     j = max(k, l)
     for io, cmp in enumerate(order):
@@ -192,18 +186,42 @@ def matrix_nondiagonal_order(mat_ij):
         return io
     raise Exception("find_order overflow")
 
-  for i in range(n):
-    for j in range(n):
-      if i == j:
-        print("-- ", end="")
-      else:
-        odr = find_order(i, j)
-        if odr < 14:
+  if prioritize_diag:
+    nondiagonal_components = []
+    for i in range(n):
+      for j in range(i+1, n):
+        nondiagonal_components.append((i, j, mat_ij[i,j]))
+    order = sorted(nondiagonal_components, key=lambda x: x[2], reverse=True)
+
+    for i in range(n):
+      for j in range(n):
+        if i == j:
+          print("%02d " % i, end="")
+        else:
+          odr = find_order(i, j, order) * 2 + 9
+          if odr < max_odr:
+            print("%02d " % odr, end="")
+          else:
+            print("** ", end="")
+      print("")
+    print("")
+
+  else:
+    all_components = []
+    for i in range(n):
+      for j in range(n):
+        all_components.append((i, j, mat_ij[i,j]))
+    order = sorted(all_components, key=lambda x: x[2], reverse=True)
+
+    for i in range(n):
+      for j in range(n):
+        odr = find_order(i, j, order)
+        if odr < max_odr:
           print("%02d " % odr, end="")
         else:
           print("** ", end="")
+      print("")
     print("")
-  print("")
 
   return 0
 
