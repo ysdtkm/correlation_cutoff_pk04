@@ -8,7 +8,7 @@ DIMM = 9    # dimension of model variable n
 DIMO = DIMM # dimension of observation variable m
 
 DT = 0.01
-TMAX = 10
+TMAX = 30
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 FCST_LT = 5
@@ -18,13 +18,14 @@ OERR_O = 5.0
 FERR_INI = 10.0
 AINT = 8
 
-rho = "adaptive"
-nmem = 4
+# rho = "adaptive"
+nmem = 5
 amp_b_tdvar = 2.0
 amp_b_fdvar = 1.5
 
 EXPLIST = [ \
-  {"name":"full_105", "rho":1.05, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"full"}, \
+  {"name":"full_adaptive", "rho":"adaptive", "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"full"}, \
+  {"name":"3-components_adaptive", "rho":"adaptive", "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"3-components"}, \
 ]
 
 Calc_lv = False

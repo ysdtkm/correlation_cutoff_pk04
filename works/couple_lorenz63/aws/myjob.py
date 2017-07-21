@@ -8,10 +8,15 @@ import numpy as np
 
 from_template = True
 flag_test = (socket.gethostname()[:7] == "DESKTOP")
-param1s = ["4", "5", "6"]
+param1s = ["4", "6"]
 param2s = ["full", "3-components"]
-param3s = list(map(str, np.linspace(1.00, 1.05, 6))) + ['"adaptive"']
+param3s = ['1.02', '"adaptive"']
 # ====================================
+
+if flag_test:
+  param1s = ["4"]
+  param2s = ["full"]
+  param3s = ['"adaptive"']
 
 def main():
   if flag_test:
@@ -47,8 +52,9 @@ def main():
 
         os.system("cp -f data/lyapunov.txt image/true/")
         os.system("cp -f latex/out.pdf image/")
-        os.system("aws s3 cp image s3://ysdtkm-bucket-1/couple_lorenz63/tar/%s/%s_%s --recursive" % (job_name, param1, param2))
-        os.system("aws s3 cp latex/out.pdf s3://ysdtkm-bucket-1/couple_lorenz63/%s/%s_%s.pdf" % (job_name, param1, param2))
+        if not flag_test:
+          os.system("aws s3 cp image s3://ysdtkm-bucket-1/couple_lorenz63/tar/%s/%s_%s --recursive" % (job_name, param1, param2))
+          os.system("aws s3 cp latex/out.pdf s3://ysdtkm-bucket-1/couple_lorenz63/%s/%s_%s.pdf" % (job_name, param1, param2))
         os.system("rm -rf image_%s_%s" % (param1, param2))
         os.system("mv image image_%s_%s" % (param1, param2))
 
@@ -56,14 +62,16 @@ def main():
     import super_verif
     os.system("mkdir -p verif")
     super_verif.verif(param1s, param2s, param3s)
-    os.system("aws s3 sync verif s3://ysdtkm-bucket-1/couple_lorenz63/%s" % job_name)
+    if not flag_test:
+      os.system("aws s3 sync verif s3://ysdtkm-bucket-1/couple_lorenz63/%s" % job_name)
 
   else:
     subprocess.check_call("make")
     os.system("cp -f data/lyapunov.txt image/true/")
     os.system("cp -f latex/out.pdf image/")
-    os.system("aws s3 cp image s3://ysdtkm-bucket-1/couple_lorenz63/tar/%s --recursive" % job_name)
-    os.system("aws s3 cp latex/out.pdf s3://ysdtkm-bucket-1/couple_lorenz63/%s.pdf" % job_name)
+    if not flag_test:
+      os.system("aws s3 cp image s3://ysdtkm-bucket-1/couple_lorenz63/tar/%s --recursive" % job_name)
+      os.system("aws s3 cp latex/out.pdf s3://ysdtkm-bucket-1/couple_lorenz63/%s.pdf" % job_name)
 
 def sanitize_num(strin):
   tmp = strin

@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
+import const
 
 def verif(param1s, param2s, param3s):
   len1 = len(param1s)
@@ -40,6 +41,7 @@ def plot(rmse_all, param1s, param2s, param3s):
     for ic in range(lenc):
       for j, param2 in enumerate(param2s):
         plt.plot(x, rmse_all[i,j,:,ic], color=colors[ic], linestyle=styles[j], label=(["extra", "trop", "ocean"][ic] + "_" + param2))
+    plt.ylim(0, max(const.OERR_A, const.OERR_O) * 1.5)
     plt.legend()
     plt.savefig("verif/verif_%s.pdf" % param1)
     plt.clf()
@@ -61,13 +63,15 @@ def plot_min3(rmse_all, param1s, param2s, param3s):
       plt.plot(x, rmse_min[:,j,ic], color=colors[ic], linestyle=styles[j],
                label=(["extra", "trop", "ocean"][ic] + "_" + param2))
   plt.legend()
+  plt.ylim(0, max(const.OERR_A, const.OERR_O) * 1.5)
   plt.savefig("verif/verif_min.pdf")
   plt.clf()
   plt.close()
   return 0
 
 if __name__ == "__main__":
-  param1s = ["full", "3-components"]
-  param2s = ["1.05", "1.1"]
-  verif(param1s, param2s)
+  param1s = ["4"]
+  param2s = ["full"]
+  param3s = ['"adaptive"']
+  verif(param1s, param2s, param3s)
 
