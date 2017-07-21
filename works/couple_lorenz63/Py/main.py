@@ -173,6 +173,8 @@ def analyze_one_window(fcst, fcst_pre, obs, h, r, settings, obj_adaptive, i_s=0,
     anl[0,:] = tdvar(fcst[0,:].T, h[:,:], r[:,:], yo[:,:], i_s, i_e, settings["amp_b"])
   elif (settings["method"] == "4dvar"):
     anl[0,:] = fdvar(fcst_pre[0,:], h[:,:], r[:,:], yo[:,:], AINT, i_s, i_e, settings["amp_b"], bc)
+  else:
+    raise Exception("analysis method mis-specified: %s" % settings["method"])
 
   return anl[:,:], bf[:,:], ba[:,:], obj_adaptive
 

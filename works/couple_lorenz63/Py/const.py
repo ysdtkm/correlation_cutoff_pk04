@@ -8,7 +8,7 @@ DIMM = 9    # dimension of model variable n
 DIMO = DIMM # dimension of observation variable m
 
 DT = 0.01
-TMAX = 100
+TMAX = 10
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 FCST_LT = 5
@@ -23,26 +23,12 @@ nmem = 5
 amp_b_tdvar = 2.0
 amp_b_fdvar = 1.5
 
-EXPLIST = [{"name":name, "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":name} \
-    for name in ["full", "see_adjacent", "trop_ocean_couple", "extra_trop_couple", "individual", \
-        "atmos_sees_ocean", "ocean_sees_atmos", "trop_sees_ocean", "ocean_sees_trop", "dynamical", "rms_correlation", "rms_covariance"]]
-  # {"name":"full", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"full"}, \
-  # {"name":"see_adjacent", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"see_adjacent"}, \
-  # {"name":"trop_ocean_couple", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"trop_ocean_couple"}, \
-  # {"name":"extra_trop_couple", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"trop_ocean_couple"}, \
-  # {"name":"individual", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"individual"}, \
-
-  # {"name":"atmos_sees_ocean", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"individual"}, \
-  # {"name":"ocean_sees_atmos", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"individual"}, \
-  # {"name":"trop_sees_ocean", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"individual"}, \
-  # {"name":"ocean_sees_trop", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"individual"}, \
-
-  # {"name":"dynamical", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"individual"}, \
-  # {"name":"rms_correlation", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"individual"}, \
-  # {"name":"rms_covariance", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"individual"}, \
-  # {"name":"mean_correlation", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"individual"}, \
-  # {"name":"mean_covariance", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"individual"}, \
-# ]
+# EXPLIST = [{"name":"tdvar", "amp_b":amp_b_tdvar, "nmem":1, "method":"3dvar", "couple":"strong"}]
+# EXPLIST = [{"name":"fdvar", "amp_b":amp_b_fdvar, "nmem":1, "method":"4dvar", "couple":"strong"}]
+# EXPLIST = [{"name":name, "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":name} \
+#     for name in ["full", "see_adjacent", "trop_ocean_couple", "extra_trop_couple", "individual", \
+#         "atmos_sees_ocean", "ocean_sees_atmos", "trop_sees_ocean", "ocean_sees_trop", "dynamical", "rms_correlation", "rms_covariance"]]
+EXPLIST = [{"name":name, "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":name} for name in ["full"]]
 
 Calc_lv = False
 

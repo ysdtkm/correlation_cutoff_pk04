@@ -500,4 +500,5 @@ def plot_adaptive_inflation(name, method):
   plt.savefig("./image/%s/%s_inflation.pdf" % (name, name))
   plt.close()
 
-plot_all()
+if __name__ == "__main__":
+  plot_all()
