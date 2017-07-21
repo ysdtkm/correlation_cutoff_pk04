@@ -30,7 +30,10 @@ def verif(param1s, param2s, param3s):
 
 def plot(rmse_all, param1s, param2s, param3s):
   lenc = 3 # extra, trop, ocean
-  x = list(map(float, param3s))
+  try:
+    x = list(map(float, param3s))
+  except:
+    x = range(len(param3s))
   colors = ["r", "g", "b"]
   styles = ["solid", "dotted", "dashed", "dashdot"]
   for i, param1 in enumerate(param1s):
@@ -46,7 +49,10 @@ def plot(rmse_all, param1s, param2s, param3s):
 def plot_min3(rmse_all, param1s, param2s, param3s):
   # take minimum along param3s, and plot it on param1s-param2s
   lenc = 3 # extra, trop, ocean
-  x = list(map(float, param1s))
+  try:
+    x = list(map(float, param1s))
+  except:
+    x = range(len(param1s))
   colors = ["r", "g", "b"]
   styles = ["solid", "dotted", "dashed", "dashdot"]
   rmse_min = np.mean(rmse_all, axis=2)
