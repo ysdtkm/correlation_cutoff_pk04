@@ -118,10 +118,10 @@ def obtain_r2_etkf():
   hist_fcst = np.fromfile("data/%s_cycle.bin" % settings["name"], np.float64)
   hist_fcst = hist_fcst.reshape((STEPS, nmem, DIMM))
 
-  r_ijt = np.empty((STEPS, DIMM, DIMM))
-  r_ijt[:,:,:] = np.nan
-  r2_ijt = np.empty((STEPS, DIMM, DIMM))
-  r2_ijt[:,:,:] = np.nan
+  corr_ijt = np.empty((STEPS, DIMM, DIMM))
+  corr_ijt[:,:,:] = np.nan
+  corr2_ijt = np.empty((STEPS, DIMM, DIMM))
+  corr2_ijt[:,:,:] = np.nan
   cov_ijt = np.empty((STEPS, DIMM, DIMM))
   cov_ijt[:,:,:] = np.nan
   cov2_ijt = np.empty((STEPS, DIMM, DIMM))
@@ -145,25 +145,29 @@ def obtain_r2_etkf():
           vector_j[:] -= np.mean(vector_j)
           numera = np.sum(vector_i * vector_j)
           denomi = (np.sum(vector_i ** 2) * np.sum(vector_j ** 2)) ** 0.5
-          r_ijt[it, i, j] = numera / denomi
-          r2_ijt[it, i, j] = numera ** 2 / denomi ** 2
+          corr_ijt[it, i, j] = numera / denomi
+          corr2_ijt[it, i, j] = numera ** 2 / denomi ** 2
           cov_ijt[it, i, j] = numera
           cov2_ijt[it, i, j] = numera **2
 
-  r_ij = np.nanmean(r_ijt, axis=0)
-  r2_ij = np.nanmean(r2_ijt, axis=0)
-  cov_ij = np.nanmean(cov_ijt, axis=0)
-  cov2_ij = np.nanmean(cov2_ijt, axis=0)
+  corr_mean_ij = np.nanmean(corr_ijt, axis=0)
+  corr_rms_ij = np.sqrt(np.nanmean(corr2_ijt, axis=0))
+  cov_mean_ij = np.nanmean(cov_ijt, axis=0)
+  cov_rms_ij = np.sqrt(np.nanmean(cov2_ijt, axis=0))
 
-  plot_matrix(r_ij, title="R", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
-  plot_matrix(r2_ij, title="R2", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
-  plot_matrix(cov_ij, title="Cov", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-3)
-  plot_matrix(cov2_ij, title="Cov2", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-6)
+  plot_matrix(corr_mean_ij, title="Corr_mean", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
+  plot_matrix(corr_rms_ij, title="Corr_rms", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
+  plot_matrix(cov_mean_ij, title="Cov_mean", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-3)
+  plot_matrix(cov_rms_ij, title="Cov_rms", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-3)
 
-  print("r-squared")
-  matrix_nondiagonal_order(r2_ij)
-  print("covariance-squared")
-  matrix_nondiagonal_order(cov2_ij)
+  print("correlation-mean")
+  matrix_nondiagonal_order(corr_mean_ij)
+  print("correlation-rms")
+  matrix_nondiagonal_order(corr_rms_ij)
+  print("covariance-mean")
+  matrix_nondiagonal_order(cov_mean_ij)
+  print("covariance-rms")
+  matrix_nondiagonal_order(cov_rms_ij)
   print("random")
   mat_rand = np.random.randn(DIMM, DIMM)
   matrix_nondiagonal_order(mat_rand)
