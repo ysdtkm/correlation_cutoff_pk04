@@ -119,121 +119,7 @@ def obtain_localization_weight(dimc, j, r_local):
     return localization_weight
 
   if dimc == DIMM: # strongly coupled
-    # weight_table[iy, ix] is weight of iy-th obs for ix-th grid
-    if r_local == "individual":
-      weight_table_components = np.array(
-        [[1.0, 0.0, 0.0],
-         [0.0, 1.0, 0.0],
-         [0.0, 0.0, 1.0]])
-    elif r_local == "extra_trop_couple":
-      weight_table_components = np.array(
-        [[1.0, 1.0, 0.0],
-         [1.0, 1.0, 0.0],
-         [0.0, 0.0, 1.0]])
-    elif r_local == "trop_ocean_couple":
-      weight_table_components = np.array(
-        [[1.0, 0.0, 0.0],
-         [0.0, 1.0, 1.0],
-         [0.0, 1.0, 1.0]])
-    elif r_local == "atmos_sees_ocean":
-      weight_table_components = np.array(
-        [[1.0, 1.0, 0.0],
-         [1.0, 1.0, 0.0],
-         [1.0, 1.0, 1.0]])
-    elif r_local == "trop_sees_ocean":
-      weight_table_components = np.array(
-        [[1.0, 0.0, 0.0],
-         [0.0, 1.0, 0.0],
-         [0.0, 1.0, 1.0]])
-    elif r_local == "ocean_sees_atmos":
-      weight_table_components = np.array(
-        [[1.0, 1.0, 1.0],
-         [1.0, 1.0, 1.0],
-         [0.0, 0.0, 1.0]])
-    elif r_local == "ocean_sees_trop":
-      weight_table_components = np.array(
-        [[1.0, 0.0, 0.0],
-         [0.0, 1.0, 1.0],
-         [0.0, 0.0, 1.0]])
-    elif r_local == "full":
-      weight_table_components = np.array(
-        [[1.0, 1.0, 1.0],
-         [1.0, 1.0, 1.0],
-         [1.0, 1.0, 1.0]])
-    elif r_local == "see_adjacent":
-      weight_table_components = np.array(
-        [[1.0, 1.0, 0.0],
-         [1.0, 1.0, 1.0],
-         [0.0, 1.0, 1.0]])
-    elif (r_local == "dynamical" or
-          r_local == "rms_correlation" or
-          r_local == "rms_covariance" or
-          r_local == "mean_correlation" or
-          r_local == "mean_covariance" or
-          r_local == "random"):
-      pass
-    else:
-      raise Exception("r_local: %s is not correct choice" % r_local)
-
-    if r_local == "dynamical": # a38p35
-      weight_table = np.array([
-        [1,1,1,  1,0,0,  0,0,0],
-        [1,1,1,  0,1,0,  0,0,0],
-        [1,1,1,  0,0,0,  0,0,0],
-
-        [1,0,0,  1,1,1,  1,0,0],
-        [0,1,0,  1,1,1,  0,1,0],
-        [0,0,0,  1,1,1,  0,0,1],
-
-        [0,0,0,  1,0,0,  1,1,1],
-        [0,0,0,  0,1,0,  1,1,1],
-        [0,0,0,  0,0,1,  1,1,1]], dtype=np.float64)
-    elif r_local == "rms_correlation": # commit:9104078
-      weight_table = np.array([
-        [1,1,1,  0,0,0,  0,0,0],
-        [1,1,1,  0,0,0,  0,0,0],
-        [1,1,1,  0,0,0,  0,0,0],
-
-        [0,0,0,  1,1,1,  0,0,1],
-        [0,0,0,  1,1,0,  1,0,1],
-        [0,0,0,  1,0,1,  1,1,1],
-
-        [0,0,0,  0,1,1,  1,1,1],
-        [0,0,0,  0,0,1,  1,1,1],
-        [0,0,0,  1,1,1,  1,1,1]], dtype=np.float64)
-    elif r_local == "rms_covariance":
-      weight_table = np.array([
-        [1,1,1,  0,0,0,  0,0,0],
-        [1,1,1,  0,0,0,  0,0,0],
-        [1,1,1,  0,0,0,  0,0,0],
-
-        [0,0,0,  1,1,0,  0,1,1],
-        [0,0,0,  1,1,0,  0,1,1],
-        [0,0,0,  0,0,1,  1,1,1],
-
-        [0,0,0,  0,0,1,  1,1,1],
-        [0,0,0,  1,1,1,  1,1,1],
-        [0,0,0,  1,1,1,  1,1,1]], dtype=np.float64)
-    elif r_local == "random":
-      weight_table = np.array([
-        [1,0,0,  1,0,0,  0,0,0],
-        [0,1,1,  0,1,1,  1,0,0],
-        [0,1,1,  1,1,0,  0,1,0],
-
-        [1,0,1,  1,1,1,  0,0,1],
-        [0,1,1,  1,1,0,  1,0,0],
-        [0,1,0,  1,0,1,  0,1,0],
-
-        [0,1,0,  0,1,0,  1,1,0],
-        [0,0,1,  0,0,1,  1,1,0],
-        [0,0,0,  1,0,0,  0,0,1]], dtype=np.float64)
-    else:
-      weight_table = np.ones((DIMM, DIMM))
-      for iyc in range(3):
-        for ixc in range(3):
-          weight_table[iyc*3:iyc*3+3, ixc*3:ixc*3+3] = \
-            weight_table_components[iyc, ixc]
-
+    weight_table = get_weight_table(r_local)
     for iy in range(dimc):
       localization_weight[iy, :] *= weight_table[iy, j]
       localization_weight[:, iy] *= weight_table[iy, j]
@@ -245,6 +131,48 @@ def obtain_localization_weight(dimc, j, r_local):
     pass
 
   return np.asmatrix(localization_weight)
+
+def get_weight_table(r_local):
+  # return weight_table[iy, ix] : weight of iy-th obs for ix-th grid
+
+  if r_local == "dynamical": # a38p35
+    weight_table = np.array([
+      [1,1,1,  1,0,0,  0,0,0], [1,1,1,  0,1,0,  0,0,0], [1,1,1,  0,0,0,  0,0,0],
+      [1,0,0,  1,1,1,  1,0,0], [0,1,0,  1,1,1,  0,1,0], [0,0,0,  1,1,1,  0,0,1],
+      [0,0,0,  1,0,0,  1,1,1], [0,0,0,  0,1,0,  1,1,1], [0,0,0,  0,0,1,  1,1,1]], dtype=np.float64)
+  elif r_local == "rms_correlation": # commit:9104078
+    weight_table = np.array([
+      [1,1,1,  0,0,0,  0,0,0], [1,1,1,  0,0,0,  0,0,0], [1,1,1,  0,0,0,  0,0,0],
+      [0,0,0,  1,1,1,  0,0,1], [0,0,0,  1,1,0,  1,0,1], [0,0,0,  1,0,1,  1,1,1],
+      [0,0,0,  0,1,1,  1,1,1], [0,0,0,  0,0,1,  1,1,1], [0,0,0,  1,1,1,  1,1,1]], dtype=np.float64)
+  elif r_local == "rms_covariance":
+    weight_table = np.array([
+      [1,1,1,  0,0,0,  0,0,0], [1,1,1,  0,0,0,  0,0,0], [1,1,1,  0,0,0,  0,0,0],
+      [0,0,0,  1,1,0,  0,1,1], [0,0,0,  1,1,0,  0,1,1], [0,0,0,  0,0,1,  1,1,1],
+      [0,0,0,  0,0,1,  1,1,1], [0,0,0,  1,1,1,  1,1,1], [0,0,0,  1,1,1,  1,1,1]], dtype=np.float64)
+  elif r_local == "random":
+    weight_table = np.array([
+      [1,0,0,  1,0,0,  0,0,0], [0,1,1,  0,1,1,  1,0,0], [0,1,1,  1,1,0,  0,1,0],
+      [1,0,1,  1,1,1,  0,0,1], [0,1,1,  1,1,0,  1,0,0], [0,1,0,  1,0,1,  0,1,0],
+      [0,1,0,  0,1,0,  1,1,0], [0,0,1,  0,0,1,  1,1,0], [0,0,0,  1,0,0,  0,0,1]], dtype=np.float64)
+  else:
+    weight_table_small = {
+      "individual":        np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]),
+      "extra_trop_couple": np.array([[1.0, 1.0, 0.0], [1.0, 1.0, 0.0], [0.0, 0.0, 1.0]]),
+      "trop_ocean_couple": np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 1.0], [0.0, 1.0, 1.0]]),
+      "atmos_sees_ocean":  np.array([[1.0, 1.0, 0.0], [1.0, 1.0, 0.0], [1.0, 1.0, 1.0]]),
+      "trop_sees_ocean":   np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 1.0, 1.0]]),
+      "ocean_sees_atmos":  np.array([[1.0, 1.0, 1.0], [1.0, 1.0, 1.0], [0.0, 0.0, 1.0]]),
+      "ocean_sees_trop":   np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 1.0], [0.0, 0.0, 1.0]]),
+      "full":              np.array([[1.0, 1.0, 1.0], [1.0, 1.0, 1.0], [1.0, 1.0, 1.0]]),
+      "see_adjacent":      np.array([[1.0, 1.0, 0.0], [1.0, 1.0, 1.0], [0.0, 1.0, 1.0]]),
+    }
+    weight_table = np.ones((DIMM, DIMM))
+    for iyc in range(3):
+      for ixc in range(3):
+        weight_table[iyc*3:iyc*3+3, ixc*3:ixc*3+3] = \
+          weight_table_small[r_local][iyc, ixc]
+  return weight_table
 
 def init_etkf_adaptive_inflation():
   # return : np.array([[delta_extra, delta_trop, delta_ocean],
