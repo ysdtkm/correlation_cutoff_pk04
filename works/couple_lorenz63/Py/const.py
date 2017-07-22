@@ -33,9 +33,11 @@ EXPLIST = [
 {"name":"covariance-rms_81", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-rms", "num_yes":81},
 {"name":"covariance-rms_60", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-rms", "num_yes":60},
 {"name":"covariance-rms_37", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-rms", "num_yes":37},
+{"name":"covariance-rms_23", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-rms", "num_yes":23},
 {"name":"bhhtri_81", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"bhhtri", "num_yes":81},
 {"name":"bhhtri_60", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"bhhtri", "num_yes":60},
 {"name":"bhhtri_37", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"bhhtri", "num_yes":37},
+{"name":"bhhtri_23", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"bhhtri", "num_yes":23},
 ]
 
 Calc_lv = False
