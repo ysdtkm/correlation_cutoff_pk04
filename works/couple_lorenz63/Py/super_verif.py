@@ -22,10 +22,7 @@ def verif(param1s, param2s, param3s):
       rf.close()
 
   plot(rmse_all, param1s, param2s, param3s)
-  try:
-    plot_min3(rmse_all, param1s, param2s, param3s)
-  except:
-    print("if param1s is not number, plot_min3 is skipped")
+  plot_min3(rmse_all, param1s, param2s, param3s)
 
   return 0
 
@@ -35,14 +32,20 @@ def plot(rmse_all, param1s, param2s, param3s):
     x = list(map(float, param3s))
   except:
     x = range(len(param3s))
-  colors = ["r", "g", "b"]
-  styles = ["solid", "dotted", "dashed", "dashdot"]
+  colors = ["red", "green", "blue"]
+  styles = ["solid", "dotted", "dashed", "dashdot"] * 3
+  lwidth = [1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3]
+
   for i, param1 in enumerate(param1s):
+    plt.rcParams["font.size"] = 8
+    fig, ax = plt.subplots()
+    fig.subplots_adjust(top=0.85, bottom=0.2, right=0.67)
     for ic in range(lenc):
       for j, param2 in enumerate(param2s):
-        plt.plot(x, rmse_all[i,j,:,ic], color=colors[ic], linestyle=styles[j], label=(["extra", "trop", "ocean"][ic] + "_" + param2))
-    plt.ylim(0, max(const.OERR_A, const.OERR_O) * 1.5)
-    plt.legend()
+        ax.plot(x, rmse_all[i,j,:,ic], color=colors[ic], linestyle=styles[j], linewidth=lwidth[j],
+                 label=(["extra", "trop", "ocean"][ic] + "_" + param2))
+    ax.set_ylim(0, max(const.OERR_A, const.OERR_O) * 1.5)
+    ax.legend(bbox_to_anchor=(1.03,1), loc="upper left")
     plt.savefig("verif/verif_%s.pdf" % param1)
     plt.clf()
     plt.close()
@@ -55,23 +58,28 @@ def plot_min3(rmse_all, param1s, param2s, param3s):
     x = list(map(float, param1s))
   except:
     x = range(len(param1s))
-  colors = ["r", "g", "b"]
-  styles = ["solid", "dotted", "dashed", "dashdot"]
+  colors = ["red", "green", "blue"]
+  styles = ["solid", "dotted", "dashed", "dashdot"] * 3
+  lwidth = [1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3]
   rmse_min = np.mean(rmse_all, axis=2)
+
+  plt.rcParams["font.size"] = 8
+  fig, ax = plt.subplots()
+  fig.subplots_adjust(top=0.85, bottom=0.2, right=0.67)
   for ic in range(lenc):
     for j, param2 in enumerate(param2s):
-      plt.plot(x, rmse_min[:,j,ic], color=colors[ic], linestyle=styles[j],
+      ax.plot(x, rmse_min[:,j,ic], color=colors[ic], linestyle=styles[j], linewidth=lwidth[j],
                label=(["extra", "trop", "ocean"][ic] + "_" + param2))
-  plt.legend()
-  plt.ylim(0, max(const.OERR_A, const.OERR_O) * 1.5)
+  ax.set_ylim(0, max(const.OERR_A, const.OERR_O) * 1.5)
+  ax.legend(bbox_to_anchor=(1.03,1), loc="upper left")
   plt.savefig("verif/verif_min.pdf")
   plt.clf()
   plt.close()
   return 0
 
 if __name__ == "__main__":
-  param1s = ["4"]
-  param2s = ["full"]
-  param3s = ['"adaptive"']
+  param1s = ["4", "6", "10"]
+  param2s = ["covariance-rms", "covariance-mean", "correlation-rms", "correlation-mean", "bhhtri-rms", "bhhtri-mean"]
+  param3s = ["9", "19", "29", "39", "49", "59", "69", "81"]
   verif(param1s, param2s, param3s)
 
