@@ -30,14 +30,18 @@ amp_b_fdvar = 1.5
 #         "atmos_sees_ocean", "ocean_sees_atmos", "trop_sees_ocean", "ocean_sees_trop", "dynamical", "rms_correlation", "rms_covariance"]]
 EXPLIST = [
 {"name":"full", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"full"},
-{"name":"covariance-rms_81", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-rms", "num_yes":81},
 {"name":"covariance-rms_60", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-rms", "num_yes":60},
 {"name":"covariance-rms_37", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-rms", "num_yes":37},
 {"name":"covariance-rms_23", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-rms", "num_yes":23},
-{"name":"bhhtri_81", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"bhhtri", "num_yes":81},
-{"name":"bhhtri_60", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"bhhtri", "num_yes":60},
-{"name":"bhhtri_37", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"bhhtri", "num_yes":37},
-{"name":"bhhtri_23", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"bhhtri", "num_yes":23},
+{"name":"covariance-mean_60", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-mean", "num_yes":60},
+{"name":"covariance-mean_37", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-mean", "num_yes":37},
+{"name":"covariance-mean_23", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-mean", "num_yes":23},
+{"name":"bhhtri-rms_60", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"bhhtri-rms", "num_yes":60},
+{"name":"bhhtri-rms_37", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"bhhtri-rms", "num_yes":37},
+{"name":"bhhtri-rms_23", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"bhhtri-rms", "num_yes":23},
+{"name":"bhhtri-mean_60", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"bhhtri-mean", "num_yes":60},
+{"name":"bhhtri-mean_37", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"bhhtri-mean", "num_yes":37},
+{"name":"bhhtri-mean_23", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"bhhtri-mean", "num_yes":23},
 ]
 
 Calc_lv = False

@@ -156,24 +156,28 @@ def obtain_r2_etkf():
   cov_mean_ij = np.nanmean(cov_ijt, axis=0)
   cov_rms_ij = np.sqrt(np.nanmean(cov2_ijt, axis=0))
   ri = np.linalg.inv(getr())
-  bhhtri_ij = np.abs(cov_rms_ij.dot(ri))
+  bhhtri_rms_ij = cov_rms_ij.dot(ri)
+  bhhtri_mean_ij = cov_mean_ij.dot(ri)
 
   plot_matrix(corr_mean_ij, title="Corr_mean", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
   plot_matrix(corr_rms_ij, title="Corr_rms", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
-  plot_matrix(cov_mean_ij, title="Cov_mean", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-3)
-  plot_matrix(cov_rms_ij, title="Cov_rms", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-3)
-  plot_matrix(bhhtri_ij, title="BHHtRi", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-3)
+  plot_matrix(cov_mean_ij, title="Cov_mean", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
+  plot_matrix(cov_rms_ij, title="Cov_rms", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
+  plot_matrix(bhhtri_rms_ij, title="BHHtRi_rms", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
+  plot_matrix(bhhtri_mean_ij, title="BHHtRi_mean", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
 
   print("correlation-mean")
-  matrix_nondiagonal_order(corr_mean_ij)
+  matrix_nondiagonal_order(np.abs(corr_mean_ij))
   print("correlation-rms")
   matrix_nondiagonal_order(corr_rms_ij)
   print("covariance-mean")
-  matrix_nondiagonal_order(cov_mean_ij)
+  matrix_nondiagonal_order(np.abs(cov_mean_ij))
   print("covariance-rms")
   matrix_nondiagonal_order(cov_rms_ij)
-  print("BHHtRi")
-  matrix_nondiagonal_order(bhhtri_ij)
+  print("BHHtRi-rms")
+  matrix_nondiagonal_order(bhhtri_rms_ij)
+  print("BHHtRi-mean")
+  matrix_nondiagonal_order(np.abs(bhhtri_mean_ij))
   print("random")
   mat_rand = np.random.randn(DIMM, DIMM)
   matrix_nondiagonal_order(mat_rand)
@@ -207,11 +211,11 @@ def matrix_nondiagonal_order(mat_ij, prioritize_diag=False, max_odr=81):
     for i in range(n):
       for j in range(n):
         if i == j:
-          print("%2d " % i, end="")
+          print("%2d, " % i, end="")
         else:
           odr = find_order(i, j, order, True) * 2 + 9
           if odr < max_odr:
-            print("%2d " % odr, end="")
+            print("%2d, " % odr, end="")
           else:
             print("** ", end="")
       print("")
@@ -228,7 +232,7 @@ def matrix_nondiagonal_order(mat_ij, prioritize_diag=False, max_odr=81):
       for j in range(n):
         odr = find_order(i, j, order, False)
         if odr < max_odr:
-          print("%2d " % odr, end="")
+          print("%2d, " % odr, end="")
         else:
           print("** ", end="")
       print("")
