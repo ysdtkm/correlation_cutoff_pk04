@@ -126,9 +126,6 @@ def obtain_r2_etkf():
   cov_ijt[:,:,:] = np.nan
   cov2_ijt = np.empty((STEPS, DIMM, DIMM))
   cov2_ijt[:,:,:] = np.nan
-  bhhtri_ijt = np.empty((STEPS, DIMM, DIMM))
-  bhhtri_ijt[:,:,:] = np.nan
-  ri = np.linalg.inv(getr())
 
   for it in range(STEPS//2, STEPS):
     if it % AINT == 0:
@@ -151,15 +148,15 @@ def obtain_r2_etkf():
           corr_ijt[it, i, j] = numera / denomi
           corr2_ijt[it, i, j] = numera ** 2 / denomi ** 2
           cov_ijt[it, i, j] = numera
-          cov2_ijt[it, i, j] = numera **2
-          bhhtri_ijt[it, i, j] = numera * ri[i,i]
+          cov2_ijt[it, i, j] = numera ** 2
 
 
   corr_mean_ij = np.nanmean(corr_ijt, axis=0)
   corr_rms_ij = np.sqrt(np.nanmean(corr2_ijt, axis=0))
   cov_mean_ij = np.nanmean(cov_ijt, axis=0)
   cov_rms_ij = np.sqrt(np.nanmean(cov2_ijt, axis=0))
-  bhhtri_ij = np.nanmean(bhhtri_ijt, axis=0)
+  ri = np.linalg.inv(getr())
+  bhhtri_ij = np.abs(cov_mean_ij.dot(ri))
 
   plot_matrix(corr_mean_ij, title="Corr_mean", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
   plot_matrix(corr_rms_ij, title="Corr_rms", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
@@ -187,9 +184,14 @@ def matrix_nondiagonal_order(mat_ij, prioritize_diag=False, max_odr=81):
   if len(mat_ij[0]) != n:
     raise Exception("input matrix non-square")
 
-  def find_order(k, l, order):
-    i = min(k, l)
-    j = max(k, l)
+  def find_order(k, l, order, asymmetric):
+    if asymmetric:
+      i = min(k, l)
+      j = max(k, l)
+    else:
+      i = k
+      j = l
+
     for io, cmp in enumerate(order):
       if cmp[0] == i and cmp[1] == j:
         return io
@@ -207,7 +209,7 @@ def matrix_nondiagonal_order(mat_ij, prioritize_diag=False, max_odr=81):
         if i == j:
           print("%2d " % i, end="")
         else:
-          odr = find_order(i, j, order) * 2 + 9
+          odr = find_order(i, j, order, True) * 2 + 9
           if odr < max_odr:
             print("%2d " % odr, end="")
           else:
@@ -224,7 +226,7 @@ def matrix_nondiagonal_order(mat_ij, prioritize_diag=False, max_odr=81):
 
     for i in range(n):
       for j in range(n):
-        odr = find_order(i, j, order)
+        odr = find_order(i, j, order, False)
         if odr < max_odr:
           print("%2d " % odr, end="")
         else:
