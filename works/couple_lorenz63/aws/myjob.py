@@ -6,17 +6,17 @@ import numpy as np
 # ====================================
 # largest param is innermost paramter
 
-from_template = False
+from_template = True
 flag_test = (socket.gethostname()[:7] == "DESKTOP")
-param1s = ["4", "6"]
-param2s = ["full", "individual"]
-param3s = ['1.02', '"adaptive"']
+param1s = ["4", "6", "10"]
+param2s = ["covariance-rms", "covariance-mean", "correlation-rms", "correlation-mean", "bhhtri-rms", "bhhtri-mean"]
+param3s = ["9", "19", "29", "39", "49", "59", "69", "81"]
 # ====================================
 
 if flag_test:
-  param1s = ["4"]
-  param2s = ["full"]
-  param3s = ['"adaptive"']
+  param1s = param1s[:1]
+  param2s = param2s[:1]
+  # param3s = param3s[:1]
 
 def main():
   if flag_test:

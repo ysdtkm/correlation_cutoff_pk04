@@ -8,7 +8,7 @@ DIMM = 9    # dimension of model variable n
 DIMO = DIMM # dimension of observation variable m
 
 DT = 0.01
-TMAX = 1000
+TMAX = 30
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 FCST_LT = 5
@@ -23,25 +23,15 @@ nmem = 4
 amp_b_tdvar = 2.0
 amp_b_fdvar = 1.5
 
-# EXPLIST = [{"name":"tdvar", "amp_b":amp_b_tdvar, "nmem":1, "method":"3dvar", "couple":"strong"}]
-# EXPLIST = [{"name":"fdvar", "amp_b":amp_b_fdvar, "nmem":1, "method":"4dvar", "couple":"strong"}]
-# EXPLIST = [{"name":name, "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":name} \
-#     for name in ["full", "see_adjacent", "trop_ocean_couple", "extra_trop_couple", "individual", \
-#         "atmos_sees_ocean", "ocean_sees_atmos", "trop_sees_ocean", "ocean_sees_trop", "dynamical", "rms_correlation", "rms_covariance"]]
-EXPLIST = [
-{"name":"full", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"full"},
-{"name":"covariance-rms_60", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-rms", "num_yes":60},
-{"name":"covariance-rms_37", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-rms", "num_yes":37},
-{"name":"covariance-rms_23", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-rms", "num_yes":23},
-{"name":"covariance-mean_60", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-mean", "num_yes":60},
-{"name":"covariance-mean_37", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-mean", "num_yes":37},
-{"name":"covariance-mean_23", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-mean", "num_yes":23},
-{"name":"bhhtri-rms_60", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"bhhtri-rms", "num_yes":60},
-{"name":"bhhtri-rms_37", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"bhhtri-rms", "num_yes":37},
-{"name":"bhhtri-rms_23", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"bhhtri-rms", "num_yes":23},
-{"name":"bhhtri-mean_60", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"bhhtri-mean", "num_yes":60},
-{"name":"bhhtri-mean_37", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"bhhtri-mean", "num_yes":37},
-{"name":"bhhtri-mean_23", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"bhhtri-mean", "num_yes":23},
+EXPLIST = [ \
+  {"name":"covariance-rms_9", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-rms", "num_yes":9},
+  {"name":"covariance-rms_19", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-rms", "num_yes":19},
+  {"name":"covariance-rms_29", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-rms", "num_yes":29},
+  {"name":"covariance-rms_39", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-rms", "num_yes":39},
+  {"name":"covariance-rms_49", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-rms", "num_yes":49},
+  {"name":"covariance-rms_59", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-rms", "num_yes":59},
+  {"name":"covariance-rms_69", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-rms", "num_yes":69},
+  {"name":"covariance-rms_81", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-rms", "num_yes":81},
 ]
 
 Calc_lv = False
