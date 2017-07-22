@@ -8,7 +8,7 @@ DIMM = 9    # dimension of model variable n
 DIMO = DIMM # dimension of observation variable m
 
 DT = 0.01
-TMAX = 100
+TMAX = 300
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 FCST_LT = 5
@@ -28,7 +28,15 @@ amp_b_fdvar = 1.5
 # EXPLIST = [{"name":name, "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":name} \
 #     for name in ["full", "see_adjacent", "trop_ocean_couple", "extra_trop_couple", "individual", \
 #         "atmos_sees_ocean", "ocean_sees_atmos", "trop_sees_ocean", "ocean_sees_trop", "dynamical", "rms_correlation", "rms_covariance"]]
-EXPLIST = [{"name":name, "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":name} for name in ["full"]]
+EXPLIST = [
+{"name":"full", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"full"},
+{"name":"covariance-rms_81", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-rms", "num_yes":81},
+{"name":"covariance-rms_60", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-rms", "num_yes":60},
+{"name":"covariance-rms_37", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-rms", "num_yes":37},
+{"name":"bhhtri_81", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"bhhtri", "num_yes":81},
+{"name":"bhhtri_60", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"bhhtri", "num_yes":60},
+{"name":"bhhtri_37", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"bhhtri", "num_yes":37},
+]
 
 Calc_lv = False
 

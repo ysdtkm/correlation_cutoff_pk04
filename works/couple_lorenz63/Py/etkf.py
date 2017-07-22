@@ -4,7 +4,7 @@ import numpy as np
 from scipy.linalg import sqrtm
 from const import *
 
-def etkf(fcst, h_nda, r_nda, yo_nda, rho_in, nmem, obj_adaptive, localization=False, r_local=""):
+def etkf(fcst, h_nda, r_nda, yo_nda, rho_in, nmem, obj_adaptive, localization=False, r_local="", num_yes=None):
   # fcst   <- np.array[nmem, dimc]
   # h_nda  <- np.array[DIMO, dimc]
   # r_nda  <- np.array[DIMO, DIMO]
@@ -67,7 +67,7 @@ def etkf(fcst, h_nda, r_nda, yo_nda, rho_in, nmem, obj_adaptive, localization=Fa
 
     for j in range(dimc):
       # step 3
-      localization_weight = obtain_localization_weight(dimc, j, r_local)
+      localization_weight = obtain_localization_weight(dimc, j, r_local, num_yes)
       yol = yo[:,:].copy()
       ybl = yb[:,:].copy()
       ybptl = ybpt[:,:].copy()
@@ -107,7 +107,7 @@ def etkf(fcst, h_nda, r_nda, yo_nda, rho_in, nmem, obj_adaptive, localization=Fa
     xam  = xapt + xa * I_1m
     return np.real(xam.T.A), (xfpt * xfpt.T).A, (xapt * xapt.T).A, obj_adaptive
 
-def obtain_localization_weight(dimc, j, r_local):
+def obtain_localization_weight(dimc, j, r_local, num_yes):
   # dimc   <- int : cimension of analyzed component
   # j      <- int : index of analyzed grid
   # r_local (string): localization pattern of R
@@ -119,7 +119,7 @@ def obtain_localization_weight(dimc, j, r_local):
     return localization_weight
 
   if dimc == DIMM: # strongly coupled
-    weight_table = get_weight_table(r_local)
+    weight_table = get_weight_table(r_local, num_yes)
     for iy in range(dimc):
       localization_weight[iy, :] *= weight_table[iy, j]
       localization_weight[:, iy] *= weight_table[iy, j]
@@ -132,29 +132,33 @@ def obtain_localization_weight(dimc, j, r_local):
 
   return np.asmatrix(localization_weight)
 
-def get_weight_table(r_local):
+def get_weight_table(r_local, num_yes):
   # return weight_table[iy, ix] : weight of iy-th obs for ix-th grid
 
-  if r_local == "dynamical": # a38p35
-    weight_table = np.array([
-      [1,1,1,  1,0,0,  0,0,0], [1,1,1,  0,1,0,  0,0,0], [1,1,1,  0,0,0,  0,0,0],
-      [1,0,0,  1,1,1,  1,0,0], [0,1,0,  1,1,1,  0,1,0], [0,0,0,  1,1,1,  0,0,1],
-      [0,0,0,  1,0,0,  1,1,1], [0,0,0,  0,1,0,  1,1,1], [0,0,0,  0,0,1,  1,1,1]], dtype=np.float64)
-  elif r_local == "rms_correlation": # commit:9104078
-    weight_table = np.array([
-      [1,1,1,  0,0,0,  0,0,0], [1,1,1,  0,0,0,  0,0,0], [1,1,1,  0,0,0,  0,0,0],
-      [0,0,0,  1,1,1,  0,0,1], [0,0,0,  1,1,0,  1,0,1], [0,0,0,  1,0,1,  1,1,1],
-      [0,0,0,  0,1,1,  1,1,1], [0,0,0,  0,0,1,  1,1,1], [0,0,0,  1,1,1,  1,1,1]], dtype=np.float64)
-  elif r_local == "rms_covariance":
-    weight_table = np.array([
-      [1,1,1,  0,0,0,  0,0,0], [1,1,1,  0,0,0,  0,0,0], [1,1,1,  0,0,0,  0,0,0],
-      [0,0,0,  1,1,0,  0,1,1], [0,0,0,  1,1,0,  0,1,1], [0,0,0,  0,0,1,  1,1,1],
-      [0,0,0,  0,0,1,  1,1,1], [0,0,0,  1,1,1,  1,1,1], [0,0,0,  1,1,1,  1,1,1]], dtype=np.float64)
-  elif r_local == "random":
-    weight_table = np.array([
-      [1,0,0,  1,0,0,  0,0,0], [0,1,1,  0,1,1,  1,0,0], [0,1,1,  1,1,0,  0,1,0],
-      [1,0,1,  1,1,1,  0,0,1], [0,1,1,  1,1,0,  1,0,0], [0,1,0,  1,0,1,  0,1,0],
-      [0,1,0,  0,1,0,  1,1,0], [0,0,1,  0,0,1,  1,1,0], [0,0,0,  1,0,0,  0,0,1]], dtype=np.float64)
+  # if r_local == "dynamical": # a38p35
+  #   weight_table = np.array([
+  #     [1,1,1,  1,0,0,  0,0,0], [1,1,1,  0,1,0,  0,0,0], [1,1,1,  0,0,0,  0,0,0],
+  #     [1,0,0,  1,1,1,  1,0,0], [0,1,0,  1,1,1,  0,1,0], [0,0,0,  1,1,1,  0,0,1],
+  #     [0,0,0,  1,0,0,  1,1,1], [0,0,0,  0,1,0,  1,1,1], [0,0,0,  0,0,1,  1,1,1]], dtype=np.float64)
+  # elif r_local == "rms_correlation": # commit:9104078
+  #   weight_table = np.array([
+  #     [1,1,1,  0,0,0,  0,0,0], [1,1,1,  0,0,0,  0,0,0], [1,1,1,  0,0,0,  0,0,0],
+  #     [0,0,0,  1,1,1,  0,0,1], [0,0,0,  1,1,0,  1,0,1], [0,0,0,  1,0,1,  1,1,1],
+  #     [0,0,0,  0,1,1,  1,1,1], [0,0,0,  0,0,1,  1,1,1], [0,0,0,  1,1,1,  1,1,1]], dtype=np.float64)
+  # elif r_local == "rms_covariance":
+  #   weight_table = np.array([
+  #     [1,1,1,  0,0,0,  0,0,0], [1,1,1,  0,0,0,  0,0,0], [1,1,1,  0,0,0,  0,0,0],
+  #     [0,0,0,  1,1,0,  0,1,1], [0,0,0,  1,1,0,  0,1,1], [0,0,0,  0,0,1,  1,1,1],
+  #     [0,0,0,  0,0,1,  1,1,1], [0,0,0,  1,1,1,  1,1,1], [0,0,0,  1,1,1,  1,1,1]], dtype=np.float64)
+  # elif r_local == "random":
+  #   weight_table = np.array([
+  #     [1,0,0,  1,0,0,  0,0,0], [0,1,1,  0,1,1,  1,0,0], [0,1,1,  1,1,0,  0,1,0],
+  #     [1,0,1,  1,1,1,  0,0,1], [0,1,1,  1,1,0,  1,0,0], [0,1,0,  1,0,1,  0,1,0],
+  #     [0,1,0,  0,1,0,  1,1,0], [0,0,1,  0,0,1,  1,1,0], [0,0,0,  1,0,0,  0,0,1]], dtype=np.float64)
+  if r_local in ["dynamical", "covariance-mean", "correlation-mean", "covariance-rms", "correlation-rms", "random", "bhhtri"]:
+    if num_yes == None:
+      num_yes = 37
+    weight_table = choose_weight_order(r_local, num_yes)
   else:
     weight_table_small = {
       "individual":        np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]),
@@ -173,6 +177,76 @@ def get_weight_table(r_local):
         weight_table[iyc*3:iyc*3+3, ixc*3:ixc*3+3] = \
           weight_table_small[r_local][iyc, ixc]
   return weight_table
+
+def choose_weight_order(r_local, odr_max=37):
+  # order_table obtained from d265ebb, unit_test.py (diagonal elements prioritized)
+  if r_local == "correlation-mean":
+    order_table = np.array([
+    [ 0,  9, 67, 41, 33, 73, 47, 55, 37],
+    [ 9,  1, 39, 43, 31, 63, 49, 59, 35],
+    [67, 39,  2, 71, 65, 57, 53, 45, 51],
+    [41, 43, 71,  3, 11, 79, 27, 23, 25],
+    [33, 31, 65, 11,  4, 69, 21, 17, 29],
+    [73, 63, 57, 79, 69,  5, 75, 77, 19],
+    [47, 49, 53, 27, 21, 75,  6, 13, 15],
+    [55, 59, 45, 23, 17, 77, 13,  7, 61],
+    [37, 35, 51, 25, 29, 19, 15, 61,  8]], dtype=np.int32)
+  elif r_local == "correlation-rms":
+    order_table = np.array([
+    [ 0, 11, 17, 65, 47, 67, 63, 59, 53],
+    [11,  1, 25, 57, 45, 61, 51, 55, 49],
+    [17, 25,  2, 77, 69, 79, 75, 73, 71],
+    [65, 57, 77,  3, 13, 21, 43, 31, 33],
+    [47, 45, 69, 13,  4, 41, 39, 37, 35],
+    [67, 61, 79, 21, 41,  5, 29, 27, 19],
+    [63, 51, 75, 43, 39, 29,  6, 15,  9],
+    [59, 55, 73, 31, 37, 27, 15,  7, 23],
+    [53, 49, 71, 33, 35, 19,  9, 23,  8]], dtype=np.int32)
+  elif r_local == "covariance-mean":
+    order_table = np.array([
+    [ 9,  6, 27, 43, 35, 51, 61, 69, 39],
+    [ 6,  2, 20, 41, 33, 55, 63, 67, 37],
+    [27, 20,  3, 57, 59, 49, 47, 45, 65],
+    [43, 41, 57, 26, 24, 71, 31, 22, 18],
+    [35, 33, 59, 24, 17, 53, 29, 13, 15],
+    [51, 55, 49, 71, 53, 12, 73, 79, 10],
+    [61, 63, 47, 31, 29, 73,  8,  4, 75],
+    [69, 67, 45, 22, 13, 79,  4,  0, 77],
+    [39, 37, 65, 18, 15, 10, 75, 77,  1]], dtype=np.int32)
+  elif r_local == "covariance-rms":
+    order_table = np.array([
+    [21, 10, 14, 79, 75, 69, 71, 53, 55],
+    [10,  4, 12, 73, 63, 57, 61, 47, 51],
+    [14, 12,  7, 77, 67, 65, 59, 43, 49],
+    [79, 73, 77, 42, 40, 38, 45, 29, 27],
+    [75, 63, 67, 40, 33, 34, 36, 22, 24],
+    [69, 57, 65, 38, 34, 26, 31, 18, 16],
+    [71, 61, 59, 45, 36, 31, 20,  5,  8],
+    [53, 47, 43, 29, 22, 18,  5,  1,  2],
+    [55, 51, 49, 27, 24, 16,  8,  2,  0]], dtype=np.int32)
+  elif r_local == "bhhtri": # ttk
+    order_table = np.array([
+    [ 4,  2, 19, 40, 32, 56, 66, 75, 37],
+    [ 2,  0, 13, 38, 28, 60, 67, 74, 34],
+    [19, 13,  1, 62, 64, 54, 53, 46, 68],
+    [40, 38, 62, 18, 16, 77, 24, 15, 10],
+    [32, 28, 64, 16,  9, 58, 21,  7,  8],
+    [56, 60, 54, 77, 58,  6, 79, 80,  5],
+    [66, 67, 53, 24, 21, 79, 25, 22, 70],
+    [75, 74, 46, 15,  7, 80, 22, 11, 72],
+    [37, 34, 68, 10,  8,  5, 70, 72, 12]], dtype=np.int32)
+  elif r_local == "random":
+    order_table = np.array([
+    [68, 54, 40, 11, 48, 79, 66, 34, 73],
+    [54, 43, 14, 42, 26, 13,  1, 35, 64],
+    [40, 14, 28, 27, 23, 44, 62, 16, 70],
+    [11, 42, 27, 10,  2,  7, 60, 65,  6],
+    [48, 26, 23,  2, 30, 45,  4, 63, 78],
+    [79, 13, 44,  7, 45, 72, 33,  9, 59],
+    [66,  1, 62, 60,  4, 33, 57,  8, 58],
+    [34, 35, 16, 65, 63,  9,  8, 50, 56],
+    [73, 64, 70,  6, 78, 59, 58, 56, 17]], dtype=np.int32)
+  return np.float64(order_table < odr_max)
 
 def init_etkf_adaptive_inflation():
   # return : np.array([[delta_extra, delta_trop, delta_ocean],
@@ -229,3 +303,5 @@ def obtain_delta_this_step(yo, yb, ybpt, r, nmem, common):
       dob = yol - ybl
       delta[i] = (dob.T.dot(dob) - np.trace(rl)) / np.trace(ybptl.dot(ybptl.T) / (nmem-1))
   return delta
+
+choose_weight_order("covariance-rms")

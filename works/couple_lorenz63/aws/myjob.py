@@ -6,7 +6,7 @@ import numpy as np
 # ====================================
 # largest param is innermost paramter
 
-from_template = True
+from_template = False
 flag_test = (socket.gethostname()[:7] == "DESKTOP")
 param1s = ["4", "6"]
 param2s = ["full", "individual"]

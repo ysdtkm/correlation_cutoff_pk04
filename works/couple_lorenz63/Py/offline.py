@@ -126,6 +126,9 @@ def obtain_r2_etkf():
   cov_ijt[:,:,:] = np.nan
   cov2_ijt = np.empty((STEPS, DIMM, DIMM))
   cov2_ijt[:,:,:] = np.nan
+  bhhtri_ijt = np.empty((STEPS, DIMM, DIMM))
+  bhhtri_ijt[:,:,:] = np.nan
+  ri = np.linalg.inv(getr())
 
   for it in range(STEPS//2, STEPS):
     if it % AINT == 0:
@@ -149,16 +152,20 @@ def obtain_r2_etkf():
           corr2_ijt[it, i, j] = numera ** 2 / denomi ** 2
           cov_ijt[it, i, j] = numera
           cov2_ijt[it, i, j] = numera **2
+          bhhtri_ijt[it, i, j] = numera * ri[i,i]
+
 
   corr_mean_ij = np.nanmean(corr_ijt, axis=0)
   corr_rms_ij = np.sqrt(np.nanmean(corr2_ijt, axis=0))
   cov_mean_ij = np.nanmean(cov_ijt, axis=0)
   cov_rms_ij = np.sqrt(np.nanmean(cov2_ijt, axis=0))
+  bhhtri_ij = np.nanmean(bhhtri_ijt, axis=0)
 
   plot_matrix(corr_mean_ij, title="Corr_mean", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
   plot_matrix(corr_rms_ij, title="Corr_rms", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
   plot_matrix(cov_mean_ij, title="Cov_mean", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-3)
   plot_matrix(cov_rms_ij, title="Cov_rms", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-3)
+  plot_matrix(bhhtri_ij, title="BHHtRi", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-3)
 
   print("correlation-mean")
   matrix_nondiagonal_order(corr_mean_ij)
@@ -168,12 +175,14 @@ def obtain_r2_etkf():
   matrix_nondiagonal_order(cov_mean_ij)
   print("covariance-rms")
   matrix_nondiagonal_order(cov_rms_ij)
+  print("BHHtRi")
+  matrix_nondiagonal_order(bhhtri_ij)
   print("random")
   mat_rand = np.random.randn(DIMM, DIMM)
   matrix_nondiagonal_order(mat_rand)
   return 0
 
-def matrix_nondiagonal_order(mat_ij, prioritize_diag=True, max_odr=81):
+def matrix_nondiagonal_order(mat_ij, prioritize_diag=False, max_odr=81):
   n = len(mat_ij)
   if len(mat_ij[0]) != n:
     raise Exception("input matrix non-square")
@@ -196,11 +205,11 @@ def matrix_nondiagonal_order(mat_ij, prioritize_diag=True, max_odr=81):
     for i in range(n):
       for j in range(n):
         if i == j:
-          print("%02d " % i, end="")
+          print("%2d " % i, end="")
         else:
           odr = find_order(i, j, order) * 2 + 9
           if odr < max_odr:
-            print("%02d " % odr, end="")
+            print("%2d " % odr, end="")
           else:
             print("** ", end="")
       print("")
@@ -217,7 +226,7 @@ def matrix_nondiagonal_order(mat_ij, prioritize_diag=True, max_odr=81):
       for j in range(n):
         odr = find_order(i, j, order)
         if odr < max_odr:
-          print("%02d " % odr, end="")
+          print("%2d " % odr, end="")
         else:
           print("** ", end="")
       print("")

@@ -168,7 +168,7 @@ def analyze_one_window(fcst, fcst_pre, obs, h, r, settings, obj_adaptive, i_s=0,
   if (settings["method"] == "etkf"):
     anl[:,:], bf[:,:], ba[:,:], obj_adaptive = \
         etkf(fcst[:,:], h[:,:], r[:,:], yo[:,:], settings["rho"],
-             settings["nmem"], obj_adaptive, True, settings["r_local"])
+             settings["nmem"], obj_adaptive, True, settings["r_local"], settings.get("num_yes"))
   elif (settings["method"] == "3dvar"):
     anl[0,:] = tdvar(fcst[0,:].T, h[:,:], r[:,:], yo[:,:], i_s, i_e, settings["amp_b"])
   elif (settings["method"] == "4dvar"):
