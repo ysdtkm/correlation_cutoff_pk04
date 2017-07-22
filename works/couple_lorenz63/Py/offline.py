@@ -156,7 +156,7 @@ def obtain_r2_etkf():
   cov_mean_ij = np.nanmean(cov_ijt, axis=0)
   cov_rms_ij = np.sqrt(np.nanmean(cov2_ijt, axis=0))
   ri = np.linalg.inv(getr())
-  bhhtri_ij = np.abs(cov_mean_ij.dot(ri))
+  bhhtri_ij = np.abs(cov_rms_ij.dot(ri))
 
   plot_matrix(corr_mean_ij, title="Corr_mean", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
   plot_matrix(corr_rms_ij, title="Corr_rms", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
