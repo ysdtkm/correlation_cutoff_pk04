@@ -4,15 +4,16 @@ import os, subprocess, sys, re, socket
 import numpy as np
 
 # ====================================
-from_template = False
-flag_test = (socket.gethostname()[:7] == "DESKTOP")
+from_template = True
 
 if from_template: # largest param is innermost paramter
-  param1s = ["4", "6", "10"]
-  param2s = ["covariance-rms", "covariance-mean", "correlation-rms", "correlation-mean", "bhhtri-rms", "bhhtri-mean"]
+  param1s = ["4", "6"]
+  param2s = ["covariance-rms", "covariance-mean"]
+  # param2s = ["covariance-rms", "covariance-mean", "correlation-rms", "correlation-mean", "bhhtri-rms", "bhhtri-mean"]
   param3s = list(map(str, np.linspace(9, 81,37)))
 # ====================================
 
+flag_test = (socket.gethostname()[:7] == "DESKTOP")
 if flag_test:
   param1s = param1s[:1]
   param2s = param2s[:1]
