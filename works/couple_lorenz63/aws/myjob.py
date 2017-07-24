@@ -4,13 +4,13 @@ import os, subprocess, sys, re, socket
 import numpy as np
 
 # ====================================
-# largest param is innermost paramter
-
-from_template = True
+from_template = False
 flag_test = (socket.gethostname()[:7] == "DESKTOP")
-param1s = ["4", "6", "10"]
-param2s = ["covariance-rms", "covariance-mean", "correlation-rms", "correlation-mean", "bhhtri-rms", "bhhtri-mean"]
-param3s = list(map(str, np.linspace(9, 81,37)))
+
+if from_template: # largest param is innermost paramter
+  param1s = ["4", "6", "10"]
+  param2s = ["covariance-rms", "covariance-mean", "correlation-rms", "correlation-mean", "bhhtri-rms", "bhhtri-mean"]
+  param3s = list(map(str, np.linspace(9, 81,37)))
 # ====================================
 
 if flag_test:
