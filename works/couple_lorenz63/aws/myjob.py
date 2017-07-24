@@ -8,7 +8,7 @@ from_template = True
 
 if from_template: # largest param is innermost paramter
   param1s = ["4", "5", "6"]
-  param2s = ["covariance-rms", "covariance-mean"]
+  param2s = ["covariance-rms", "correlation-rms"]
   # param2s = ["covariance-rms", "covariance-mean", "correlation-rms", "correlation-mean", "bhhtri-rms", "bhhtri-mean"]
   param3s = list(map(str, np.linspace(9, 81, 19, dtype=np.int32)))
 # ====================================
