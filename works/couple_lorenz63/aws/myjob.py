@@ -10,7 +10,7 @@ from_template = True
 flag_test = (socket.gethostname()[:7] == "DESKTOP")
 param1s = ["4", "6", "10"]
 param2s = ["covariance-rms", "covariance-mean", "correlation-rms", "correlation-mean", "bhhtri-rms", "bhhtri-mean"]
-param3s = ["9", "19", "29", "39", "49", "59", "69", "81"]
+param3s = list(map(str, np.linspace(9, 81,37)))
 # ====================================
 
 if flag_test:
@@ -48,7 +48,7 @@ def main():
         rf.close()
         wf.close()
 
-        subprocess.check_call("make")
+        subprocess.check_call(["make", "plot"]) # ttk
 
         os.system("cp -f data/lyapunov.txt image/true/")
         os.system("cp -f latex/out.pdf image/")
