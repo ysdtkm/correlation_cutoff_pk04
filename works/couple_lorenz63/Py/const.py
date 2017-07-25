@@ -25,14 +25,14 @@ amp_b_fdvar = 1.5
 
 EXPLIST = [ \
   {"name":"full", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"full"},
-  {"name":"atmos_sees_ocean", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"atmos_sees_ocean"},
-  {"name":"ocean_sees_atmos", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"ocean_sees_atmos"},
+  {"name":"adjacent", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"adjacent"},
+  {"name":"ENSO_coupling", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"enso_coupling"},
   {"name":"atmos_coupling", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"atmos_coupling"},
-  # {"name":"adjacent", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"adjacent"},
-  # {"name":"ENSO_coupling", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"enso_coupling"},
+  {"name":"individual", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"individual"},
+  # {"name":"atmos_sees_ocean", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"atmos_sees_ocean"},
+  # {"name":"ocean_sees_atmos", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"ocean_sees_atmos"},
   # {"name":"trop_sees_ocean", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"trop_sees_ocean"},
   # {"name":"ocean_sees_trop", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"ocean_sees_trop"},
-  # {"name":"individual", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"individual"},
   # {"name":"dynamical", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"dynamical"},
 ]
 
