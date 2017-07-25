@@ -4,7 +4,7 @@ import os, subprocess, sys, re, socket
 import numpy as np
 
 # ====================================
-from_template = True
+from_template = False
 
 if from_template: # largest param is innermost paramter
   param1s = ["4", "5", "6"]
