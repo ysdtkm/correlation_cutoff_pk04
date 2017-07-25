@@ -97,7 +97,7 @@ def exec_assim_cycle(settings, all_fcst, all_obs):
       persis_bc = None
     elif settings["couple"] == "none" and settings["bc"] == "independent":
       persis_bc = all_obs[i-1,:].copy()
-    else:
+    else: # persistence BC
       persis_bc = np.mean(all_fcst[i-1,:,:], axis=0)
 
     for m in range(0, settings["nmem"]):
