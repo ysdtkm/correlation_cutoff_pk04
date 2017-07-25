@@ -310,18 +310,18 @@ def plot_time_value(hist_true, hist_fcst, hist_obs, name, nmem):
       fig, (ax1, ax2, ax3) = plt.subplots(3, sharex=True)
       ax1.set_title("%s %s" % (name, name_component))
       ax1.plot(hist_true[:,0+i_adjust], label="true")
-      ax1.plot(hist_fcst_mean[:,0+i_adjust], label="model")
+      ax1.plot(hist_fcst_mean[:,0+i_adjust], label="DA cycle")
       if "x" in name:
         ax1.plot(hist_obs[:,0+i_adjust], label="obs", linestyle='None', marker=".")
       ax1.set_ylabel("x")
       ax1.legend(loc="upper right")
       ax2.plot(hist_true[:,1+i_adjust], label="true")
-      ax2.plot(hist_fcst_mean[:,1+i_adjust], label="model")
+      ax2.plot(hist_fcst_mean[:,1+i_adjust], label="DA cycle")
       if "y" in name:
         ax2.plot(hist_obs[:,1+i_adjust], label="obs", linestyle='None', marker=".")
       ax2.set_ylabel("y")
       ax3.plot(hist_true[:,2+i_adjust], label="true")
-      ax3.plot(hist_fcst_mean[:,2+i_adjust], label="model")
+      ax3.plot(hist_fcst_mean[:,2+i_adjust], label="DA cycle")
       if "z" in name:
         ax3.plot(hist_obs[:,2+i_adjust], label="obs", linestyle='None', marker=".")
       ax3.set_ylabel("z")
@@ -334,7 +334,7 @@ def plot_time_value(hist_true, hist_fcst, hist_obs, name, nmem):
     fig, ax1 = plt.subplots(1)
     ax1.set_title(name)
     ax1.plot(hist_true[:,0], label="true")
-    ax1.plot(hist_fcst_mean[:,0], label="model")
+    ax1.plot(hist_fcst_mean[:,0], label="DA cycle")
     ax1.plot(hist_obs[:,0], label="obs", linestyle='None', marker=".")
     ax1.set_ylabel("0th element")
     ax1.legend(loc="upper right")
@@ -368,7 +368,7 @@ def plot_3d_trajectory(hist_true, hist_fcst, name, nmem):
     ax.plot(hist_true[st:,0+i_adjust], hist_true[st:,1+i_adjust], \
       hist_true[st:,2+i_adjust], label="true")
     ax.plot(hist_fcst_mean[st:,0+i_adjust], hist_fcst_mean[st:,1+i_adjust], \
-      hist_fcst_mean[st:,2+i_adjust], label="model")
+      hist_fcst_mean[st:,2+i_adjust], label="DA cycle")
     ax.legend()
     # ax.set_xlim([-30,30])
     # ax.set_ylim([-30,30])
