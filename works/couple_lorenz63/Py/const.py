@@ -19,7 +19,7 @@ FERR_INI = 10.0
 AINT = 8
 
 rho = "adaptive"
-nmem = 4
+nmem = 10
 amp_b_tdvar = 2.0
 amp_b_fdvar = 1.5
 
@@ -29,10 +29,10 @@ EXPLIST = [ \
   {"name":"ENSO_coupling", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"enso_coupling"},
   {"name":"atmos_coupling", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"atmos_coupling"},
   {"name":"individual", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"individual"},
-  # {"name":"atmos_sees_ocean", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"atmos_sees_ocean"},
-  # {"name":"ocean_sees_atmos", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"ocean_sees_atmos"},
-  # {"name":"trop_sees_ocean", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"trop_sees_ocean"},
-  # {"name":"ocean_sees_trop", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"ocean_sees_trop"},
+  {"name":"atmos_sees_ocean", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"atmos_sees_ocean"},
+  {"name":"ocean_sees_atmos", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"ocean_sees_atmos"},
+  {"name":"trop_sees_ocean", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"trop_sees_ocean"},
+  {"name":"ocean_sees_trop", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"ocean_sees_trop"},
   # {"name":"dynamical", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"dynamical"},
 ]
 
