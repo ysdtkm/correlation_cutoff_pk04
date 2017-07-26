@@ -8,7 +8,7 @@ DIMM = 9    # dimension of model variable n
 DIMO = DIMM # dimension of observation variable m
 
 DT = 0.01
-TMAX = 100
+TMAX = 10
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 FCST_LT = 5
@@ -37,7 +37,7 @@ EXPLIST = [ \
   # {"name":"tdvar", "nmem":1, "method":"3dvar", "couple":"strong", "amp_b":amp_b_tdvar},
 ]
 
-Calc_lv = False
+Calc_lv = True
 
 def getr():
   r = np.identity(DIMO) * OERR_A ** 2

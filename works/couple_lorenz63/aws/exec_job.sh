@@ -29,11 +29,12 @@ echo ""
 COMMIT=`git show HEAD | head -n1 | cut -c8-14`
 DATE=`date "+%Y%m%d_%H%M"`
 
+# "command": ["./myjob.py"],
 cat <<EOF > ./aws/env.json
 {
   "vcpus": 1,
   "memory": 5000,
-  "command": ["./myjob.py"],
+  "command": ["make"],
   "environment": [
     {
       "name": "BATCH_FILE_TYPE",
