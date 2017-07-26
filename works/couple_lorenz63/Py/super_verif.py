@@ -21,12 +21,12 @@ def verif(param1s, param2s, param3s):
         rmse_all[i,j,k:] = np.array(rmse)
       rf.close()
 
-  plot(rmse_all, param1s, param2s, param3s)
+  plot_rmse(rmse_all, param1s, param2s, param3s)
   plot_min3(rmse_all, param1s, param2s, param3s)
 
   return 0
 
-def plot(rmse_all, param1s, param2s, param3s):
+def plot_rmse(rmse_all, param1s, param2s, param3s):
   lenc = 3 # extra, trop, ocean
   try:
     x = list(map(float, param3s))
@@ -45,6 +45,8 @@ def plot(rmse_all, param1s, param2s, param3s):
         ax.plot(x, rmse_all[i,j,:,ic], color=colors[ic], linestyle=styles[j], linewidth=lwidth[j],
                  label=(["extra", "trop", "ocean"][ic] + "_" + param2))
     ax.set_ylim(0, max(const.OERR_A, const.OERR_O) * 1.5)
+    ax.set_xlabel("Number of yes (assimilated)")
+    ax.set_ylabel("RMSE")
     ax.legend(bbox_to_anchor=(1.03,1), loc="upper left")
     plt.savefig("verif/verif_%s.pdf" % param1)
     plt.clf()
@@ -71,6 +73,8 @@ def plot_min3(rmse_all, param1s, param2s, param3s):
       ax.plot(x, rmse_min[:,j,ic], color=colors[ic], linestyle=styles[j], linewidth=lwidth[j],
                label=(["extra", "trop", "ocean"][ic] + "_" + param2))
   ax.set_ylim(0, max(const.OERR_A, const.OERR_O) * 1.5)
+  ax.set_xlabel("Ensemble member")
+  ax.set_ylabel("minimum RMSE for various number of yes")
   ax.legend(bbox_to_anchor=(1.03,1), loc="upper left")
   plt.savefig("verif/verif_min.pdf")
   plt.clf()
