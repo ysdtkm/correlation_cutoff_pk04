@@ -54,8 +54,6 @@ def write_const_file_from_template(param1s, param2s, param3s):
   wf.close()
 
 def exec_from_template(param1s, param2s, param3s, job_name, flag_test):
-  import super_verif
-
   for param1 in param1s:
     for param2 in param2s:
       write_const_file_from_template(param1s, param2s, param3s)
@@ -74,6 +72,7 @@ def exec_from_template(param1s, param2s, param3s, job_name, flag_test):
       os.system("mv image image_%s_%s" % (param1, param2))
 
   sys.path.append('Py')
+  import super_verif
   os.system("mkdir -p verif")
   super_verif.verif(param1s, param2s, param3s)
   if not flag_test:

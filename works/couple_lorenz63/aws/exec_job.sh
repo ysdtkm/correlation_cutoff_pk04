@@ -28,13 +28,13 @@ git pull && git push
 echo ""
 COMMIT=`git show HEAD | head -n1 | cut -c8-14`
 DATE=`date "+%Y%m%d_%H%M"`
+SCRIPT="myjob.py"
 
-# "command": ["./myjob.py"],
 cat <<EOF > ./aws/env.json
 {
   "vcpus": 1,
   "memory": 5000,
-  "command": ["./myjob.py"],
+  "command": ["./${SCRIPT}"],
   "environment": [
     {
       "name": "BATCH_FILE_TYPE",
@@ -42,7 +42,7 @@ cat <<EOF > ./aws/env.json
     },
     {
       "name": "BATCH_FILE_S3_URL",
-      "value": "s3://ysdtkm-bucket-1/myjob.py"
+      "value": "s3://ysdtkm-bucket-1/${SCRIPT}"
     },
     {
       "name": "BATCH_JOB_NAME",
@@ -56,7 +56,7 @@ cat <<EOF > ./aws/env.json
 }
 EOF
 
-aws s3 cp aws/myjob.py s3://ysdtkm-bucket-1/
+aws s3 cp aws/${SCRIPT} s3://ysdtkm-bucket-1/
 id=`aws batch submit-job \
   --job-name ${DATE}_${COMMIT}_${JOBNAME} \
   --job-queue ${queue} \
