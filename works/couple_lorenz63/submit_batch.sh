@@ -33,8 +33,8 @@ SCRIPT="myjob.py"
 cat <<EOF > ./aws/env.json
 {
   "vcpus": 1,
-  "memory": 5000,
-  "command": ["./${SCRIPT}", "python", "exec_from_template.py", "${JOBNAME}"],
+  "memory": 7000,
+  "command": ["./${SCRIPT}", "python", "exec_from_template.py", "${DATE}_${COMMIT}_${JOBNAME}"],
   "environment": [
     {
       "name": "BATCH_FILE_TYPE",
