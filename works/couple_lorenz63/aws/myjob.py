@@ -4,8 +4,8 @@
 import os, subprocess, sys
 
 def main():
-  commit = os.getenv("BATCH_COMMIT", "dummy")
-  wdir = os.getenv("BATCH_WDIR")
+  commit   = os.getenv("BATCH_COMMIT")
+  wdir     = os.getenv("BATCH_WDIR")
   job_name = os.getenv("BATCH_JOB_NAME", "dummy_job")
   commands = sys.argv[1:]
 
