@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-git status --short --branch
+git status --short --branch .
 if [ $# -lt 1 ]; then
   echo "Type (Ctrl-C) to stop."
   echo ""
