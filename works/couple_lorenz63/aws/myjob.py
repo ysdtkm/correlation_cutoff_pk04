@@ -38,7 +38,7 @@ def main():
   else:
     exec_not_from_template(job_name, flag_test)
 
-def write_const_file_from_template(param1s, param2s, param3s):
+def write_const_file_from_template(param1, param2, param3s):
   rf = open("aws/template_const.py", "r")
   wf = open("Py/const.py", "w")
   for line in rf:
@@ -56,7 +56,7 @@ def write_const_file_from_template(param1s, param2s, param3s):
 def exec_from_template(param1s, param2s, param3s, job_name, flag_test):
   for param1 in param1s:
     for param2 in param2s:
-      write_const_file_from_template(param1s, param2s, param3s)
+      write_const_file_from_template(param1, param2, param3s)
       try:
         subprocess.check_call(["make"])
       except:
