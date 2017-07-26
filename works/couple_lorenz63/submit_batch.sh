@@ -46,7 +46,7 @@ cat <<EOF > ./aws/env.json
     },
     {
       "name": "BATCH_FILE_S3_URL",
-      "value": "s3://ysdtkm-bucket-1/${SCRIPT}"
+      "value": "s3://ysdtkm-bucket-1/batch/${SCRIPT}"
     },
     {
       "name": "BATCH_JOB_NAME",
@@ -60,7 +60,7 @@ cat <<EOF > ./aws/env.json
 }
 EOF
 
-aws s3 cp aws/${SCRIPT} s3://ysdtkm-bucket-1/
+aws s3 cp aws/${SCRIPT} s3://ysdtkm-bucket-1/batch/
 id=`aws batch submit-job \
   --job-name ${DATE}_${COMMIT}_${JOBNAME} \
   --job-queue ${queue} \
