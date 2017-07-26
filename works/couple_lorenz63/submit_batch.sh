@@ -34,11 +34,15 @@ cat <<EOF > ./aws/env.json
 {
   "vcpus": 1,
   "memory": 5000,
-  "command": ["./${SCRIPT}"],
+  "command": ["./${SCRIPT}", "python", "exec_from_template.py", "${JOBNAME}"],
   "environment": [
     {
       "name": "BATCH_FILE_TYPE",
       "value": "script"
+    },
+    {
+      "name": "BATCH_WDIR",
+      "value": "/tmp/repos/works/couple_lorenz63"
     },
     {
       "name": "BATCH_FILE_S3_URL",
