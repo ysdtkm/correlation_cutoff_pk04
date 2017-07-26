@@ -16,7 +16,7 @@ def obtain_climatology():
   all_true = np.empty((nstep, DIMM))
 
   np.random.seed((10**9+7)*11)
-  true = np.random.normal(0.0, FERR_INI, DIMM)
+  true = np.random.randn(DIMM) * FERR_INI
 
   for i in range(0, nstep):
     true[:] = timestep(true[:], DT)

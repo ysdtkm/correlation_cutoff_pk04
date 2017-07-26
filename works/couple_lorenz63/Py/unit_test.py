@@ -46,7 +46,7 @@ def test_tangent_model():
   step_verif = 10
 
   # initialization (verification t0 -> t1)
-  x_t0 = np.random.normal(0.0, FERR_INI, DIMM)
+  x_t0 = np.random.randn(DIMM) * FERR_INI
   for i in range(STEPS):
     x_t0 = timestep(x_t0, DT)
   x_t1 = np.copy(x_t0)
@@ -83,7 +83,7 @@ def test_tangent_model():
 def test_tangent_sv():
   step_verif = 10
 
-  x_t0 = np.random.normal(0.0, FERR_INI, DIMM)
+  x_t0 = np.random.randn(DIMM) * FERR_INI
   for i in range(STEPS):
     x_t0 = timestep(x_t0, DT)
   m_finite = finite_time_tangent(x_t0, DT/4.0, step_verif*4)
@@ -207,7 +207,7 @@ def compare_coupled_vs_persistent_bc():
 
   np.random.seed((10**9+7)*12)
   all_true = np.empty((nstep, DIMM))
-  true = np.random.normal(0.0, FERR_INI, DIMM)
+  lrue = np.random.randn(DIMM) * FERR_INI
   fcst_cp = np.empty((DIMM))
   fcst_bc = np.empty((DIMM))
   msd_extra = np.zeros((leadtime))

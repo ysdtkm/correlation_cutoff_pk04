@@ -26,7 +26,7 @@ def exec_nature():
   # return   -> np.array[STEPS, DIMM]
 
   all_true = np.empty((STEPS, DIMM))
-  true = np.random.normal(0.0, FERR_INI, DIMM)
+  true = np.random.randn(DIMM) * FERR_INI
 
   # forward integration i-1 -> i
   for i in range(0, STEPS):
@@ -52,10 +52,10 @@ def exec_obs(nature):
   all_obs = np.empty((STEPS, DIMO))
   for i in range(0, STEPS):
     if DIMM == 9:
-      all_obs[i,:6] = nature[i,:6] + np.random.normal(0.0, OERR_A, 6)
-      all_obs[i,6:] = nature[i,6:] + np.random.normal(0.0, OERR_O, 3)
+      all_obs[i,:6] = nature[i,:6] + np.random.randn(6) * OERR_A
+      all_obs[i,6:] = nature[i,6:] + np.random.randn(3) * OERR_O
     else:
-      all_obs[i,:] = nature[i,:] + np.random.normal(0.0, OERR_A, DIMO)
+      all_obs[i,:] = nature[i,:] + np.random.randn(DIMO) * OERR_A
 
   all_obs.tofile("data/obs.bin")
   return all_obs
@@ -66,7 +66,7 @@ def exec_free_run(settings):
 
   free_run = np.empty((STEPS, settings["nmem"], DIMM))
   for m in range(0, settings["nmem"]):
-    free_run[0,m,:] = np.random.normal(0.0, FERR_INI, DIMM)
+    free_run[0,m,:] = np.random.randn(DIMM) * FERR_INI
     for i in range(1, STEP_FREE):
       free_run[i,m,:] = timestep(free_run[i-1,m,:], DT)
   return free_run

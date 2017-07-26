@@ -12,7 +12,7 @@ def calc_blv(all_true):
 
   orth_int = 1
 
-  blv = np.random.normal(0.0, 1.0, (DIMM, DIMM))
+  blv = np.random.randn(DIMM, DIMM)
   blv, ble = orth_norm_vectors(blv)
   all_blv = np.zeros((STEPS, DIMM, DIMM))
   all_ble = np.zeros((STEPS, DIMM))
@@ -37,7 +37,7 @@ def calc_flv(all_true):
 
   orth_int = 1
 
-  flv = np.random.normal(0.0, 1.0, (DIMM, DIMM))
+  flv = np.random.randn(DIMM, DIMM)
   flv, fle = orth_norm_vectors(flv)
   all_flv = np.zeros((STEPS, DIMM, DIMM))
   all_fle = np.zeros((STEPS, DIMM))
