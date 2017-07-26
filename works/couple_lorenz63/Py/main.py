@@ -10,11 +10,14 @@ from fdvar import *
 from vectors import *
 
 def main():
-  np.random.seed(1)
+  np.random.seed((10**9+7)*1)
   nature = exec_nature()
+
+  np.random.seed((10**9+7)*3)
   obs = exec_obs(nature)
+
   for settings in EXPLIST:
-    np.random.seed(100000007)
+    np.random.seed((10**9+7)*4)
     free = exec_free_run(settings)
     anl  = exec_assim_cycle(settings, free, obs)
     exec_deterministic_fcst(settings, anl)
@@ -31,6 +34,7 @@ def exec_nature():
     all_true[i,:] = true[:]
   all_true.tofile("data/true.bin")
 
+  np.random.seed((10**9+7)*2)
   if Calc_lv:
     all_blv, all_ble = calc_blv(all_true)
     all_flv, all_fle = calc_flv(all_true)

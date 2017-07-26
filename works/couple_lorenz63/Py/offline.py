@@ -15,7 +15,7 @@ def obtain_climatology():
   nstep = 100000
   all_true = np.empty((nstep, DIMM))
 
-  np.random.seed(1)
+  np.random.seed((10**9+7)*11)
   true = np.random.normal(0.0, FERR_INI, DIMM)
 
   for i in range(0, nstep):
@@ -35,12 +35,12 @@ def obtain_climatology():
   return 0
 
 def obtain_tdvar_b():
-  np.random.seed(100000007*2)
+  np.random.seed((10**9+7)*12)
   nature = exec_nature()
   obs = exec_obs(nature)
   settings = {"name":"etkf_strong_int8",  "rho":1.1, "aint":8, "nmem":10, \
               "method":"etkf", "couple":"strong"}
-  np.random.seed(100000007*3)
+  np.random.seed((10**9+7)*13)
   free = exec_free_run(settings)
   anl  = exec_assim_cycle(settings, free, obs)
   hist_bf = np.fromfile("data/%s_covr_back.bin" % settings["name"], np.float64)
@@ -105,12 +105,12 @@ def plot_matrix(data, name="", title="", color=plt.cm.bwr, xlabel="", ylabel="",
 def obtain_r2_etkf():
   use_posterior = False
 
-  np.random.seed(100000007*2)
+  np.random.seed((10**9+7)*12)
   nature = exec_nature()
   obs = exec_obs(nature)
   settings = {"name":"etkf_strong_int8",  "rho":"adaptive", "nmem":10,
               "method":"etkf", "couple":"strong", "r_local": "full"}
-  np.random.seed(100000007*3)
+  np.random.seed((10**9+7)*13)
   free = exec_free_run(settings)
   anl  = exec_assim_cycle(settings, free, obs)
 

@@ -205,7 +205,7 @@ def compare_coupled_vs_persistent_bc():
   nstep = 10000
   leadtime = 100
 
-  np.random.seed(100000007*2)
+  np.random.seed((10**9+7)*12)
   all_true = np.empty((nstep, DIMM))
   true = np.random.normal(0.0, FERR_INI, DIMM)
   fcst_cp = np.empty((DIMM))
