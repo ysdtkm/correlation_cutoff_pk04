@@ -34,7 +34,7 @@ cat <<EOF > ./aws/env.json
 {
   "vcpus": 1,
   "memory": 5000,
-  "command": ["make"],
+  "command": ["./myjob.py"],
   "environment": [
     {
       "name": "BATCH_FILE_TYPE",
