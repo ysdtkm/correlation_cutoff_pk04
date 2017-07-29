@@ -145,27 +145,25 @@ def obtain_r2_etkf():
           corr_ijt[it, i, j] = numera / denomi
           cov_ijt[it, i, j] = numera
 
-  corr_mean_ij = np.nanmean(corr_ijt, axis=0)
-  corr_rms_ij = np.sqrt(np.nanmean(corr_ijt**2, axis=0))
-  cov_mean_ij = np.nanmean(cov_ijt, axis=0)
-  cov_rms_ij = np.sqrt(np.nanmean(cov_ijt**2, axis=0))
-  ri = np.linalg.inv(getr())
-  bhhtri_rms_ij = cov_rms_ij.dot(ri)
+  corr_mean_ij   = np.nanmean(corr_ijt, axis=0)
+  corr_rms_ij    = np.sqrt(np.nanmean(corr_ijt**2, axis=0))
+  cov_mean_ij    = np.nanmean(cov_ijt, axis=0)
+  cov_rms_ij     = np.sqrt(np.nanmean(cov_ijt**2, axis=0))
+  ri             = np.linalg.inv(getr())
+  bhhtri_rms_ij  = cov_rms_ij.dot(ri)
   bhhtri_mean_ij = cov_mean_ij.dot(ri)
-  rand_ij = np.random.randn(DIMM, DIMM)
+  rand_ij        = np.random.randn(DIMM, DIMM)
 
   data_hash = {"correlation-mean":corr_mean_ij, "correlation-rms":corr_rms_ij, "covariance-mean":cov_mean_ij,
                "covariance-rms":cov_rms_ij, "BHHtRi-mean":bhhtri_mean_ij, "BHHtRi-rms":bhhtri_rms_ij, "random":rand_ij}
   for name in data_hash:
     plot_matrix(data_hash[name], title=name, xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
     print(name)
-    matrix_nondiagonal_order(np.abs(data_hash[name]))
-
-  print(rand_ij)
+    matrix_order(np.abs(data_hash[name]))
 
   return 0
 
-def matrix_nondiagonal_order(mat_ij, prioritize_diag=False, max_odr=81):
+def matrix_order(mat_ij, prioritize_diag=False, max_odr=81):
   n = len(mat_ij)
   if len(mat_ij[0]) != n:
     raise Exception("input matrix non-square")
@@ -183,43 +181,46 @@ def matrix_nondiagonal_order(mat_ij, prioritize_diag=False, max_odr=81):
         return io
     raise Exception("find_order overflow")
 
+  def print_order(order):
+    for i in range(n):
+      print("[", end="")
+      for j in range(n):
+        if order[i][j] < max_odr:
+          print("%2d" % order[i][j], end="")
+        else:
+          print("**", end="")
+        if j < n-1:
+          print(", ", end="")
+      print("],")
+    print("")
+    return
+
+  order = [[0 for j in range(n)] for i in range(n)]
   if prioritize_diag:
     nondiagonal_components = []
     for i in range(n):
       for j in range(i+1, n):
         nondiagonal_components.append((i, j, mat_ij[i,j]))
-    order = sorted(nondiagonal_components, key=lambda x: x[2], reverse=True)
-
+    order_obj_upper = sorted(nondiagonal_components, key=lambda x: x[2], reverse=True)
     for i in range(n):
       for j in range(n):
         if i == j:
-          print("%2d, " % i, end="")
+          order[i][j] = i
         else:
-          odr = find_order(i, j, order, True) * 2 + 9
-          if odr < max_odr:
-            print("%2d, " % odr, end="")
-          else:
-            print("** ", end="")
-      print("")
-    print("")
-
+          order[i][j] = find_order(i, j, order_obj_upper, True) * 2 + 9
   else:
     all_components = []
     for i in range(n):
       for j in range(n):
         all_components.append((i, j, mat_ij[i,j]))
-    order = sorted(all_components, key=lambda x: x[2], reverse=True)
-
+    order_obj = sorted(all_components, key=lambda x: x[2], reverse=True)
     for i in range(n):
       for j in range(n):
-        odr = find_order(i, j, order, False)
-        if odr < max_odr:
-          print("%2d, " % odr, end="")
-        else:
-          print("** ", end="")
-      print("")
-    print("")
+        order[i][j] = find_order(i, j, order_obj, False)
+
+    print_order(order)
 
   return 0
+
 
 obtain_r2_etkf()
