@@ -154,13 +154,8 @@ def obtain_r2_etkf():
   bhhtri_mean_ij = cov_mean_ij.dot(ri)
   rand_ij = np.random.randn(DIMM, DIMM)
 
-  data_hash = {"correlation-mean":corr_mean_ij,
-               "correlation-rms":corr_rms_ij,
-               "covariance-mean":cov_mean_ij,
-               "covariance-rms":cov_rms_ij,
-               "BHHtRi-mean":bhhtri_mean_ij,
-               "BHHtRi-rms":bhhtri_rms_ij,
-               "random":rand_ij}
+  data_hash = {"correlation-mean":corr_mean_ij, "correlation-rms":corr_rms_ij, "covariance-mean":cov_mean_ij,
+               "covariance-rms":cov_rms_ij, "BHHtRi-mean":bhhtri_mean_ij, "BHHtRi-rms":bhhtri_rms_ij, "random":rand_ij}
   for name in data_hash:
     plot_matrix(data_hash[name], title=name, xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
     print(name)
