@@ -102,7 +102,14 @@ def plot_matrix(data, name="", title="", color=plt.cm.bwr, xlabel="", ylabel="",
   plt.close()
   return 0
 
-def obtain_r2_etkf():
+def obtain_stats_etkf():
+  def cov_to_corr(cov):
+    corr = cov.copy()
+    for i in range(DIMM):
+      for j in range(DIMM):
+        corr[i,j] /= np.sqrt(cov[i,i] * cov[j,j])
+    return corr
+
   use_posterior = False
 
   np.random.seed((10**8+7)*12)
@@ -226,4 +233,4 @@ def matrix_order(mat_ij, prioritize_diag=False, max_odr=81):
 
   return 0
 
-obtain_r2_etkf()
+obtain_stats_etkf()
