@@ -163,7 +163,7 @@ def obtain_r2_etkf():
 
   return 0
 
-def matrix_order(mat_ij, prioritize_diag=False, max_odr=81):
+def matrix_order(mat_ij, prioritize_diag=True, max_odr=37): # ttk
   n = len(mat_ij)
   if len(mat_ij[0]) != n:
     raise Exception("input matrix non-square")
@@ -197,11 +197,11 @@ def matrix_order(mat_ij, prioritize_diag=False, max_odr=81):
 
   order = [[0 for j in range(n)] for i in range(n)]
   if prioritize_diag:
-    nondiagonal_components = []
+    upper_components = []
     for i in range(n):
       for j in range(i+1, n):
-        nondiagonal_components.append((i, j, mat_ij[i,j]))
-    order_obj_upper = sorted(nondiagonal_components, key=lambda x: x[2], reverse=True)
+        upper_components.append((i, j, mat_ij[i,j]))
+    order_obj_upper = sorted(upper_components, key=lambda x: x[2], reverse=True)
     for i in range(n):
       for j in range(n):
         if i == j:
@@ -218,7 +218,7 @@ def matrix_order(mat_ij, prioritize_diag=False, max_odr=81):
       for j in range(n):
         order[i][j] = find_order(i, j, order_obj, False)
 
-    print_order(order)
+  print_order(order)
 
   return 0
 
