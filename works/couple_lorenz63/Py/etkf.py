@@ -140,7 +140,7 @@ def get_weight_table(r_local, num_yes):
                  "correlation-rms", "random", "bhhtri-mean", "bhhtri-rms"]:
     if num_yes == None:
       num_yes = 37
-    weight_table = stats_weight_order(r_local, num_yes)
+    weight_table = weight_based_on_stats(r_local, num_yes)
   elif r_local == "dynamical": # a38p35
     weight_table = np.array([
       [1,1,1,  1,0,0,  0,0,0], [1,1,1,  0,1,0,  0,0,0], [1,1,1,  0,0,0,  0,0,0],
@@ -164,6 +164,13 @@ def get_weight_table(r_local, num_yes):
         weight_table[iyc*3:iyc*3+3, ixc*3:ixc*3+3] = \
           weight_table_small[r_local][iyc, ixc]
   return weight_table
+
+def weight_based_on_stats(r_local, odr_max=37):
+  if DIMM != 9:
+    raise Exception("stats_weight_order() is only for 9-variable PK04 model")
+
+  order_table = stats_order(r_local)
+  return np.float64(order_table < odr_max)
 
 def init_etkf_adaptive_inflation():
   # return : np.array([[delta_extra, delta_trop, delta_ocean],

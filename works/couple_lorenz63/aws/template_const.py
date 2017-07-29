@@ -27,6 +27,10 @@ EXPLIST = [ \
   {"name":"<<param2>>_<<param3_sanit>>", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"<<param2>>", "num_yes":<<param3>>},
 ]
 
+# {"name":"etkf", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"full"},
+# {"name":"tdvar", "rho":rho, "nmem":1, "method":"3dvar", "couple":"strong", "amp_b":amp_b_tdvar},
+# {"name":"fdvar", "rho":rho, "nmem":1, "method":"4dvar", "couple":"strong", "amp_b":amp_b_fdvar},
+
 Calc_lv = False
 
 def getr():

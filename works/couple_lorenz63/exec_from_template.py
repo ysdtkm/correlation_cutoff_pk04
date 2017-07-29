@@ -6,9 +6,9 @@ import numpy as np
 # ====================================
 from_template = True
 if from_template:
-  param1s = ["4", "5", "6"]
-  param2s = ["covariance-rms", "covariance-mean"]
-  param3s = ["9", "19"] # list(map(str, np.linspace(9, 81, 3, dtype=np.int32)))
+  param1s = ["4"] # , "5", "6"]
+  param2s = ["covariance-rms"] # , "covariance-mean"]
+  param3s = list(map(str, np.linspace(9, 19, 11, dtype=np.int32)))
 # ====================================
 
 def main():
@@ -27,9 +27,16 @@ def exec_not_from_template(job_name, flag_local):
     os.system("aws s3 cp image s3://ysdtkm-bucket-1/couple_lorenz63/tar/%s --recursive" % job_name)
     os.system("aws s3 cp latex/out.pdf s3://ysdtkm-bucket-1/couple_lorenz63/pdf/%s.pdf" % job_name)
 
-def exec_from_template(param1s, param2s, param3s, job_name, flag_local):
+def exec_from_template(param1s, param2s, param3s_raw, job_name, flag_local):
+  sys.path.append('Py')
+  import super_verif, stats_const
+
   for param1 in param1s:
     for param2 in param2s:
+      weight_order = stats_const.stats_order(param2).flatten()
+      param3s = [p3 for p3 in param3s_raw if (int(p3) - 1 in weight_order)]
+      print(param3s); sys.exit(3)
+
       write_const_file_from_template(param1, param2, param3s)
       try:
         subprocess.check_call(["make"])
@@ -45,8 +52,6 @@ def exec_from_template(param1s, param2s, param3s, job_name, flag_local):
       os.system("rm -rf image_%s_%s" % (param1, param2))
       os.system("mv image image_%s_%s" % (param1, param2))
 
-  sys.path.append('Py')
-  import super_verif
   os.system("mkdir -p verif")
   super_verif.verif(param1s, param2s, param3s)
   if not flag_local:

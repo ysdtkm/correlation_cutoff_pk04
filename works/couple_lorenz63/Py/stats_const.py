@@ -32,9 +32,9 @@ def tdvar_b():
 
   return b
 
-def stats_weight_order(r_local, odr_max=37):
+def stats_order(r_local):
   if DIMM != 9:
-    raise Exception("stats_weight_order() is only for 9-variable PK04 model")
+    raise Exception("stats_order() is only for 9-variable PK04 model")
 
   # order_table obtained from d265ebb, unit_test.py (diagonal elements prioritized)
   if r_local == "correlation-mean":
@@ -121,5 +121,5 @@ def stats_weight_order(r_local, odr_max=37):
     [67, 75, 77, 76, 71, 47, 36, 50, 56],
     [12, 46,  3, 31, 80, 15, 24, 25, 17]],
     dtype=np.int32)
-  return np.float64(order_table < odr_max)
+  return order_table
 
