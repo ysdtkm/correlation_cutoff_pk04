@@ -15,7 +15,7 @@ def obtain_climatology():
   nstep = 100000
   all_true = np.empty((nstep, DIMM))
 
-  np.random.seed((10**9+7)*11)
+  np.random.seed((10**8+7)*11)
   true = np.random.randn(DIMM) * FERR_INI
 
   for i in range(0, nstep):
@@ -35,12 +35,12 @@ def obtain_climatology():
   return 0
 
 def obtain_tdvar_b():
-  np.random.seed((10**9+7)*12)
+  np.random.seed((10**8+7)*12)
   nature = exec_nature()
   obs = exec_obs(nature)
   settings = {"name":"etkf_strong_int8",  "rho":1.1, "aint":8, "nmem":10, \
               "method":"etkf", "couple":"strong"}
-  np.random.seed((10**9+7)*13)
+  np.random.seed((10**8+7)*13)
   free = exec_free_run(settings)
   anl  = exec_assim_cycle(settings, free, obs)
   hist_bf = np.fromfile("data/%s_covr_back.bin" % settings["name"], np.float64)
@@ -105,12 +105,12 @@ def plot_matrix(data, name="", title="", color=plt.cm.bwr, xlabel="", ylabel="",
 def obtain_r2_etkf():
   use_posterior = False
 
-  np.random.seed((10**9+7)*12)
+  np.random.seed((10**8+7)*12)
   nature = exec_nature()
   obs = exec_obs(nature)
   settings = {"name":"etkf_strong_int8",  "rho":"adaptive", "nmem":10,
               "method":"etkf", "couple":"strong", "r_local": "full"}
-  np.random.seed((10**9+7)*13)
+  np.random.seed((10**8+7)*13)
   free = exec_free_run(settings)
   anl  = exec_assim_cycle(settings, free, obs)
 
@@ -126,6 +126,8 @@ def obtain_r2_etkf():
   cov_ijt[:,:,:] = np.nan
   cov2_ijt = np.empty((STEPS, DIMM, DIMM))
   cov2_ijt[:,:,:] = np.nan
+  k_ijt = np.empty((STEPS, DIMM, DIMM))
+  r = getr()
 
   for it in range(STEPS//2, STEPS):
     if it % AINT == 0:
@@ -149,6 +151,7 @@ def obtain_r2_etkf():
           corr2_ijt[it, i, j] = numera ** 2 / denomi ** 2
           cov_ijt[it, i, j] = numera
           cov2_ijt[it, i, j] = numera ** 2
+      k_ijt[it,:,:] = cov_ijt[it,:,:].dot(np.linalg.inv(r + cov_ijt[it,:,:]))
 
 
   corr_mean_ij = np.nanmean(corr_ijt, axis=0)
@@ -158,6 +161,8 @@ def obtain_r2_etkf():
   ri = np.linalg.inv(getr())
   bhhtri_rms_ij = cov_rms_ij.dot(ri)
   bhhtri_mean_ij = cov_mean_ij.dot(ri)
+  k_rms_ij = np.sqrt(np.nanmean(k_ijt**2, axis=0))
+  k_mean_ij = np.nanmean(k_ijt, axis=0)
 
   plot_matrix(corr_mean_ij, title="Corr_mean", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
   plot_matrix(corr_rms_ij, title="Corr_rms", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
@@ -165,6 +170,8 @@ def obtain_r2_etkf():
   plot_matrix(cov_rms_ij, title="Cov_rms", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
   plot_matrix(bhhtri_rms_ij, title="BHHtRi_rms", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
   plot_matrix(bhhtri_mean_ij, title="BHHtRi_mean", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
+  plot_matrix(k_rms_ij, title="K_rms", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
+  plot_matrix(k_mean_ij, title="K_mean", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
 
   print("correlation-mean")
   matrix_nondiagonal_order(np.abs(corr_mean_ij))
