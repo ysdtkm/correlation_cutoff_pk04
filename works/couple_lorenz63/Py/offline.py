@@ -163,7 +163,7 @@ def obtain_r2_etkf():
 
   return 0
 
-def matrix_order(mat_ij, prioritize_diag=True, max_odr=37): # ttk
+def matrix_order(mat_ij, prioritize_diag=False, max_odr=81):
   n = len(mat_ij)
   if len(mat_ij[0]) != n:
     raise Exception("input matrix non-square")
@@ -178,7 +178,11 @@ def matrix_order(mat_ij, prioritize_diag=True, max_odr=37): # ttk
 
     for io, cmp in enumerate(order):
       if cmp[0] == i and cmp[1] == j:
-        return io
+        if (io < len(order) - 1) and (order[io+1][0] == j) and (order[io+1][1] == i):
+          # if same elements in symmetric position, return rouded-up number
+          return io + 1
+        else:
+          return io
     raise Exception("find_order overflow")
 
   def print_order(order):
@@ -207,7 +211,7 @@ def matrix_order(mat_ij, prioritize_diag=True, max_odr=37): # ttk
         if i == j:
           order[i][j] = i
         else:
-          order[i][j] = find_order(i, j, order_obj_upper, True) * 2 + 9
+          order[i][j] = find_order(i, j, order_obj_upper, True) * 2 + 9 + 1
   else:
     all_components = []
     for i in range(n):
@@ -221,6 +225,5 @@ def matrix_order(mat_ij, prioritize_diag=True, max_odr=37): # ttk
   print_order(order)
 
   return 0
-
 
 obtain_r2_etkf()
