@@ -9,6 +9,7 @@ from main import exec_nature, exec_obs, exec_free_run, exec_assim_cycle
 import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
+import matplotlib.colors as colors
 
 def test_fdvar_overflow():
   exp = EXPLIST[1]
@@ -45,7 +46,7 @@ def test_tangent_model():
   step_verif = 10
 
   # initialization (verification t0 -> t1)
-  x_t0 = np.random.normal(0.0, FERR_INI, DIMM)
+  x_t0 = np.random.randn(DIMM) * FERR_INI
   for i in range(STEPS):
     x_t0 = timestep(x_t0, DT)
   x_t1 = np.copy(x_t0)
@@ -82,7 +83,7 @@ def test_tangent_model():
 def test_tangent_sv():
   step_verif = 10
 
-  x_t0 = np.random.normal(0.0, FERR_INI, DIMM)
+  x_t0 = np.random.randn(DIMM) * FERR_INI
   for i in range(STEPS):
     x_t0 = timestep(x_t0, DT)
   m_finite = finite_time_tangent(x_t0, DT/4.0, step_verif*4)
@@ -126,94 +127,6 @@ def test_cost_function_grad():
 
   return 0
 
-def obtain_climatology():
-  nstep = 100000
-  all_true = np.empty((nstep, DIMM))
-
-  np.random.seed(1)
-  true = np.random.normal(0.0, FERR_INI, DIMM)
-
-  for i in range(0, nstep):
-    true[:] = timestep(true[:], DT)
-    all_true[i,:] = true[:]
-  # all_true.tofile("data/true_for_clim.bin")
-
-  mean = np.mean(all_true[nstep//2:,:], axis=0)
-  print("mean")
-  print(mean)
-
-  mean2 = np.mean(all_true[nstep//2:,:]**2, axis=0)
-  stdv = np.sqrt(mean2 - mean**2)
-  print("stdv")
-  print(stdv)
-
-  return 0
-
-def obtain_tdvar_b():
-  np.random.seed(100000007*2)
-  nature = exec_nature()
-  obs = exec_obs(nature)
-  settings = {"name":"etkf_strong_int8",  "rho":1.1, "aint":8, "nmem":10, \
-              "method":"etkf", "couple":"strong"}
-  np.random.seed(100000007*3)
-  free = exec_free_run(settings)
-  anl  = exec_assim_cycle(settings, free, obs)
-  hist_bf = np.fromfile("data/%s_covr_back.bin" % settings["name"], np.float64)
-  hist_bf = hist_bf.reshape((STEPS, DIMM, DIMM))
-  mean_bf = np.nanmean(hist_bf[STEPS//2:, :, :], axis=0)
-  trace = np.trace(mean_bf)
-  mean_bf *= (DIMM / trace)
-
-  print("[ \\")
-  for i in range(DIMM):
-    print("[", end="")
-    for j in range(DIMM):
-      print("%12.9g" % mean_bf[i,j], end="")
-      if j < (DIMM - 1):
-        print(", ", end="")
-    if i < (DIMM - 1):
-      print("], \\")
-    else:
-      print("]  \\")
-      print("]")
-
-  return 0
-
-def print_two_dim_nparray(data, format="%12.9g"):
-  n = data.shape[0]
-  m = data.shape[1]
-  print("[ \\")
-  for i in range(n):
-    print("[", end="")
-    for j in range(m):
-      print(format % data[i,j], end="")
-      if j < (m - 1):
-        print(", ", end="")
-    if i < (n - 1):
-      print("], \\")
-    else:
-      print("]  \\")
-      print("]")
-
-def plot_matrix(data, name="", title="", color=plt.cm.bwr, xlabel="", ylabel=""):
-  fig, ax = plt.subplots(1)
-  fig.subplots_adjust(left=0.12, right=0.95, bottom=0.12, top=0.92)
-  cmax = np.max(np.abs(data))
-  map1 = ax.pcolor(data, cmap=color)
-  if (color == plt.cm.bwr):
-    map1.set_clim(-1.0 * cmax, cmax)
-  x0,x1 = ax.get_xlim()
-  y0,y1 = ax.get_ylim()
-  ax.set_aspect(abs(x1-x0)/abs(y1-y0))
-  ax.set_xlabel(xlabel)
-  ax.set_ylabel(ylabel)
-  cbar = plt.colorbar(map1)
-  plt.title(title)
-  plt.gca().invert_yaxis()
-  plt.savefig("./matrix_%s_%s.png" % (name, title))
-  plt.close()
-  return 0
-
 def check_b():
   # obtained by unit_test.py/obtain_tdvar_b(), a66aa31, 100000 timesteps
   new = np.array([ \
@@ -250,13 +163,51 @@ def check_b():
   plot_matrix(np.log(np.abs(new)), "", "new", color=plt.cm.Reds)
   return 0
 
+def print_two_dim_nparray(data, format="%12.9g"):
+  n = data.shape[0]
+  m = data.shape[1]
+  print("[ \\")
+  for i in range(n):
+    print("[", end="")
+    for j in range(m):
+      print(format % data[i,j], end="")
+      if j < (m - 1):
+        print(", ", end="")
+    if i < (n - 1):
+      print("], \\")
+    else:
+      print("]  \\")
+      print("]")
+
+def plot_matrix(data, name="", title="", color=plt.cm.bwr, xlabel="", ylabel="", logscale=False, linthresh=1e-3):
+  fig, ax = plt.subplots(1)
+  fig.subplots_adjust(left=0.12, right=0.95, bottom=0.12, top=0.92)
+  cmax = np.max(np.abs(data))
+  if logscale:
+    map1 = ax.pcolor(data, cmap=color, norm=colors.SymLogNorm(linthresh=linthresh*cmax))
+  else:
+    map1 = ax.pcolor(data, cmap=color)
+  if (color == plt.cm.bwr):
+    map1.set_clim(-1.0 * cmax, cmax)
+  x0,x1 = ax.get_xlim()
+  y0,y1 = ax.get_ylim()
+  ax.set_aspect(abs(x1-x0)/abs(y1-y0))
+  ax.set_xlabel(xlabel)
+  ax.set_ylabel(ylabel)
+  cbar = plt.colorbar(map1)
+  plt.title(title)
+  plt.gca().invert_yaxis()
+  plt.savefig("./matrix_%s_%s.png" % (name, title))
+  plt.close()
+  return 0
+
 def compare_coupled_vs_persistent_bc():
   nstep = 10000
   leadtime = 100
 
-  np.random.seed(100000007*2)
+  np.random.seed((10**9+7)*12)
   all_true = np.empty((nstep, DIMM))
-  true = np.random.normal(0.0, FERR_INI, DIMM)
+  lrue = np.random.randn(DIMM) * FERR_INI
   fcst_cp = np.empty((DIMM))
   fcst_bc = np.empty((DIMM))
   msd_extra = np.zeros((leadtime))
@@ -270,7 +221,7 @@ def compare_coupled_vs_persistent_bc():
 
   fcst_interval = 100
   for i in range(nstep // fcst_interval):
-    persis_bc = all_true[i*fcst_interval,:]
+    persis_bc = all_true[i*fcst_interval,:].copy()
     fcst_cp[:] = all_true[i*fcst_interval,:]
     fcst_bc[:] = all_true[i*fcst_interval,:]
 
@@ -303,44 +254,3 @@ def compare_coupled_vs_persistent_bc():
   plt.ylabel("RMSD, coupled vs persistent BC forecasts")
   plt.savefig("./rmsd_coupled_vs_persistentbc.png")
 
-def obtain_r2_etkf():
-  np.random.seed(100000007*2)
-  nature = exec_nature()
-  obs = exec_obs(nature)
-  settings = {"name":"etkf_strong_int8",  "rho":1.1, "nmem":10,
-              "method":"etkf", "couple":"strong", "r_local": "full"}
-  np.random.seed(100000007*3)
-  free = exec_free_run(settings)
-  anl  = exec_assim_cycle(settings, free, obs)
-
-  nmem = settings["nmem"]
-  hist_fcst = np.fromfile("data/%s_cycle.bin" % settings["name"], np.float64)
-  hist_fcst = hist_fcst.reshape((STEPS, nmem, DIMM))
-
-  r2_ijt = np.empty((STEPS, DIMM, DIMM))
-  r2_ijt[:,:,:] = np.nan
-  for it in range(STEPS//2, STEPS):
-    if it % AINT == 0:
-      # reproduce background
-      fcst = hist_fcst[it-AINT, :, :]
-      for jt in range(AINT):
-        for k in range(nmem):
-          fcst[k, :] = timestep(fcst[k,:], DT)
-
-      for i in range(DIMM):
-        for j in range(DIMM):
-          # a38p40
-          vector_i = fcst[:, i]
-          vector_j = fcst[:, j]
-          vector_i[:] -= np.mean(vector_i)
-          vector_j[:] -= np.mean(vector_j)
-          numera = np.sum(vector_i * vector_j) ** 2
-          denomi = np.sum(vector_i ** 2) * np.sum(vector_j ** 2)
-          r2 = numera / denomi
-          r2_ijt[it, i, j] = r2
-  r2_ij = np.nanmean(r2_ijt, axis=0)
-  print(r2_ij)
-  plot_matrix(r2_ij, title="R_squared", xlabel="grid index i", ylabel="grid index j")
-  return 0
-
-obtain_r2_etkf()

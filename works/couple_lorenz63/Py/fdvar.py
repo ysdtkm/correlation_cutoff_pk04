@@ -5,7 +5,7 @@ import numpy as np
 from scipy.linalg import sqrtm
 from scipy.optimize import fmin, fmin_bfgs
 from const import *
-from tdvar import *
+from stats_const import *
 from model import *
 
 def fdvar(fcst_0, h, r, yo, aint, i_s, i_e, amp_b, bc=None):

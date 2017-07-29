@@ -19,14 +19,12 @@ FERR_INI = 10.0
 AINT = 8
 
 rho = "adaptive"
-nmem = 6
+nmem = <<param1>>
 amp_b_tdvar = 2.0
 amp_b_fdvar = 1.5
 
 EXPLIST = [ \
-  {"name":"etkf", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"full"},
-  {"name":"tdvar", "rho":rho, "nmem":1, "method":"3dvar", "couple":"strong", "amp_b":amp_b_tdvar},
-  {"name":"fdvar", "rho":rho, "nmem":1, "method":"4dvar", "couple":"strong", "amp_b":amp_b_fdvar},
+  {"name":"<<param2>>_<<param3_sanit>>", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"<<param2>>", "num_yes":<<param3>>},
 ]
 
 Calc_lv = False

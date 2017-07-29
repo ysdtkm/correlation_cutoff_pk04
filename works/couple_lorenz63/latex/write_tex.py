@@ -17,7 +17,7 @@ def main():
   # rmse and lyapunov exponents
   txt_out += figure_table("", ["../image/true/rmse_bar.pdf"], 1, 1, datestr, commit_name)
   txt_out += write_txt(datestr, commit_name,
-                        "../image/true/rmse.txt", "9pt", "rmse")
+                        "../image/true/rmse_for_tex.txt", "9pt", "rmse")
   txt_out += write_txt(datestr, commit_name,
                         "../data/lyapunov.txt", "5.4pt", "lyapunov exponents")
 
@@ -37,7 +37,7 @@ def main():
     imglist = ["anl_covar_logrms", "back_covar_logrms", "anl_covar_mean", "back_covar_mean", \
                "extra_traj", "trop_traj", "ocean_traj", "back_cosine_mean", \
                "extra_val", "trop_val", "ocean_val", "anl_cosine_mean", \
-               "extra_time", "trop_time", "ocean_time", ""]
+               "extra_time", "trop_time", "ocean_time", "inflation"]
     for imgname in imglist:
       filelist.append("../image/%s/%s_%s.pdf" % (exp["name"], exp["name"], imgname))
     txt_out += figure_table(exp["name"], filelist, 4, 4, datestr, commit_name)

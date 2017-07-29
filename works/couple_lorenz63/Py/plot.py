@@ -51,6 +51,9 @@ def plot_all():
       plot_3d_trajectory(hist_true, hist_fcst, name, nmem)
 
     if (exp["method"] == "etkf"):
+      if exp["rho"] == "adaptive" or exp["rho"] == "adaptive_each":
+        plot_adaptive_inflation(name, exp["rho"])
+
       for vec in vectors:
         is_oblique = (vec == "clv")
         plot_lv_projection(hist_vector[vec], hist_fcst, name, vector_name[vec], nmem, is_oblique)
@@ -252,10 +255,17 @@ def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
       plt.savefig("./image/%s/%s_%s_%s.pdf" % (name, name, name_component, "time"), dpi=80)
       plt.clf()
       plt.close()
+
+    # text output
     f = open("./image/true/rmse.txt", "a")
-    f.write(("%-25s" % name) + str(["%5g" % x for x in rmse_component]) + "\n")
-    print("%-25s" % name, ["%5g" % x for x in rmse_component])
+    f.write(("%-25s" % name) + " ".join(map(str, rmse_component)) + "\n")
     f.close()
+
+    f = open("./image/true/rmse_for_tex.txt", "a")
+    f.write(("%-25s" % name) + " ".join(["%-8.03g" % x for x in rmse_component]) + "\n")
+    f.close()
+
+    print(("%-25s" % name) + " ".join(["%-8.03g" % x for x in rmse_component]))
     rmse_hash[name] = rmse_component
 
   else: # lorenz96
@@ -300,18 +310,18 @@ def plot_time_value(hist_true, hist_fcst, hist_obs, name, nmem):
       fig, (ax1, ax2, ax3) = plt.subplots(3, sharex=True)
       ax1.set_title("%s %s" % (name, name_component))
       ax1.plot(hist_true[:,0+i_adjust], label="true")
-      ax1.plot(hist_fcst_mean[:,0+i_adjust], label="model")
+      ax1.plot(hist_fcst_mean[:,0+i_adjust], label="DA cycle")
       if "x" in name:
         ax1.plot(hist_obs[:,0+i_adjust], label="obs", linestyle='None', marker=".")
       ax1.set_ylabel("x")
       ax1.legend(loc="upper right")
       ax2.plot(hist_true[:,1+i_adjust], label="true")
-      ax2.plot(hist_fcst_mean[:,1+i_adjust], label="model")
+      ax2.plot(hist_fcst_mean[:,1+i_adjust], label="DA cycle")
       if "y" in name:
         ax2.plot(hist_obs[:,1+i_adjust], label="obs", linestyle='None', marker=".")
       ax2.set_ylabel("y")
       ax3.plot(hist_true[:,2+i_adjust], label="true")
-      ax3.plot(hist_fcst_mean[:,2+i_adjust], label="model")
+      ax3.plot(hist_fcst_mean[:,2+i_adjust], label="DA cycle")
       if "z" in name:
         ax3.plot(hist_obs[:,2+i_adjust], label="obs", linestyle='None', marker=".")
       ax3.set_ylabel("z")
@@ -324,7 +334,7 @@ def plot_time_value(hist_true, hist_fcst, hist_obs, name, nmem):
     fig, ax1 = plt.subplots(1)
     ax1.set_title(name)
     ax1.plot(hist_true[:,0], label="true")
-    ax1.plot(hist_fcst_mean[:,0], label="model")
+    ax1.plot(hist_fcst_mean[:,0], label="DA cycle")
     ax1.plot(hist_obs[:,0], label="obs", linestyle='None', marker=".")
     ax1.set_ylabel("0th element")
     ax1.legend(loc="upper right")
@@ -358,7 +368,7 @@ def plot_3d_trajectory(hist_true, hist_fcst, name, nmem):
     ax.plot(hist_true[st:,0+i_adjust], hist_true[st:,1+i_adjust], \
       hist_true[st:,2+i_adjust], label="true")
     ax.plot(hist_fcst_mean[st:,0+i_adjust], hist_fcst_mean[st:,1+i_adjust], \
-      hist_fcst_mean[st:,2+i_adjust], label="model")
+      hist_fcst_mean[st:,2+i_adjust], label="DA cycle")
     ax.legend()
     # ax.set_xlim([-30,30])
     # ax.set_ylim([-30,30])
@@ -379,7 +389,7 @@ def plot_covariance_matr(hist_covar, name, sel):
   with warnings.catch_warnings():
     warnings.simplefilter("ignore", category=RuntimeWarning)
     rms_covar  = np.sqrt(np.nan_to_num(np.nanmean(hist_covar[STEPS//2:STEPS,:,:]**2, axis=0)))
-    mean_covar = np.nan_to_num(np.nanmean(hist_covar, axis=0))
+    mean_covar = np.nan_to_num(np.nanmean(hist_covar[STEPS//2:STEPS,:,:], axis=0))
     rms_log = np.log(rms_covar)
     mean_cosine = np.copy(mean_covar)
     for i in range(DIMM):
@@ -447,8 +457,8 @@ def plot_rmse_bar(hist_true):
 
   fig, ax = plt.subplots()
   fig.subplots_adjust(top=0.85, bottom=0.2, right=0.67)
-  oerr_a = ax.axhline(y=OERR_A, label="sqrt(R_atmos)", alpha=0.5, color="red")
-  oerr_o = ax.axhline(y=OERR_O, label="sqrt(R_ocean)", alpha=0.5, color="blue")
+  oerr_a = ax.axhline(y=OERR_A, label="obs_error(atmos)", alpha=0.5, color="red")
+  oerr_o = ax.axhline(y=OERR_O, label="obs_error(ocean)", alpha=0.5, color="blue")
 
   plist = []
   j = 0
@@ -470,4 +480,25 @@ def plot_rmse_bar(hist_true):
 
   return 0
 
-plot_all()
+def plot_adaptive_inflation(name, method):
+  hist_infl = np.fromfile("data/%s_inflation.bin" % name, np.float64)
+  hist_infl = hist_infl.reshape((STEPS, 3))
+
+  if method == "adaptive_each":
+    for i in range(3):
+      name_component = ["extra", "trop", "ocean"][i]
+      color = ["r", "g", "b"][i]
+      plt.plot(hist_infl[:,i], color=color, label=name_component)
+  else:
+    plt.plot(hist_infl[:,0], label="common")
+
+  plt.xlim(0, STEPS)
+  plt.ylim(0.9, 1.2)
+  plt.axhline(y=1.0, color="black", alpha=0.5)
+  plt.title("adaptive inflation")
+  plt.legend()
+  plt.savefig("./image/%s/%s_inflation.pdf" % (name, name))
+  plt.close()
+
+if __name__ == "__main__":
+  plot_all()
