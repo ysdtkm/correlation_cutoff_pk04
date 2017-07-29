@@ -120,13 +120,8 @@ def obtain_r2_etkf():
 
   corr_ijt = np.empty((STEPS, DIMM, DIMM))
   corr_ijt[:,:,:] = np.nan
-  corr2_ijt = np.empty((STEPS, DIMM, DIMM))
-  corr2_ijt[:,:,:] = np.nan
   cov_ijt = np.empty((STEPS, DIMM, DIMM))
   cov_ijt[:,:,:] = np.nan
-  cov2_ijt = np.empty((STEPS, DIMM, DIMM))
-  cov2_ijt[:,:,:] = np.nan
-  k_ijt = np.empty((STEPS, DIMM, DIMM))
   r = getr()
 
   for it in range(STEPS//2, STEPS):
@@ -148,46 +143,31 @@ def obtain_r2_etkf():
           numera = np.sum(vector_i * vector_j)
           denomi = (np.sum(vector_i ** 2) * np.sum(vector_j ** 2)) ** 0.5
           corr_ijt[it, i, j] = numera / denomi
-          corr2_ijt[it, i, j] = numera ** 2 / denomi ** 2
           cov_ijt[it, i, j] = numera
-          cov2_ijt[it, i, j] = numera ** 2
-      k_ijt[it,:,:] = cov_ijt[it,:,:].dot(np.linalg.inv(r + cov_ijt[it,:,:]))
-
 
   corr_mean_ij = np.nanmean(corr_ijt, axis=0)
-  corr_rms_ij = np.sqrt(np.nanmean(corr2_ijt, axis=0))
+  corr_rms_ij = np.sqrt(np.nanmean(corr_ijt**2, axis=0))
   cov_mean_ij = np.nanmean(cov_ijt, axis=0)
-  cov_rms_ij = np.sqrt(np.nanmean(cov2_ijt, axis=0))
+  cov_rms_ij = np.sqrt(np.nanmean(cov_ijt**2, axis=0))
   ri = np.linalg.inv(getr())
   bhhtri_rms_ij = cov_rms_ij.dot(ri)
   bhhtri_mean_ij = cov_mean_ij.dot(ri)
-  k_rms_ij = np.sqrt(np.nanmean(k_ijt**2, axis=0))
-  k_mean_ij = np.nanmean(k_ijt, axis=0)
+  rand_ij = np.random.randn(DIMM, DIMM)
 
-  plot_matrix(corr_mean_ij, title="Corr_mean", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
-  plot_matrix(corr_rms_ij, title="Corr_rms", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
-  plot_matrix(cov_mean_ij, title="Cov_mean", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
-  plot_matrix(cov_rms_ij, title="Cov_rms", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
-  plot_matrix(bhhtri_rms_ij, title="BHHtRi_rms", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
-  plot_matrix(bhhtri_mean_ij, title="BHHtRi_mean", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
-  plot_matrix(k_rms_ij, title="K_rms", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
-  plot_matrix(k_mean_ij, title="K_mean", xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
+  data_hash = {"correlation-mean":corr_mean_ij,
+               "correlation-rms":corr_rms_ij,
+               "covariance-mean":cov_mean_ij,
+               "covariance-rms":cov_rms_ij,
+               "BHHtRi-mean":bhhtri_mean_ij,
+               "BHHtRi-rms":bhhtri_rms_ij,
+               "random":rand_ij}
+  for name in data_hash:
+    plot_matrix(data_hash[name], title=name, xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
+    print(name)
+    matrix_nondiagonal_order(np.abs(data_hash[name]))
 
-  print("correlation-mean")
-  matrix_nondiagonal_order(np.abs(corr_mean_ij))
-  print("correlation-rms")
-  matrix_nondiagonal_order(corr_rms_ij)
-  print("covariance-mean")
-  matrix_nondiagonal_order(np.abs(cov_mean_ij))
-  print("covariance-rms")
-  matrix_nondiagonal_order(cov_rms_ij)
-  print("BHHtRi-rms")
-  matrix_nondiagonal_order(bhhtri_rms_ij)
-  print("BHHtRi-mean")
-  matrix_nondiagonal_order(np.abs(bhhtri_mean_ij))
-  print("random")
-  mat_rand = np.random.randn(DIMM, DIMM)
-  matrix_nondiagonal_order(mat_rand)
+  print(rand_ij)
+
   return 0
 
 def matrix_nondiagonal_order(mat_ij, prioritize_diag=False, max_odr=81):
