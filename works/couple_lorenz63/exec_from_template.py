@@ -6,9 +6,9 @@ import numpy as np
 # ====================================
 from_template = True
 if from_template:
-  param1s = ["4"] # , "5", "6"]
-  param2s = ["covariance-rms"] # , "covariance-mean"]
-  param3s = list(map(str, np.linspace(9, 19, 11, dtype=np.int32)))
+  param1s = ["4", "5", "6"]
+  param2s = ["covariance-rms", "covariance-mean"]
+  param3s = ["9", "19"] # list(map(str, np.linspace(9, 37, dtype=np.int32)))
 # ====================================
 
 def main():
@@ -35,7 +35,6 @@ def exec_from_template(param1s, param2s, param3s_raw, job_name, flag_local):
     for param2 in param2s:
       weight_order = stats_const.stats_order(param2).flatten()
       param3s = [p3 for p3 in param3s_raw if (int(p3) - 1 in weight_order)]
-      print(param3s); sys.exit(3)
 
       write_const_file_from_template(param1, param2, param3s)
       try:
