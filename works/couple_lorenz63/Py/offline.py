@@ -115,7 +115,7 @@ def obtain_stats_etkf():
   np.random.seed((10**8+7)*12)
   nature = exec_nature()
   obs = exec_obs(nature)
-  settings = {"name":"etkf_strong_int8",  "rho":"adaptive", "nmem":10,
+  settings = {"name":"etkf",  "rho":"adaptive", "nmem":10,
               "method":"etkf", "couple":"strong", "r_local": "full"}
   np.random.seed((10**8+7)*13)
   free = exec_free_run(settings)
@@ -150,7 +150,8 @@ def obtain_stats_etkf():
           numera = np.sum(vector_i * vector_j)
           denomi = (np.sum(vector_i ** 2) * np.sum(vector_j ** 2)) ** 0.5
           corr_ijt[it, i, j] = numera / denomi
-          cov_ijt[it, i, j] = numera
+          cov_ijt[it, i, j] = numera / (nmem - 1.0)
+      cov_instant_ij = cov_ijt[it, :, :].copy()
 
   corr_mean_ij   = np.nanmean(corr_ijt, axis=0)
   corr_rms_ij    = np.sqrt(np.nanmean(corr_ijt**2, axis=0))
@@ -161,10 +162,23 @@ def obtain_stats_etkf():
   bhhtri_mean_ij = cov_mean_ij.dot(ri)
   rand_ij        = np.random.randn(DIMM, DIMM)
 
+  clim_mean = np.mean(nature[STEPS//2:,:], axis=0)
+  cov_clim_ij = np.empty((DIMM, DIMM))
+  k = 0
+  for it in range(STEPS//2, STEPS):
+    anom = nature[it,:] - clim_mean[:]
+    for i in range(DIMM):
+      cov_clim_ij[i,:] += anom[i] * anom[:]
+    k += 1
+  cov_clim_ij[:,:] /= (k - 1.0)
+  corr_clim_ij = cov_to_corr(cov_clim_ij)
+
   data_hash = {"correlation-mean":corr_mean_ij, "correlation-rms":corr_rms_ij, "covariance-mean":cov_mean_ij,
-               "covariance-rms":cov_rms_ij, "BHHtRi-mean":bhhtri_mean_ij, "BHHtRi-rms":bhhtri_rms_ij, "random":rand_ij}
+               "covariance-rms":cov_rms_ij, "BHHtRi-mean":bhhtri_mean_ij, "BHHtRi-rms":bhhtri_rms_ij,
+               "covariance-clim":cov_clim_ij, "correlation-clim":corr_clim_ij, "random":rand_ij,
+               "covariance-instant":cov_instant_ij}
   for name in data_hash:
-    plot_matrix(data_hash[name], title=name, xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-2)
+    plot_matrix(data_hash[name], title=name, xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-1)
     print(name)
     matrix_order(np.abs(data_hash[name]))
 
