@@ -10,7 +10,7 @@ if from_template:
   param2s = ["correlation-clim"]
   # param2s = ["correlation-rms", "correlation-mean", "covariance-rms", "covariance-mean",
   #            "BHHtRi-mean", "BHHtRi-rms", "covariance-clim", "correlation-clim"]
-  param3s = list(map(str, range(9, 82, 2)))
+  param3s = list(map(str, range(9, 82)))
 # ====================================
 
 def main():
