@@ -8,7 +8,7 @@ DIMM = 9    # dimension of model variable n
 DIMO = DIMM # dimension of observation variable m
 
 DT = 0.01
-TMAX = 2
+TMAX = 1000
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 FCST_LT = 5
@@ -24,9 +24,12 @@ amp_b_tdvar = 2.0
 amp_b_fdvar = 1.5
 
 EXPLIST = [ \
-  {"name":"etkf", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"full"},
-  {"name":"tdvar", "rho":rho, "nmem":1, "method":"3dvar", "couple":"strong", "amp_b":amp_b_tdvar},
-  {"name":"fdvar", "rho":rho, "nmem":1, "method":"4dvar", "couple":"strong", "amp_b":amp_b_fdvar},
+  {"name":"4mem_full", "rho":rho, "nmem":4, "method":"etkf", "couple":"strong", "r_local":"full"},
+  {"name":"6mem_full", "rho":rho, "nmem":6, "method":"etkf", "couple":"strong", "r_local":"full"},
+  {"name":"4mem_enso_coupling", "rho":rho, "nmem":4, "method":"etkf", "couple":"strong", "r_local":"enso_coupling"},
+  {"name":"6mem_enso_coupling", "rho":rho, "nmem":6, "method":"etkf", "couple":"strong", "r_local":"enso_coupling"},
+  # {"name":"tdvar", "rho":rho, "nmem":1, "method":"3dvar", "couple":"strong", "amp_b":amp_b_tdvar},
+  # {"name":"fdvar", "rho":rho, "nmem":1, "method":"4dvar", "couple":"strong", "amp_b":amp_b_fdvar},
 ]
 
 Calc_lv = False
