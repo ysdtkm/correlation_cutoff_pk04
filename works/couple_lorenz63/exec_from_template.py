@@ -7,7 +7,7 @@ import numpy as np
 from_template = True
 if from_template:
   param1s = ["4", "5", "6"]
-  param2s = ["covariance-rms", "covariance-mean"]
+  param2s = ["correlation-rms", "correlation-mean"]
   # param2s = ["correlation-rms", "correlation-mean", "covariance-rms", "covariance-mean",
   #            "BHHtRi-mean", "BHHtRi-rms", "covariance-clim", "correlation-clim"]
   param3s = list(map(str, np.linspace(9, 37, dtype=np.int32)))
