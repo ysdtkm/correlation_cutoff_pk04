@@ -17,6 +17,7 @@ def main():
   obs = exec_obs(nature)
 
   for settings in EXPLIST:
+    print("Analysis cycle: %s" % settings["name"])
     np.random.seed((10**9+7)*4)
     free = exec_free_run(settings)
     anl  = exec_assim_cycle(settings, free, obs)
@@ -135,7 +136,7 @@ def exec_assim_cycle(settings, all_fcst, all_obs):
       all_fcst[i,:,:] = fcst[:,:]
       if settings["method"] == "etkf" and (settings["rho"] == "adaptive" or settings["rho"] == "adaptive_each"):
         all_inflation[i,:] = obj_adaptive[0,:]
-  except ValueError as e:
+  except (LinAlgError, ValueError) as e:
     import traceback
     print("")
     print("ANALYSIS CYCLE DIVERGED: %s" % e)

@@ -7,7 +7,7 @@ import numpy as np
 from_template = True
 if from_template:
   param1s = ["4", "5", "6"]
-  param2s = ["covariance-rms", "covariance-mean", "covariance-clim"]
+  param2s = ["covariance-clim", "covariance-rms", "covariance-mean"]
   # param2s = ["correlation-rms", "correlation-mean", "covariance-rms", "covariance-mean",
   #            "BHHtRi-mean", "BHHtRi-rms", "covariance-clim", "correlation-clim"]
   param3s = list(map(str, range(9, 82)))
@@ -39,10 +39,11 @@ def exec_from_template(param1s, param2s, param3s_raw, job_name, flag_local):
       param3s = [p3 for p3 in param3s_raw if (int(p3) - 1 in weight_order)]
 
       write_const_file_from_template(param1, param2, param3s)
+      subprocess.check_call(["make", "plot"])
       try:
-        subprocess.check_call(["make"])
-      except:
-        subprocess.check_call(["make", "plot"])
+        subprocess.check_call(["make", "tex"])
+      except CalledProcessError:
+        pass
       os.system("cp -f data/lyapunov.txt image/true/")
       os.system("cp -f latex/out.pdf image/")
       if not flag_local:
