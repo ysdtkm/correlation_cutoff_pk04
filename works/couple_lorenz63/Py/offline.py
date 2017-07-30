@@ -3,9 +3,7 @@
 import sys
 import numpy as np
 from const import *
-from model import *
-from fdvar import *
-from main import exec_nature, exec_obs, exec_free_run, exec_assim_cycle
+import model, fdvar, main
 import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
@@ -19,7 +17,7 @@ def obtain_climatology():
   true = np.random.randn(DIMM) * FERR_INI
 
   for i in range(0, nstep):
-    true[:] = timestep(true[:], DT)
+    true[:] = model.timestep(true[:], DT)
     all_true[i,:] = true[:]
   # all_true.tofile("data/true_for_clim.bin")
 
@@ -36,13 +34,13 @@ def obtain_climatology():
 
 def obtain_tdvar_b():
   np.random.seed((10**8+7)*12)
-  nature = exec_nature()
-  obs = exec_obs(nature)
+  nature = main.exec_nature()
+  obs = main.exec_obs(nature)
   settings = {"name":"etkf_strong_int8",  "rho":1.1, "aint":8, "nmem":10, \
-              "method":"etkf", "couple":"strong"}
+              "method":"etkf", "couple":"strong", "r_local":"full"}
   np.random.seed((10**8+7)*13)
-  free = exec_free_run(settings)
-  anl  = exec_assim_cycle(settings, free, obs)
+  free = main.exec_free_run(settings)
+  anl  = main.exec_assim_cycle(settings, free, obs)
   hist_bf = np.fromfile("data/%s_covr_back.bin" % settings["name"], np.float64)
   hist_bf = hist_bf.reshape((STEPS, DIMM, DIMM))
   mean_bf = np.nanmean(hist_bf[STEPS//2:, :, :], axis=0)
@@ -113,13 +111,13 @@ def obtain_stats_etkf():
   use_posterior = False
 
   np.random.seed((10**8+7)*12)
-  nature = exec_nature()
-  obs = exec_obs(nature)
+  nature = main.exec_nature()
+  obs = main.exec_obs(nature)
   settings = {"name":"etkf",  "rho":"adaptive", "nmem":10,
               "method":"etkf", "couple":"strong", "r_local": "full"}
   np.random.seed((10**8+7)*13)
-  free = exec_free_run(settings)
-  anl  = exec_assim_cycle(settings, free, obs)
+  free = main.exec_free_run(settings)
+  anl  = main.exec_assim_cycle(settings, free, obs)
 
   nmem = settings["nmem"]
   hist_fcst = np.fromfile("data/%s_cycle.bin" % settings["name"], np.float64)
@@ -139,7 +137,7 @@ def obtain_stats_etkf():
         fcst = hist_fcst[it-AINT, :, :].copy()
         for jt in range(AINT):
           for k in range(nmem):
-            fcst[k, :] = timestep(fcst[k,:], DT)
+            fcst[k, :] = model.timestep(fcst[k,:], DT)
       for i in range(DIMM):
         for j in range(DIMM):
           # a38p40
