@@ -136,8 +136,9 @@ def obtain_localization_weight(dimc, j, r_local, num_yes):
 def get_weight_table(r_local, num_yes):
   # return weight_table[iy, ix] : weight of iy-th obs for ix-th grid
 
-  if r_local in ["covariance-mean", "correlation-mean", "covariance-rms", \
-                 "correlation-rms", "random", "bhhtri-mean", "bhhtri-rms"]:
+  if r_local in ["covariance-mean", "correlation-mean", "covariance-rms",
+                 "correlation-rms", "random", "BHHtRi-mean", "BHHtRi-rms",
+                 "covariance-clim", "correlation-clim"]:
     if num_yes == None:
       num_yes = 37
     weight_table = weight_based_on_stats(r_local, num_yes)
