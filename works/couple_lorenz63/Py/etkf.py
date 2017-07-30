@@ -3,7 +3,7 @@
 import numpy as np
 from scipy.linalg import sqrtm
 from const import *
-from stats_const import *
+import stats_const
 
 def etkf(fcst, h_nda, r_nda, yo_nda, rho_in, nmem, obj_adaptive, localization=False, r_local="", num_yes=None):
   # fcst   <- np.array[nmem, dimc]
@@ -170,7 +170,7 @@ def weight_based_on_stats(r_local, odr_max=37):
   if DIMM != 9:
     raise Exception("stats_weight_order() is only for 9-variable PK04 model")
 
-  order_table = stats_order(r_local)
+  order_table = stats_const.stats_order(r_local)
   return np.float64(order_table < odr_max)
 
 def init_etkf_adaptive_inflation():
