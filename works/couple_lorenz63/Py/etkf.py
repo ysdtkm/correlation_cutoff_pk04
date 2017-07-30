@@ -191,18 +191,15 @@ def update_adaptive_inflation(obj_adaptive, delta_this_step):
   # delta_this_step:
   #   np.array([delta_extra, delta_trop, delta_ocean])
 
-  vo = 1.0
-  kappa = 1.01
-
   # limit delta_this_step
-  delta_max = np.array([1.2, 1.2, 1.2])
-  delta_min = np.array([0.9, 0.9, 0.9])
+  delta_max = np.ones(3) * ETKF_AI_max
+  delta_min = np.ones(3) * ETKF_AI_min
   delta_this_step = np.max(np.row_stack((delta_min, delta_this_step)), axis=0)
   delta_this_step = np.min(np.row_stack((delta_max, delta_this_step)), axis=0)
 
-  vf = obj_adaptive[1,:].copy() * kappa
-  delta_new = (obj_adaptive[0,:] * vo + delta_this_step[:] * vf[:]) / (vo + vf[:])
-  va = (vf[:] * vo) / (vf[:] + vo)
+  vf = obj_adaptive[1,:].copy() * ETKF_kappa
+  delta_new = (obj_adaptive[0,:] * ETKF_vo + delta_this_step[:] * vf[:]) / (ETKF_vo + vf[:])
+  va = (vf[:] * ETKF_vo) / (vf[:] + ETKF_vo)
 
   obj_adaptive[0,:] = delta_new[:]
   obj_adaptive[1,:] = va[:]
