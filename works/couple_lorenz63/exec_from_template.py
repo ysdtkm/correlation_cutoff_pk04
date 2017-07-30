@@ -8,7 +8,9 @@ from_template = True
 if from_template:
   param1s = ["4", "5", "6"]
   param2s = ["covariance-rms", "covariance-mean"]
-  param3s = ["9", "19"] # list(map(str, np.linspace(9, 37, dtype=np.int32)))
+  # param2s = ["correlation-rms", "correlation-mean", "covariance-rms", "covariance-mean",
+  #            "BHHtRi-mean", "BHHtRi-rms", "covariance-clim", "correlation-clim"]
+  param3s = list(map(str, np.linspace(9, 37, dtype=np.int32)))
 # ====================================
 
 def main():
