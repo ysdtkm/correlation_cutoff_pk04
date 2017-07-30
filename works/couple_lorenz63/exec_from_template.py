@@ -10,7 +10,7 @@ if from_template:
   param2s = ["correlation-rms", "correlation-mean"]
   # param2s = ["correlation-rms", "correlation-mean", "covariance-rms", "covariance-mean",
   #            "BHHtRi-mean", "BHHtRi-rms", "covariance-clim", "correlation-clim"]
-  param3s = list(map(str, np.linspace(9, 37, dtype=np.int32)))
+  param3s = list(map(str, np.linspace(9, 81, 37, dtype=np.int32)))
 # ====================================
 
 def main():
