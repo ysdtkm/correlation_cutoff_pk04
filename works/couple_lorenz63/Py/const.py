@@ -29,7 +29,7 @@ EXPLIST = [ \
   {"name":"fdvar", "rho":rho, "nmem":1, "method":"4dvar", "couple":"strong", "amp_b":amp_b_fdvar},
 ]
 
-Calc_lv = False
+Calc_lv = True
 
 def getr():
   r = np.identity(DIMO) * OERR_A ** 2
