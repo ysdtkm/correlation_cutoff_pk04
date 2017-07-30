@@ -96,44 +96,51 @@ def exec_assim_cycle(settings, all_fcst, all_obs):
     obj_adaptive = None
 
   # forecast-analysis cycle
-  for i in range(STEP_FREE, STEPS):
-    if settings["couple"] == "none" and settings["bc"] == "climatology":
-      persis_bc = None
-    elif settings["couple"] == "none" and settings["bc"] == "independent":
-      persis_bc = all_obs[i-1,:].copy()
-    else: # persistence BC
-      persis_bc = np.mean(all_fcst[i-1,:,:], axis=0)
+  try:
+    for i in range(STEP_FREE, STEPS):
+      if settings["couple"] == "none" and settings["bc"] == "climatology":
+        persis_bc = None
+      elif settings["couple"] == "none" and settings["bc"] == "independent":
+        persis_bc = all_obs[i-1,:].copy()
+      else: # persistence BC
+        persis_bc = np.mean(all_fcst[i-1,:,:], axis=0)
 
-    for m in range(0, settings["nmem"]):
-      if (settings["couple"] == "strong" or settings["couple"] == "weak"):
-        fcst[m,:] = timestep(all_fcst[i-1,m,:], DT)
-      elif (settings["couple"] == "none"):
-        fcst[m,0:6] = timestep(all_fcst[i-1,m,0:6], DT, 0, 6, persis_bc)
-        fcst[m,6:9] = timestep(all_fcst[i-1,m,6:9], DT, 6, 9, persis_bc)
+      for m in range(0, settings["nmem"]):
+        if (settings["couple"] == "strong" or settings["couple"] == "weak"):
+          fcst[m,:] = timestep(all_fcst[i-1,m,:], DT)
+        elif (settings["couple"] == "none"):
+          fcst[m,0:6] = timestep(all_fcst[i-1,m,0:6], DT, 0, 6, persis_bc)
+          fcst[m,6:9] = timestep(all_fcst[i-1,m,6:9], DT, 6, 9, persis_bc)
 
-    if (i % AINT == 0):
-      obs_used[i,:] = all_obs[i,:]
-      fcst_pre = all_fcst[i-AINT,:,:].copy()
+      if (i % AINT == 0):
+        obs_used[i,:] = all_obs[i,:]
+        fcst_pre = all_fcst[i-AINT,:,:].copy()
 
-      if (settings["couple"] == "strong"):
-        fcst[:,:], all_bf[i,:,:], all_ba[i,:,:], obj_adaptive = \
-          analyze_one_window(fcst, fcst_pre, all_obs[i,:], h, r, settings, obj_adaptive)
-      elif (settings["couple"] == "weak" or settings["couple"] == "none"):
-        dim_atm = 6
-        # atmospheric assimilation
-        fcst[:, :dim_atm], all_bf[i, :dim_atm, :dim_atm], all_ba[i, :dim_atm, :dim_atm], obj_adaptive \
-            = analyze_one_window(fcst[:, :dim_atm], fcst_pre[:, :dim_atm],
-                                 all_obs[i, :dim_atm], h[:dim_atm, :dim_atm],
-                                 r[:dim_atm, :dim_atm], settings, obj_adaptive, 0, 6, persis_bc)
-        # oceanic assimilation
-        fcst[:, dim_atm:], all_bf[i, dim_atm:, dim_atm:], all_ba[i, dim_atm:, dim_atm:], obj_adaptive  \
-            = analyze_one_window(fcst[:, dim_atm:], fcst_pre[:, dim_atm:],
-                                 all_obs[i, dim_atm:], h[dim_atm:, dim_atm:],
-                                 r[dim_atm:, dim_atm:], settings, obj_adaptive, 6, 9, persis_bc)
+        if (settings["couple"] == "strong"):
+          fcst[:,:], all_bf[i,:,:], all_ba[i,:,:], obj_adaptive = \
+            analyze_one_window(fcst, fcst_pre, all_obs[i,:], h, r, settings, obj_adaptive)
+        elif (settings["couple"] == "weak" or settings["couple"] == "none"):
+          dim_atm = 6
+          # atmospheric assimilation
+          fcst[:, :dim_atm], all_bf[i, :dim_atm, :dim_atm], all_ba[i, :dim_atm, :dim_atm], obj_adaptive \
+              = analyze_one_window(fcst[:, :dim_atm], fcst_pre[:, :dim_atm],
+                                   all_obs[i, :dim_atm], h[:dim_atm, :dim_atm],
+                                   r[:dim_atm, :dim_atm], settings, obj_adaptive, 0, 6, persis_bc)
+          # oceanic assimilation
+          fcst[:, dim_atm:], all_bf[i, dim_atm:, dim_atm:], all_ba[i, dim_atm:, dim_atm:], obj_adaptive  \
+              = analyze_one_window(fcst[:, dim_atm:], fcst_pre[:, dim_atm:],
+                                   all_obs[i, dim_atm:], h[dim_atm:, dim_atm:],
+                                   r[dim_atm:, dim_atm:], settings, obj_adaptive, 6, 9, persis_bc)
 
-    all_fcst[i,:,:] = fcst[:,:]
-    if settings["method"] == "etkf" and (settings["rho"] == "adaptive" or settings["rho"] == "adaptive_each"):
-      all_inflation[i,:] = obj_adaptive[0,:]
+      all_fcst[i,:,:] = fcst[:,:]
+      if settings["method"] == "etkf" and (settings["rho"] == "adaptive" or settings["rho"] == "adaptive_each"):
+        all_inflation[i,:] = obj_adaptive[0,:]
+  except (ValueError, RuntimeWarning) as e:
+    import traceback
+    print("Analysis cycle diverged: %s" % e)
+    print("Settings: ", settings)
+    traceback.print_exc()
+    sys.exit(3) # ttk
 
   # save to files
   obs_used.tofile("data/%s_obs.bin" % settings["name"])
