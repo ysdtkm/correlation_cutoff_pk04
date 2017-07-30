@@ -132,7 +132,7 @@ def exec_assim_cycle(settings, all_fcst, all_obs):
       all_fcst[i,:,:] = fcst[:,:]
       if settings["method"] == "etkf" and (settings["rho"] == "adaptive" or settings["rho"] == "adaptive_each"):
         all_inflation[i,:] = obj_adaptive[0,:]
-  except (LinAlgError, ValueError) as e:
+  except (np.linalg.LinAlgError, ValueError) as e:
     import traceback
     print("")
     print("ANALYSIS CYCLE DIVERGED: %s" % e)
