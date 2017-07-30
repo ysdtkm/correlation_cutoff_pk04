@@ -63,7 +63,7 @@ def main():
   f = io.open("./temp.tex", "w")
   f.write(txt_out)
   f.close()
-  os.system("make")
+  subprocess.check_output("make")
   os.system("mkdir -p ./archive")
   return 0
 
