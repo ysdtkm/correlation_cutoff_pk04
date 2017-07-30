@@ -3,9 +3,7 @@
 import sys
 import numpy as np
 from const import *
-from model import *
-from fdvar import *
-from main import exec_nature, exec_obs, exec_free_run, exec_assim_cycle
+import model, fdvar, main
 import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
@@ -38,7 +36,7 @@ def test_fdvar_overflow():
     [117.90228464480583]] \
   )
 
-  fdvar(fcst_0, h, r, yo, AINT)
+  fdvar.fdvar(fcst_0, h, r, yo, AINT, 0, DIMM, amp_b_fdvar)
   return 0
 
 def test_tangent_model():
@@ -48,14 +46,14 @@ def test_tangent_model():
   # initialization (verification t0 -> t1)
   x_t0 = np.random.randn(DIMM) * FERR_INI
   for i in range(STEPS):
-    x_t0 = timestep(x_t0, DT)
+    x_t0 = model.timestep(x_t0, DT)
   x_t1 = np.copy(x_t0)
   for i in range(step_verif):
-    x_t1 = timestep(x_t1, DT)
+    x_t1 = model.timestep(x_t1, DT)
 
   # get tangent linear
-  m = finite_time_tangent(x_t0, DT/1.0, step_verif*1)
-  # m = finite_time_tangent_using_nonlinear(x_t0, DT/1.0, step_verif*1)
+  m = model.finite_time_tangent(x_t0, DT/1.0, step_verif*1)
+  # m = model.finite_time_tangent_using_nonlinear(x_t0, DT/1.0, step_verif*1)
 
   sum_sq_diff = 0.0
   for i in range(DIMM):
@@ -65,7 +63,7 @@ def test_tangent_model():
     print(i)
     x_t1_ptb = np.copy(x_t0_ptb)
     for j in range(step_verif):
-      x_t1_ptb = timestep(x_t1_ptb, DT)
+      x_t1_ptb = model.timestep(x_t1_ptb, DT)
 
     print("nonlinear:")
     print((x_t1_ptb - x_t1) / ptb)
@@ -85,9 +83,9 @@ def test_tangent_sv():
 
   x_t0 = np.random.randn(DIMM) * FERR_INI
   for i in range(STEPS):
-    x_t0 = timestep(x_t0, DT)
-  m_finite = finite_time_tangent(x_t0, DT/4.0, step_verif*4)
-  mt_finite = finite_time_tangent(x_t0, DT/4.0, step_verif*4).T
+    x_t0 = model.timestep(x_t0, DT)
+  m_finite = model.finite_time_tangent(x_t0, DT/4.0, step_verif*4)
+  mt_finite = model.finite_time_tangent(x_t0, DT/4.0, step_verif*4).T
   eig_vals2, eig_vects2 = np.linalg.eig(m_finite * mt_finite)
   eig_vals3, eig_vects3 = np.linalg.eig(m_finite)
   print("SV growth rates:")
@@ -114,15 +112,15 @@ def test_cost_function_grad():
   yo = np.array([[-8.27064106], [-1.06064404], [34.80718227]])
   eps = 1.0
 
-  twoj = fdvar_2j(anl, fcst, h, r, yo, aint, 0, DIMM)
+  twoj = fdvar.fdvar_2j(anl, fcst, h, r, yo, aint, 0, DIMM)
   twoj_grad = np.zeros(DIMM)
   for i in range(DIMM):
     anl = np.copy(fcst)
     anl[i] += eps
-    twoj_grad[i] = (fdvar_2j(anl, fcst, h, r, yo, aint, 0, DIMM) - twoj) / eps
+    twoj_grad[i] = (fdvar.fdvar_2j(anl, fcst, h, r, yo, aint, 0, DIMM) - twoj) / eps
   print(twoj_grad)
 
-  twoj_grad_anl = fdvar_2j_deriv(anl, fcst, h, r, yo, aint, 0, DIMM)
+  twoj_grad_anl = fdvar.fdvar_2j_deriv(anl, fcst, h, r, yo, aint, 0, DIMM)
   print(twoj_grad_anl)
 
   return 0
@@ -216,7 +214,7 @@ def compare_coupled_vs_persistent_bc():
 
   # forward integration i-1 -> i
   for i in range(nstep):
-    true[:] = timestep(true[:], DT)
+    true[:] = model.timestep(true[:], DT)
     all_true[i,:] = true[:]
 
   fcst_interval = 100
@@ -226,9 +224,9 @@ def compare_coupled_vs_persistent_bc():
     fcst_bc[:] = all_true[i*fcst_interval,:]
 
     for j in range(leadtime):
-      fcst_cp[:] = timestep(fcst_cp[:], DT)
-      fcst_bc[0:6] = timestep(fcst_bc[0:6], DT, 0, 6, persis_bc)
-      fcst_bc[6:9] = timestep(fcst_bc[6:9], DT, 6, 9, persis_bc)
+      fcst_cp[:] = model.timestep(fcst_cp[:], DT)
+      fcst_bc[0:6] = model.timestep(fcst_bc[0:6], DT, 0, 6, persis_bc)
+      fcst_bc[6:9] = model.timestep(fcst_bc[6:9], DT, 6, 9, persis_bc)
 
       msd_extra[j] += np.mean((fcst_cp[0:3] - fcst_bc[0:3])**2)
       msd_trop[j]  += np.mean((fcst_cp[3:6] - fcst_bc[3:6])**2)
@@ -254,3 +252,9 @@ def compare_coupled_vs_persistent_bc():
   plt.ylabel("RMSD, coupled vs persistent BC forecasts")
   plt.savefig("./rmsd_coupled_vs_persistentbc.png")
 
+test_fdvar_overflow()
+test_tangent_model()
+test_cost_function_grad()
+test_cost_function_grad()
+check_b()
+compare_coupled_vs_persistent_bc()
