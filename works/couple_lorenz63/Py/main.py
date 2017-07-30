@@ -187,6 +187,9 @@ def exec_deterministic_fcst(settings, anl):
   # anl      <- np.array[STEPS, nmem, DIMM]
   # return   -> np.array[STEPS, FCST_LT, DIMM]
 
+  if FCST_LT == 0:
+    return 0
+
   fcst_all = np.empty((STEPS, FCST_LT, DIMM))
   for i in range(STEP_FREE, STEPS):
     if (i % AINT == 0):

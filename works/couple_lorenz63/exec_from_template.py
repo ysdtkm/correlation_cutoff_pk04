@@ -6,8 +6,8 @@ import numpy as np
 # ====================================
 from_template = True
 if from_template:
-  param1s = ["4", "5", "6"]
-  param2s = ["covariance-rms", "correlation-rms", "BHHtRi-rms"]
+  param1s = ["6", "5", "4"]
+  param2s = ["correlation-rms", "correlation-mean", "correlation-clim"]
   # param2s = ["correlation-rms", "correlation-mean", "covariance-rms", "covariance-mean",
   #            "BHHtRi-mean", "BHHtRi-rms", "covariance-clim", "correlation-clim"]
   param3s = list(map(str, range(9, 82, 2)))
