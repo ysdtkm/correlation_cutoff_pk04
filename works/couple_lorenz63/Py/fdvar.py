@@ -25,7 +25,7 @@ def fdvar(fcst_0, h, r, yo, aint, i_s, i_e, amp_b, bc=None):
 
   try:
     anl_0 = np.copy(fcst_0)
-    anl_0 = fmin_bfgs(fdvar_2j, anl_0, args=(fcst_0, h, r, yo, aint, i_s, i_e, amp_b, bc))
+    anl_0 = fmin_bfgs(fdvar_2j, anl_0, args=(fcst_0, h, r, yo, aint, i_s, i_e, amp_b, bc), disp=False)
     # anl_0 = fmin_bfgs(fdvar_2j, anl_0, fprime=fdvar_2j_deriv, args=(fcst_0, h, r, yo, aint, i_s, i_e, amp_b, bc))
   except:
     print("Method fmin_bfgs failed to converge. Use fmin for this step instead.")
