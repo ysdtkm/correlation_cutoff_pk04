@@ -19,12 +19,13 @@ FERR_INI = 10.0
 AINT = 8
 
 rho = "adaptive"
-nmem = 6
+nmem = 4
 amp_b_tdvar = 2.0
 amp_b_fdvar = 1.5
 
 EXPLIST = [ \
-  {"name":"covariance-mean_9", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-mean", "num_yes":9},
+  {"name":"correlation-clim_9", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"correlation-clim", "num_yes":9},
+  {"name":"correlation-clim_11", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"correlation-clim", "num_yes":11},
 ]
 
 # {"name":"etkf", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"full"},
