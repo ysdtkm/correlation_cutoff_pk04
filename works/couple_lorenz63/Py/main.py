@@ -135,12 +135,15 @@ def exec_assim_cycle(settings, all_fcst, all_obs):
       all_fcst[i,:,:] = fcst[:,:]
       if settings["method"] == "etkf" and (settings["rho"] == "adaptive" or settings["rho"] == "adaptive_each"):
         all_inflation[i,:] = obj_adaptive[0,:]
-  except (ValueError, RuntimeWarning) as e:
+  except ValueError as e:
     import traceback
-    print("Analysis cycle diverged: %s" % e)
+    print("")
+    print("ANALYSIS CYCLE DIVERGED: %s" % e)
     print("Settings: ", settings)
+    print("This experiment is terminated (see error traceback below). Continue on next experiments.")
+    print("")
     traceback.print_exc()
-    sys.exit(3) # ttk
+    print("")
 
   # save to files
   obs_used.tofile("data/%s_obs.bin" % settings["name"])

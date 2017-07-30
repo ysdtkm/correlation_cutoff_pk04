@@ -82,8 +82,8 @@ def plot_min3(rmse_all, param1s, param2s, param3s):
   return 0
 
 if __name__ == "__main__":
-  param1s = ["4", "6", "10"]
-  param2s = ["covariance-rms", "covariance-mean", "correlation-rms", "correlation-mean", "bhhtri-rms", "bhhtri-mean"]
-  param3s = ["9", "19", "29", "39", "49", "59", "69", "81"]
+  param1s = ["4"]
+  param2s = ["covariance-clim"]
+  param3s = ["9", "18", "25"]
   verif(param1s, param2s, param3s)
 
