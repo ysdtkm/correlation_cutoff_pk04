@@ -8,10 +8,10 @@ DIMM = 9    # dimension of model variable n
 DIMO = DIMM # dimension of observation variable m
 
 DT = 0.01
-TMAX = 1000
+TMAX = 100
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
-FCST_LT = 5
+FCST_LT = 0
 
 OERR_A = 1.0
 OERR_O = 5.0
@@ -19,23 +19,22 @@ FERR_INI = 10.0
 AINT = 8
 
 rho = "adaptive"
-nmem = 4
+nmem = <<param1>>
 amp_b_tdvar = 2.0
 amp_b_fdvar = 1.5
 
 EXPLIST = [ \
-  {"name":"4mem_full", "rho":rho, "nmem":4, "method":"etkf", "couple":"strong", "r_local":"full"},
-  {"name":"6mem_full", "rho":rho, "nmem":6, "method":"etkf", "couple":"strong", "r_local":"full"},
-  {"name":"4mem_enso_coupling", "rho":rho, "nmem":4, "method":"etkf", "couple":"strong", "r_local":"enso_coupling"},
-  {"name":"6mem_enso_coupling", "rho":rho, "nmem":6, "method":"etkf", "couple":"strong", "r_local":"enso_coupling"},
-  # {"name":"tdvar", "rho":rho, "nmem":1, "method":"3dvar", "couple":"strong", "amp_b":amp_b_tdvar},
-  # {"name":"fdvar", "rho":rho, "nmem":1, "method":"4dvar", "couple":"strong", "amp_b":amp_b_fdvar},
+  {"name":"<<param2>>_<<param3_sanit>>", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"<<param2>>", "num_yes":<<param3>>},
 ]
+
+# {"name":"etkf", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"full"},
+# {"name":"tdvar", "rho":rho, "nmem":1, "method":"3dvar", "couple":"strong", "amp_b":amp_b_tdvar},
+# {"name":"fdvar", "rho":rho, "nmem":1, "method":"4dvar", "couple":"strong", "amp_b":amp_b_fdvar},
 
 Calc_lv = False
 
 ETKF_vo = 1.0
-ETKF_kappa = 1.03
+ETKF_kappa = 1.01
 ETKF_AI_max = 1.2
 ETKF_AI_min = 0.9
 

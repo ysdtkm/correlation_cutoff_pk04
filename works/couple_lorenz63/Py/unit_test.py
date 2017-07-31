@@ -3,12 +3,11 @@
 import sys
 import numpy as np
 from const import *
-from model import *
-from fdvar import *
-from main import exec_nature, exec_obs, exec_free_run, exec_assim_cycle
+import model, fdvar, main
 import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
+import matplotlib.colors as colors
 
 def test_fdvar_overflow():
   exp = EXPLIST[1]
@@ -37,7 +36,7 @@ def test_fdvar_overflow():
     [117.90228464480583]] \
   )
 
-  fdvar(fcst_0, h, r, yo, AINT)
+  fdvar.fdvar(fcst_0, h, r, yo, AINT, 0, DIMM, amp_b_fdvar)
   return 0
 
 def test_tangent_model():
@@ -45,16 +44,16 @@ def test_tangent_model():
   step_verif = 10
 
   # initialization (verification t0 -> t1)
-  x_t0 = np.random.normal(0.0, FERR_INI, DIMM)
+  x_t0 = np.random.randn(DIMM) * FERR_INI
   for i in range(STEPS):
-    x_t0 = timestep(x_t0, DT)
+    x_t0 = model.timestep(x_t0, DT)
   x_t1 = np.copy(x_t0)
   for i in range(step_verif):
-    x_t1 = timestep(x_t1, DT)
+    x_t1 = model.timestep(x_t1, DT)
 
   # get tangent linear
-  m = finite_time_tangent(x_t0, DT/1.0, step_verif*1)
-  # m = finite_time_tangent_using_nonlinear(x_t0, DT/1.0, step_verif*1)
+  m = model.finite_time_tangent(x_t0, DT/1.0, step_verif*1)
+  # m = model.finite_time_tangent_using_nonlinear(x_t0, DT/1.0, step_verif*1)
 
   sum_sq_diff = 0.0
   for i in range(DIMM):
@@ -64,7 +63,7 @@ def test_tangent_model():
     print(i)
     x_t1_ptb = np.copy(x_t0_ptb)
     for j in range(step_verif):
-      x_t1_ptb = timestep(x_t1_ptb, DT)
+      x_t1_ptb = model.timestep(x_t1_ptb, DT)
 
     print("nonlinear:")
     print((x_t1_ptb - x_t1) / ptb)
@@ -82,11 +81,11 @@ def test_tangent_model():
 def test_tangent_sv():
   step_verif = 10
 
-  x_t0 = np.random.normal(0.0, FERR_INI, DIMM)
+  x_t0 = np.random.randn(DIMM) * FERR_INI
   for i in range(STEPS):
-    x_t0 = timestep(x_t0, DT)
-  m_finite = finite_time_tangent(x_t0, DT/4.0, step_verif*4)
-  mt_finite = finite_time_tangent(x_t0, DT/4.0, step_verif*4).T
+    x_t0 = model.timestep(x_t0, DT)
+  m_finite = model.finite_time_tangent(x_t0, DT/4.0, step_verif*4)
+  mt_finite = model.finite_time_tangent(x_t0, DT/4.0, step_verif*4).T
   eig_vals2, eig_vects2 = np.linalg.eig(m_finite * mt_finite)
   eig_vals3, eig_vects3 = np.linalg.eig(m_finite)
   print("SV growth rates:")
@@ -113,105 +112,17 @@ def test_cost_function_grad():
   yo = np.array([[-8.27064106], [-1.06064404], [34.80718227]])
   eps = 1.0
 
-  twoj = fdvar_2j(anl, fcst, h, r, yo, aint, 0, DIMM)
+  twoj = fdvar.fdvar_2j(anl, fcst, h, r, yo, aint, 0, DIMM)
   twoj_grad = np.zeros(DIMM)
   for i in range(DIMM):
     anl = np.copy(fcst)
     anl[i] += eps
-    twoj_grad[i] = (fdvar_2j(anl, fcst, h, r, yo, aint, 0, DIMM) - twoj) / eps
+    twoj_grad[i] = (fdvar.fdvar_2j(anl, fcst, h, r, yo, aint, 0, DIMM) - twoj) / eps
   print(twoj_grad)
 
-  twoj_grad_anl = fdvar_2j_deriv(anl, fcst, h, r, yo, aint, 0, DIMM)
+  twoj_grad_anl = fdvar.fdvar_2j_deriv(anl, fcst, h, r, yo, aint, 0, DIMM)
   print(twoj_grad_anl)
 
-  return 0
-
-def obtain_climatology():
-  nstep = 100000
-  all_true = np.empty((nstep, DIMM))
-
-  np.random.seed(1)
-  true = np.random.normal(0.0, FERR_INI, DIMM)
-
-  for i in range(0, nstep):
-    true[:] = timestep(true[:], DT)
-    all_true[i,:] = true[:]
-  # all_true.tofile("data/true_for_clim.bin")
-
-  mean = np.mean(all_true[nstep//2:,:], axis=0)
-  print("mean")
-  print(mean)
-
-  mean2 = np.mean(all_true[nstep//2:,:]**2, axis=0)
-  stdv = np.sqrt(mean2 - mean**2)
-  print("stdv")
-  print(stdv)
-
-  return 0
-
-def obtain_tdvar_b():
-  np.random.seed(100000007*2)
-  nature = exec_nature()
-  obs = exec_obs(nature)
-  settings = {"name":"etkf_strong_int8",  "rho":1.1, "aint":8, "nmem":10, \
-              "method":"etkf", "couple":"strong"}
-  np.random.seed(100000007*3)
-  free = exec_free_run(settings)
-  anl  = exec_assim_cycle(settings, free, obs)
-  hist_bf = np.fromfile("data/%s_covr_back.bin" % settings["name"], np.float64)
-  hist_bf = hist_bf.reshape((STEPS, DIMM, DIMM))
-  mean_bf = np.nanmean(hist_bf[STEPS//2:, :, :], axis=0)
-  trace = np.trace(mean_bf)
-  mean_bf *= (DIMM / trace)
-
-  print("[ \\")
-  for i in range(DIMM):
-    print("[", end="")
-    for j in range(DIMM):
-      print("%12.9g" % mean_bf[i,j], end="")
-      if j < (DIMM - 1):
-        print(", ", end="")
-    if i < (DIMM - 1):
-      print("], \\")
-    else:
-      print("]  \\")
-      print("]")
-
-  return 0
-
-def print_two_dim_nparray(data, format="%12.9g"):
-  n = data.shape[0]
-  m = data.shape[1]
-  print("[ \\")
-  for i in range(n):
-    print("[", end="")
-    for j in range(m):
-      print(format % data[i,j], end="")
-      if j < (m - 1):
-        print(", ", end="")
-    if i < (n - 1):
-      print("], \\")
-    else:
-      print("]  \\")
-      print("]")
-
-def plot_matrix(data, name="", title="", color=plt.cm.bwr, xlabel="", ylabel=""):
-  fig, ax = plt.subplots(1)
-  fig.subplots_adjust(left=0.12, right=0.95, bottom=0.12, top=0.92)
-  cmax = np.max(np.abs(data))
-  map1 = ax.pcolor(data, cmap=color)
-  if (color == plt.cm.bwr):
-    map1.set_clim(-1.0 * cmax, cmax)
-  x0,x1 = ax.get_xlim()
-  y0,y1 = ax.get_ylim()
-  ax.set_aspect(abs(x1-x0)/abs(y1-y0))
-  ax.set_xlabel(xlabel)
-  ax.set_ylabel(ylabel)
-  cbar = plt.colorbar(map1)
-  plt.title(title)
-  plt.gca().invert_yaxis()
-  plt.savefig("./matrix_%s_%s.png" % (name, title))
-  plt.close()
   return 0
 
 def check_b():
@@ -250,13 +161,51 @@ def check_b():
   plot_matrix(np.log(np.abs(new)), "", "new", color=plt.cm.Reds)
   return 0
 
+def print_two_dim_nparray(data, format="%12.9g"):
+  n = data.shape[0]
+  m = data.shape[1]
+  print("[ \\")
+  for i in range(n):
+    print("[", end="")
+    for j in range(m):
+      print(format % data[i,j], end="")
+      if j < (m - 1):
+        print(", ", end="")
+    if i < (n - 1):
+      print("], \\")
+    else:
+      print("]  \\")
+      print("]")
+
+def plot_matrix(data, name="", title="", color=plt.cm.bwr, xlabel="", ylabel="", logscale=False, linthresh=1e-3):
+  fig, ax = plt.subplots(1)
+  fig.subplots_adjust(left=0.12, right=0.95, bottom=0.12, top=0.92)
+  cmax = np.max(np.abs(data))
+  if logscale:
+    map1 = ax.pcolor(data, cmap=color, norm=colors.SymLogNorm(linthresh=linthresh*cmax))
+  else:
+    map1 = ax.pcolor(data, cmap=color)
+  if (color == plt.cm.bwr):
+    map1.set_clim(-1.0 * cmax, cmax)
+  x0,x1 = ax.get_xlim()
+  y0,y1 = ax.get_ylim()
+  ax.set_aspect(abs(x1-x0)/abs(y1-y0))
+  ax.set_xlabel(xlabel)
+  ax.set_ylabel(ylabel)
+  cbar = plt.colorbar(map1)
+  plt.title(title)
+  plt.gca().invert_yaxis()
+  plt.savefig("./matrix_%s_%s.png" % (name, title))
+  plt.close()
+  return 0
+
 def compare_coupled_vs_persistent_bc():
   nstep = 10000
   leadtime = 100
 
-  np.random.seed(100000007*2)
+  np.random.seed((10**9+7)*12)
   all_true = np.empty((nstep, DIMM))
-  true = np.random.normal(0.0, FERR_INI, DIMM)
+  lrue = np.random.randn(DIMM) * FERR_INI
   fcst_cp = np.empty((DIMM))
   fcst_bc = np.empty((DIMM))
   msd_extra = np.zeros((leadtime))
@@ -265,7 +214,7 @@ def compare_coupled_vs_persistent_bc():
 
   # forward integration i-1 -> i
   for i in range(nstep):
-    true[:] = timestep(true[:], DT)
+    true[:] = model.timestep(true[:], DT)
     all_true[i,:] = true[:]
 
   fcst_interval = 100
@@ -275,9 +224,9 @@ def compare_coupled_vs_persistent_bc():
     fcst_bc[:] = all_true[i*fcst_interval,:]
 
     for j in range(leadtime):
-      fcst_cp[:] = timestep(fcst_cp[:], DT)
-      fcst_bc[0:6] = timestep(fcst_bc[0:6], DT, 0, 6, persis_bc)
-      fcst_bc[6:9] = timestep(fcst_bc[6:9], DT, 6, 9, persis_bc)
+      fcst_cp[:] = model.timestep(fcst_cp[:], DT)
+      fcst_bc[0:6] = model.timestep(fcst_bc[0:6], DT, 0, 6, persis_bc)
+      fcst_bc[6:9] = model.timestep(fcst_bc[6:9], DT, 6, 9, persis_bc)
 
       msd_extra[j] += np.mean((fcst_cp[0:3] - fcst_bc[0:3])**2)
       msd_trop[j]  += np.mean((fcst_cp[3:6] - fcst_bc[3:6])**2)
@@ -303,46 +252,9 @@ def compare_coupled_vs_persistent_bc():
   plt.ylabel("RMSD, coupled vs persistent BC forecasts")
   plt.savefig("./rmsd_coupled_vs_persistentbc.png")
 
-def obtain_r2_etkf():
-  np.random.seed(100000007*2)
-  nature = exec_nature()
-  obs = exec_obs(nature)
-  settings = {"name":"etkf_strong_int8",  "rho":1.1, "nmem":10,
-              "method":"etkf", "couple":"strong", "r_local": "full"}
-  np.random.seed(100000007*3)
-  free = exec_free_run(settings)
-  anl  = exec_assim_cycle(settings, free, obs)
-
-  nmem = settings["nmem"]
-  hist_fcst = np.fromfile("data/%s_cycle.bin" % settings["name"], np.float64)
-  hist_fcst = hist_fcst.reshape((STEPS, nmem, DIMM))
-
-  r2_ijt = np.empty((STEPS, DIMM, DIMM))
-  r2_ijt[:,:,:] = np.nan
-  for it in range(STEPS//2, STEPS):
-    if it % AINT == 0:
-      # reproduce background
-      fcst = np.copy(hist_fcst[it-AINT, :, :])
-      for jt in range(AINT):
-        for k in range(nmem):
-          fcst[k, :] = timestep(fcst[k,:], DT)
-
-      for i in range(DIMM):
-        for j in range(DIMM):
-          # a38p40
-          vector_i = np.copy(fcst[:, i])
-          vector_j = np.copy(fcst[:, j])
-          vector_i[:] -= np.mean(vector_i)
-          vector_j[:] -= np.mean(vector_j)
-          # numera = np.sum(vector_i * vector_j) ** 2
-          # denomi = np.sum(vector_i ** 2) * np.sum(vector_j ** 2)
-          numera = np.sum(vector_i * vector_j)
-          denomi = (np.sum(vector_i ** 2) * np.sum(vector_j ** 2)) ** 0.5
-          r2 = numera / denomi
-          r2_ijt[it, i, j] = np.copy(r2)
-  r2_ij = np.nanmean(r2_ijt, axis=0)
-  print(r2_ij)
-  plot_matrix(r2_ij, title="cosine", xlabel="grid index i", ylabel="grid index j")
-  return 0
-
-obtain_r2_etkf()
+test_fdvar_overflow()
+test_tangent_model()
+test_cost_function_grad()
+test_cost_function_grad()
+check_b()
+compare_coupled_vs_persistent_bc()

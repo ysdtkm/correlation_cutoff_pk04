@@ -5,8 +5,7 @@ import numpy as np
 from scipy.linalg import sqrtm
 from scipy.optimize import fmin, fmin_bfgs
 from const import *
-from tdvar import *
-from model import *
+import stats_const, model
 
 def fdvar(fcst_0, h, r, yo, aint, i_s, i_e, amp_b, bc=None):
   # fcst_0 <- np.array[dimc]       : first guess at beginning of window
@@ -25,7 +24,7 @@ def fdvar(fcst_0, h, r, yo, aint, i_s, i_e, amp_b, bc=None):
 
   try:
     anl_0 = np.copy(fcst_0)
-    anl_0 = fmin_bfgs(fdvar_2j, anl_0, args=(fcst_0, h, r, yo, aint, i_s, i_e, amp_b, bc))
+    anl_0 = fmin_bfgs(fdvar_2j, anl_0, args=(fcst_0, h, r, yo, aint, i_s, i_e, amp_b, bc), disp=False)
     # anl_0 = fmin_bfgs(fdvar_2j, anl_0, fprime=fdvar_2j_deriv, args=(fcst_0, h, r, yo, aint, i_s, i_e, amp_b, bc))
   except:
     print("Method fmin_bfgs failed to converge. Use fmin for this step instead.")
@@ -34,7 +33,7 @@ def fdvar(fcst_0, h, r, yo, aint, i_s, i_e, amp_b, bc=None):
 
   anl_1 = np.copy(anl_0)
   for i in range(0, aint):
-    anl_1 = timestep(anl_1, DT, i_s, i_e, bc)
+    anl_1 = model.timestep(anl_1, DT, i_s, i_e, bc)
   return anl_1.T
 
 def fdvar_analytical(fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e, amp_b, bc=None):
@@ -56,7 +55,7 @@ def fdvar_analytical(fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e, amp_b, bc
   h  = np.asmatrix(h_nda)
   r  = np.asmatrix(r_nda)
   yo = np.asmatrix(yo_nda)
-  b  = np.matrix(amp_b * tdvar_b()[i_s:i_e, i_s:i_e])
+  b  = np.matrix(amp_b * stats_const.tdvar_b()[i_s:i_e, i_s:i_e])
   fcst_0 = np.asmatrix(fcst_0_nda).T
 
   d = yo - h * fcst_0
@@ -66,7 +65,7 @@ def fdvar_analytical(fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e, amp_b, bc
 
   anl_1_nda = np.copy(anl_0_nda)
   for i in range(aint):
-    anl_1_nda = timestep(anl_1_nda, DT, i_s, i_e, bc)
+    anl_1_nda = model.timestep(anl_1_nda, DT, i_s, i_e, bc)
 
   return anl_1_nda
 
@@ -86,13 +85,13 @@ def fdvar_2j(anl_0_nda, fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e, amp_b,
   h  = np.asmatrix(h_nda)
   r  = np.asmatrix(r_nda)
   yo = np.asmatrix(yo_nda)
-  b  = np.matrix(amp_b * tdvar_b()[i_s:i_e, i_s:i_e])
+  b  = np.matrix(amp_b * stats_const.tdvar_b()[i_s:i_e, i_s:i_e])
   anl_0  = np.asmatrix(anl_0_nda).T
   fcst_0 = np.asmatrix(fcst_0_nda).T
 
   anl_1_nda = np.copy(anl_0_nda)
   for i in range(0, aint):
-    anl_1_nda = timestep(anl_1_nda, DT, i_s, i_e, bc)
+    anl_1_nda = model.timestep(anl_1_nda, DT, i_s, i_e, bc)
 
   # all array-like objects below are np.matrix
   anl_1 = np.matrix(anl_1_nda).T
@@ -118,7 +117,7 @@ def fdvar_2j_deriv(anl_0_nda, fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e, 
   h  = np.asmatrix(h_nda)
   r  = np.asmatrix(r_nda)
   yo = np.asmatrix(yo_nda)
-  b  = np.matrix(amp_b * tdvar_b()[i_s:i_e, i_s:i_e])
+  b  = np.matrix(amp_b * stats_const.tdvar_b()[i_s:i_e, i_s:i_e])
   anl_0  = np.asmatrix(anl_0_nda).T
   fcst_0 = np.asmatrix(fcst_0_nda).T
 
@@ -126,7 +125,7 @@ def fdvar_2j_deriv(anl_0_nda, fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e, 
   inc = anl_0 - fcst_0
   fcst_1_nda = np.copy(fcst_0_nda)
   for i in range(aint):
-    fcst_1_nda = timestep(fcst_1_nda, DT)
+    fcst_1_nda = model.timestep(fcst_1_nda, DT)
   fcst_1 = np.asmatrix(fcst_1_nda).T
   d = yo - h * fcst_1
 

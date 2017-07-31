@@ -1,4 +1,4 @@
-topt = --halt-on-error --no-pdf
+topt = --interaction=nonstopmode --halt-on-error --no-pdf
 src  = temp.tex
 obj  = out.pdf
 

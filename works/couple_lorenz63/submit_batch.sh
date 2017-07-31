@@ -1,14 +1,14 @@
 #!/bin/bash
 set -e
 
-git status --short --branch
+git status --short --branch .
 if [ $# -lt 1 ]; then
-  echo -e "\e[33mType (Ctrl-C) to stop.\e[m"
+  echo "Type (Ctrl-C) to stop."
   echo ""
-  echo -ne "input \e[33mJOB NAME\e[m: "
+  echo -n "input JOB NAME: "
   read JOBNAME
 else
-  echo -e "\e[33mType Enter to continue. Type (Ctrl-C) to stop.\e[m"
+  echo "Type Enter to continue. Type (Ctrl-C) to stop."
   read DUMMY
   JOBNAME=$1
 fi
@@ -24,27 +24,33 @@ git add .
 git commit -m "${JOBNAME}"
 set -e
 
-git pull; git push
+git pull && git push
 echo ""
 COMMIT=`git show HEAD | head -n1 | cut -c8-14`
+DATE=`date "+%Y%m%d_%H%M"`
+SCRIPT="myjob.py"
 
 cat <<EOF > ./aws/env.json
 {
   "vcpus": 1,
-  "memory": 5000,
-  "command": ["./myjob.sh"],
+  "memory": 7000,
+  "command": ["./${SCRIPT}", "python", "exec_from_template.py", "${DATE}_${COMMIT}_${JOBNAME}"],
   "environment": [
     {
       "name": "BATCH_FILE_TYPE",
       "value": "script"
     },
     {
+      "name": "BATCH_WDIR",
+      "value": "/tmp/repos/works/couple_lorenz63"
+    },
+    {
       "name": "BATCH_FILE_S3_URL",
-      "value": "s3://ysdtkm-bucket-1/myjob.sh"
+      "value": "s3://ysdtkm-bucket-1/batch/${SCRIPT}"
     },
     {
       "name": "BATCH_JOB_NAME",
-      "value": "${JOBNAME}"
+      "value": "${DATE}_${COMMIT}_${JOBNAME}"
     },
     {
       "name": "BATCH_COMMIT",
@@ -54,10 +60,9 @@ cat <<EOF > ./aws/env.json
 }
 EOF
 
-aws s3 cp aws/myjob.sh s3://ysdtkm-bucket-1/
-DATE=`date "+%Y%m%d_%H%M"`
+# aws s3 cp aws/${SCRIPT} s3://ysdtkm-bucket-1/batch/
 id=`aws batch submit-job \
-  --job-name ${DATE}_${JOBNAME} \
+  --job-name ${DATE}_${COMMIT}_${JOBNAME} \
   --job-queue ${queue} \
   --job-definition def-with-other-image:9 \
   --container-overrides file://aws/env.json | grep jobId`

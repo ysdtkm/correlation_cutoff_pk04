@@ -1,4 +1,5 @@
 *.pdf
 data/
 image/
+image_*/
 md5sum.txt

@@ -3,15 +3,19 @@
 import numpy as np
 from scipy.linalg import sqrtm
 from const import *
+import stats_const
 
-def etkf(fcst, h_nda, r_nda, yo_nda, rho, nmem, localization=False, r_local=""):
+def etkf(fcst, h_nda, r_nda, yo_nda, rho_in, nmem, obj_adaptive, localization=False, r_local="", num_yes=None):
   # fcst   <- np.array[nmem, dimc]
   # h_nda  <- np.array[DIMO, dimc]
   # r_nda  <- np.array[DIMO, DIMO]
   # yo_nda <- np.array[DIMO, 1]
   # rho    <- float
   # nmem   <- int
-  # r_local (string): localization pattern of R
+  # obj_adaptive
+  #        <- object created by etkf/init_etkf_adaptive_inflation(), or None
+  # r_local
+  #        <- (string): localization pattern of R
   # return -> np.array[dimc, nmem], np.array[dimc, dimc], np.array[dimc, dimc]
 
   h  = np.asmatrix(h_nda)
@@ -55,15 +59,28 @@ def etkf(fcst, h_nda, r_nda, yo_nda, rho, nmem, localization=False, r_local=""):
   if localization:
     xai = np.matrix(np.zeros((dimc, nmem)))
 
+    if rho_in == "adaptive":
+      delta_this = obtain_delta_this_step(yo, yb, ybpt, r, nmem, True)
+      obj_adaptive = update_adaptive_inflation(obj_adaptive, delta_this)
+    elif rho_in == "adaptive_each":
+      delta_this = obtain_delta_this_step(yo, yb, ybpt, r, nmem, False)
+      obj_adaptive = update_adaptive_inflation(obj_adaptive, delta_this)
+
     for j in range(dimc):
       # step 3
-      localization_weight = obtain_localization_weight(dimc, j, r_local)
+      localization_weight = obtain_localization_weight(dimc, j, r_local, num_yes)
       yol = yo[:,:].copy()
       ybl = yb[:,:].copy()
       ybptl = ybpt[:,:].copy()
       xfl = xf[j,:].copy()
       xfptl = xfpt[j,:].copy()
       rl = r[:,:].copy()
+
+      if rho_in == "adaptive" or rho_in == "adaptive_each":
+        component = [0,0,0,1,1,1,2,2,2]
+        rho = obj_adaptive[0,component[j]]
+      else:
+        rho = rho_in
 
       # step 4-9
       cl = ybptl.T * np.asmatrix(rl.I.A * localization_weight.A)
@@ -74,18 +91,24 @@ def etkf(fcst, h_nda, r_nda, yo_nda, rho, nmem, localization=False, r_local=""):
       xai[j,:] = xail[:,:]
 
     xapt = xai - np.mean(xai[:,:], axis=1) * I_1m
-    return np.real(xai.T.A), (xfpt * xfpt.T).A, (xapt * xapt.T).A
+    return np.real(xai.T.A), (xfpt * xfpt.T).A, (xapt * xapt.T).A, obj_adaptive
 
   else:
+
+    if rho_in == "adaptive" or rho_in == "adaptive_each":
+      raise Exception("non-localized ETKF cannot handle adaptive inflation")
+    else:
+      rho = rho_in
+
     pa   = (((nmem-1.0)/rho) * I_mm + ybpt.T * r.I * ybpt).I
     wam  = np.matrix(sqrtm((nmem-1.0) * pa))
     wa   = pa * ybpt.T * r.I * (yo - yb)
     xapt = (xfm - xf * I_1m) * wam
     xa   = xf + xfm * wa
     xam  = xapt + xa * I_1m
-    return np.real(xam.T.A), (xfpt * xfpt.T).A, (xapt * xapt.T).A
+    return np.real(xam.T.A), (xfpt * xfpt.T).A, (xapt * xapt.T).A, obj_adaptive
 
-def obtain_localization_weight(dimc, j, r_local):
+def obtain_localization_weight(dimc, j, r_local, num_yes):
   # dimc   <- int : cimension of analyzed component
   # j      <- int : index of analyzed grid
   # r_local (string): localization pattern of R
@@ -97,63 +120,7 @@ def obtain_localization_weight(dimc, j, r_local):
     return localization_weight
 
   if dimc == DIMM: # strongly coupled
-    # weight_table[iy, ix] is weight of iy-th obs for ix-th grid
-    if r_local == "3-components":
-      weight_table_components = np.array(
-        [[1.0, 0.0, 0.0],
-         [0.0, 1.0, 0.0],
-         [0.0, 0.0, 1.0]])
-    elif r_local == "vertical":
-      weight_table_components = np.array(
-        [[1.0, 1.0, 0.0],
-         [1.0, 1.0, 0.0],
-         [0.0, 0.0, 1.0]])
-    elif r_local == "horizontal":
-      weight_table_components = np.array(
-        [[1.0, 0.0, 0.0],
-         [0.0, 1.0, 1.0],
-         [0.0, 1.0, 1.0]])
-    elif r_local == "atmos_sees_ocean":
-      weight_table_components = np.array(
-        [[1.0, 1.0, 0.0],
-         [1.0, 1.0, 0.0],
-         [1.0, 1.0, 1.0]])
-    elif r_local == "ocean_sees_atmos":
-      weight_table_components = np.array(
-        [[1.0, 1.0, 1.0],
-         [1.0, 1.0, 1.0],
-         [0.0, 0.0, 1.0]])
-    elif r_local == "full":
-      weight_table_components = np.array(
-        [[1.0, 1.0, 1.0],
-         [1.0, 1.0, 1.0],
-         [1.0, 1.0, 1.0]])
-    elif r_local == "dynamical":
-      pass
-    else:
-      raise Exception("r_local: %s is not correct choice" % r_local)
-
-    if r_local == "dynamical": # a38p35
-      weight_table = np.array([
-        [1.0,1.0,1.0,  1.0,0.0,0.0,  0.0,0.0,0.0],
-        [1.0,1.0,1.0,  0.0,1.0,0.0,  0.0,0.0,0.0],
-        [1.0,1.0,1.0,  0.0,0.0,0.0,  0.0,0.0,0.0],
-
-        [1.0,0.0,0.0,  1.0,1.0,1.0,  1.0,0.0,0.0],
-        [0.0,1.0,0.0,  1.0,1.0,1.0,  0.0,1.0,0.0],
-        [0.0,0.0,0.0,  1.0,1.0,1.0,  0.0,0.0,1.0],
-
-        [0.0,0.0,0.0,  1.0,0.0,0.0,  1.0,1.0,1.0],
-        [0.0,0.0,0.0,  0.0,1.0,0.0,  1.0,1.0,1.0],
-        [0.0,0.0,0.0,  0.0,0.0,1.0,  1.0,1.0,1.0]])
-
-    else:
-      weight_table = np.ones((DIMM, DIMM))
-      for iyc in range(3):
-        for ixc in range(3):
-          weight_table[iyc*3:iyc*3+3, ixc*3:ixc*3+3] = \
-            weight_table_components[iyc, ixc]
-
+    weight_table = get_weight_table(r_local, num_yes)
     for iy in range(dimc):
       localization_weight[iy, :] *= weight_table[iy, j]
       localization_weight[:, iy] *= weight_table[iy, j]
@@ -163,16 +130,99 @@ def obtain_localization_weight(dimc, j, r_local):
 
   elif dimc == 6:
     pass
-    # weight_table = np.array(
-    #   [[1.0, 1.0, 1.0, 0.0, 0.0, 0.0],
-    #    [1.0, 1.0, 1.0, 0.0, 0.0, 0.0],
-    #    [1.0, 1.0, 1.0, 0.0, 0.0, 0.0],
-    #    [0.0, 0.0, 0.0, 1.0, 1.0, 1.0],
-    #    [0.0, 0.0, 0.0, 1.0, 1.0, 1.0],
-    #    [0.0, 0.0, 0.0, 1.0, 1.0, 1.0]])
-    # for iy in range(dimc):
-    #   localization_weight[iy, :] *= weight_table[iy, j]
-    #   localization_weight[:, iy] *= weight_table[iy, j]
 
   return np.asmatrix(localization_weight)
+
+def get_weight_table(r_local, num_yes):
+  # return weight_table[iy, ix] : weight of iy-th obs for ix-th grid
+
+  if r_local in ["covariance-mean", "correlation-mean", "covariance-rms",
+                 "correlation-rms", "random", "BHHtRi-mean", "BHHtRi-rms",
+                 "covariance-clim", "correlation-clim"]:
+    if num_yes == None:
+      num_yes = 37
+    weight_table = weight_based_on_stats(r_local, num_yes)
+  elif r_local == "dynamical": # a38p35
+    weight_table = np.array([
+      [1,1,1,  1,0,0,  0,0,0], [1,1,1,  0,1,0,  0,0,0], [1,1,1,  0,0,0,  0,0,0],
+      [1,0,0,  1,1,1,  1,0,0], [0,1,0,  1,1,1,  0,1,0], [0,0,0,  1,1,1,  0,0,1],
+      [0,0,0,  1,0,0,  1,1,1], [0,0,0,  0,1,0,  1,1,1], [0,0,0,  0,0,1,  1,1,1]], dtype=np.float64)
+  else:
+    weight_table_small = {
+      "individual":        np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]),
+      "atmos_coupling":    np.array([[1.0, 1.0, 0.0], [1.0, 1.0, 0.0], [0.0, 0.0, 1.0]]),
+      "enso_coupling":     np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 1.0], [0.0, 1.0, 1.0]]),
+      "atmos_sees_ocean":  np.array([[1.0, 1.0, 0.0], [1.0, 1.0, 0.0], [1.0, 1.0, 1.0]]),
+      "trop_sees_ocean":   np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 1.0, 1.0]]),
+      "ocean_sees_atmos":  np.array([[1.0, 1.0, 1.0], [1.0, 1.0, 1.0], [0.0, 0.0, 1.0]]),
+      "ocean_sees_trop":   np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 1.0], [0.0, 0.0, 1.0]]),
+      "full":              np.array([[1.0, 1.0, 1.0], [1.0, 1.0, 1.0], [1.0, 1.0, 1.0]]),
+      "adjacent":          np.array([[1.0, 1.0, 0.0], [1.0, 1.0, 1.0], [0.0, 1.0, 1.0]]),
+    }
+    weight_table = np.ones((DIMM, DIMM))
+    for iyc in range(3):
+      for ixc in range(3):
+        weight_table[iyc*3:iyc*3+3, ixc*3:ixc*3+3] = \
+          weight_table_small[r_local][iyc, ixc]
+  return weight_table
+
+def weight_based_on_stats(r_local, odr_max=37):
+  if DIMM != 9:
+    raise Exception("stats_weight_order() is only for 9-variable PK04 model")
+
+  order_table = stats_const.stats_order(r_local)
+  return np.float64(order_table < odr_max)
+
+def init_etkf_adaptive_inflation():
+  # return : np.array([[delta_extra, delta_trop, delta_ocean],
+  #                    [var_extra, var_trop, var_ocean]])
+
+  if DIMM != 9:
+    raise Exception("adaptive inflation is only for 9-variable coupled model")
+
+  obj_adaptive = np.array([[1.05, 1.05, 1.05],
+                           [1.0,  1.0,  1.0]])
+  return obj_adaptive
+
+def update_adaptive_inflation(obj_adaptive, delta_this_step):
+  # obj_adaptive (in, out):
+  #   np.array([[delta_extra, delta_trop, delta_ocean],
+  #             [var_extra, var_trop, var_ocean]])
+  # delta_this_step:
+  #   np.array([delta_extra, delta_trop, delta_ocean])
+
+  # limit delta_this_step
+  delta_max = np.ones(3) * ETKF_AI_max
+  delta_min = np.ones(3) * ETKF_AI_min
+  delta_this_step = np.max(np.row_stack((delta_min, delta_this_step)), axis=0)
+  delta_this_step = np.min(np.row_stack((delta_max, delta_this_step)), axis=0)
+
+  vf = obj_adaptive[1,:].copy() * ETKF_kappa
+  delta_new = (obj_adaptive[0,:] * ETKF_vo + delta_this_step[:] * vf[:]) / (ETKF_vo + vf[:])
+  va = (vf[:] * ETKF_vo) / (vf[:] + ETKF_vo)
+
+  obj_adaptive[0,:] = delta_new[:]
+  obj_adaptive[1,:] = va[:]
+
+  return obj_adaptive
+
+def obtain_delta_this_step(yo, yb, ybpt, r, nmem, common):
+
+  if DIMM != 9 or yo.shape[0] != 9:
+    raise Exception("this method is only used when DIMM == 9")
+
+  delta = np.empty(3)
+
+  if common:
+    dob = yo - yb
+    delta[:] = (dob.T.dot(dob) - np.trace(r)) / np.trace(ybpt.dot(ybpt.T) / (nmem-1))
+  else:
+    for i in range(3):
+      yol = yo[i*3:i*3+3]
+      ybl = yb[i*3:i*3+3]
+      ybptl = ybpt[i*3:i*3+3,:]
+      rl = r[i*3:i*3+3,i*3:i*3+3]
+      dob = yol - ybl
+      delta[i] = (dob.T.dot(dob) - np.trace(rl)) / np.trace(ybptl.dot(ybptl.T) / (nmem-1))
+  return delta
 

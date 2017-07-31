@@ -3,7 +3,7 @@
 import os
 import numpy as np
 from const import *
-from model import *
+import model
 
 def calc_blv(all_true):
   # all_true <- np.array[STEPS, DIMM]
@@ -12,14 +12,14 @@ def calc_blv(all_true):
 
   orth_int = 1
 
-  blv = np.random.normal(0.0, 1.0, (DIMM, DIMM))
+  blv = np.random.randn(DIMM, DIMM)
   blv, ble = orth_norm_vectors(blv)
   all_blv = np.zeros((STEPS, DIMM, DIMM))
   all_ble = np.zeros((STEPS, DIMM))
 
   for i in range(1, STEPS):
     true = all_true[i-1,:].copy()
-    m = finite_time_tangent_using_nonlinear(true, DT, 1)
+    m = model.finite_time_tangent_using_nonlinear(true, DT, 1)
     blv = np.dot(m, blv)
     if (i % orth_int == 0):
       blv, ble = orth_norm_vectors(blv)
@@ -37,14 +37,14 @@ def calc_flv(all_true):
 
   orth_int = 1
 
-  flv = np.random.normal(0.0, 1.0, (DIMM, DIMM))
+  flv = np.random.randn(DIMM, DIMM)
   flv, fle = orth_norm_vectors(flv)
   all_flv = np.zeros((STEPS, DIMM, DIMM))
   all_fle = np.zeros((STEPS, DIMM))
 
   for i in range(STEPS, 0, -1):
     true = all_true[i-1,:].copy()
-    m = finite_time_tangent_using_nonlinear(true, DT, 1)
+    m = model.finite_time_tangent_using_nonlinear(true, DT, 1)
     flv = np.dot(m.T, flv)
     if (i % orth_int == 0):
       flv, fle = orth_norm_vectors(flv)
@@ -70,7 +70,7 @@ def calc_clv(all_true, all_blv, all_flv):
 
     # directional continuity
     if (i >= 2):
-      m = finite_time_tangent_using_nonlinear(all_true[i-1,:], DT, 1)
+      m = model.finite_time_tangent_using_nonlinear(all_true[i-1,:], DT, 1)
       for k in range(0, DIMM):
         clv_approx = np.dot(m, all_clv[i-1,:,k,np.newaxis]).flatten()
         if (np.dot(clv_approx, all_clv[i,:,k]) < 0):
@@ -90,7 +90,7 @@ def calc_fsv(all_true):
   window = 1
   for i in range(window, STEPS):
     true = all_true[i-window,:].copy()
-    m = finite_time_tangent_using_nonlinear(true, DT, window)
+    m = model.finite_time_tangent_using_nonlinear(true, DT, window)
     u, s, vh = np.linalg.svd(m)
     all_fsv[i,:,:] = u[:,:]
     all_fse[i,:] = np.log(np.abs(s)) / (DT * window)
@@ -109,7 +109,7 @@ def calc_isv(all_true):
   window = 1
   for i in range(STEPS, window-1, -1):
     true = all_true[i-window,:].copy()
-    m = finite_time_tangent_using_nonlinear(true, DT, window)
+    m = model.finite_time_tangent_using_nonlinear(true, DT, window)
     u, s, vh = np.linalg.svd(m)
     all_isv[i-window,:,:] = vh.T[:,:]
     all_ise[i-window,:] = np.log(np.abs(s)) / (DT * window)
