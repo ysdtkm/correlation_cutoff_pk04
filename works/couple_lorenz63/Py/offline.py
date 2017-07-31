@@ -168,7 +168,9 @@ def obtain_stats_etkf():
     for i in range(DIMM):
       cov_clim_ij[i,:] += anom[i] * anom[:]
     k += 1
-  cov_clim_ij[:,:] /= (k - 1.0)
+  tmp = cov_clim_ij # to remove assymetry caused by numerical errors
+  cov_clim_ij[:,:] += tmp.T
+  cov_clim_ij[:,:] /= (2.0 * (k - 1.0))
   corr_clim_ij = cov_to_corr(cov_clim_ij)
 
   data_hash = {"correlation-mean":corr_mean_ij, "correlation-rms":corr_rms_ij, "covariance-mean":cov_mean_ij,
@@ -177,6 +179,7 @@ def obtain_stats_etkf():
                "covariance-instant":cov_instant_ij}
   for name in data_hash:
     plot_matrix(data_hash[name], title=name, xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-1)
+    plot_matrix(data_hash[name], title=(name+"_linear"), xlabel="grid index i", ylabel="grid index j", logscale=False)
     print(name)
     matrix_order(np.abs(data_hash[name]))
 
