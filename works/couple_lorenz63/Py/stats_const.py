@@ -36,7 +36,7 @@ def stats_order(r_local):
   if DIMM != 9:
     raise Exception("stats_order() is only for 9-variable PK04 model")
 
-  # order_table obtained from 71400a1, offline.py, 1000TU
+  # order_table obtained from 5f4e847, offline.py, 1000TU
   if r_local == "correlation-mean":
     order_table = np.array([
     [ 8, 12, 42, 46, 38, 68, 70, 60, 64],
