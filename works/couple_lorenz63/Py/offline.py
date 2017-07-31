@@ -182,27 +182,17 @@ def obtain_stats_etkf():
 
   return 0
 
-def matrix_order(mat_ij, prioritize_diag=False, max_odr=81):
-  n = len(mat_ij)
-  if len(mat_ij[0]) != n:
+def matrix_order(mat_ij_in, prioritize_diag=False, max_odr=81):
+  n = len(mat_ij_in)
+  if len(mat_ij_in[0]) != n:
     raise Exception("input matrix non-square")
+  mat_ij = mat_ij_in.copy()
 
-  def find_order(k, l, order, asymmetric):
-    if asymmetric:
-      i = min(k, l)
-      j = max(k, l)
-    else:
-      i = k
-      j = l
-
-    for io, cmp in enumerate(order):
-      if cmp[0] == i and cmp[1] == j:
-        if (io < len(order) - 1) and (order[io+1][0] == j) and (order[io+1][1] == i):
-          # if same elements in symmetric position, return rouded-up number
-          return io + 1
-        else:
-          return io
-    raise Exception("find_order overflow")
+  def find_last_order(sorted_vals, test):
+    for i, val in reversed(list(enumerate(sorted_vals))):
+      if val == test:
+        return i
+    raise Exception("find_last_order overflow")
 
   def print_order(order):
     for i in range(n):
@@ -218,28 +208,20 @@ def matrix_order(mat_ij, prioritize_diag=False, max_odr=81):
     print("")
     return
 
-  order = [[0 for j in range(n)] for i in range(n)]
   if prioritize_diag:
-    upper_components = []
     for i in range(n):
-      for j in range(i+1, n):
-        upper_components.append((i, j, mat_ij[i,j]))
-    order_obj_upper = sorted(upper_components, key=lambda x: x[2], reverse=True)
-    for i in range(n):
-      for j in range(n):
-        if i == j:
-          order[i][j] = i
-        else:
-          order[i][j] = find_order(i, j, order_obj_upper, True) * 2 + 9 + 1
-  else:
-    all_components = []
-    for i in range(n):
-      for j in range(n):
-        all_components.append((i, j, mat_ij[i,j]))
-    order_obj = sorted(all_components, key=lambda x: x[2], reverse=True)
-    for i in range(n):
-      for j in range(n):
-        order[i][j] = find_order(i, j, order_obj, False)
+      mat_ij[i,i] = np.inf
+
+  all_vals = []
+  for i in range(n):
+    for j in range(n):
+      all_vals.append(mat_ij[i,j])
+  sorted_vals = sorted(all_vals, reverse=True)
+
+  order = [[0 for j in range(n)] for i in range(n)]
+  for i in range(n):
+    for j in range(n):
+      order[i][j] = find_last_order(sorted_vals, mat_ij[i,j])
 
   print_order(order)
 
