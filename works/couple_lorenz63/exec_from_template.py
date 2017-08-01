@@ -26,8 +26,9 @@ def exec_not_from_template(job_name, flag_local):
   subprocess.check_call("make")
   os.system("cp -f data/lyapunov.txt image/true/")
   os.system("cp -f latex/out.pdf image/")
+  os.system("tar -czf %s.tar.gz image" % job_name)
   if not flag_local:
-    os.system("aws s3 cp image s3://ysdtkm-bucket-1/couple_lorenz63/tar/%s --recursive" % job_name)
+    os.system("aws s3 cp %s.tar.gz s3://ysdtkm-bucket-1/couple_lorenz63/tar/" % job_name)
     os.system("aws s3 cp latex/out.pdf s3://ysdtkm-bucket-1/couple_lorenz63/pdf/%s.pdf" % job_name)
 
 def exec_from_template(param1s, param2s, param3s_raw, job_name, flag_local):
@@ -49,13 +50,14 @@ def exec_from_template(param1s, param2s, param3s_raw, job_name, flag_local):
         pass
       os.system("cp -f data/lyapunov.txt image/true/")
       os.system("cp -f latex/out.pdf image/")
-      if not flag_local:
-        os.system("aws s3 cp image s3://ysdtkm-bucket-1/couple_lorenz63/tar/%s/%s_%s --recursive"
-          % (job_name, param1, param2))
-        os.system("aws s3 cp latex/out.pdf s3://ysdtkm-bucket-1/couple_lorenz63/pdf/%s/%s_%s.pdf"
-          % (job_name, param1, param2))
+      os.system("tar -czf %s_%s.tar.gz image" % (param1, param2))
       os.system("rm -rf image_%s_%s" % (param1, param2))
       os.system("mv image image_%s_%s" % (param1, param2))
+      if not flag_local:
+        os.system("aws s3 cp %s_%s.tar.gz s3://ysdtkm-bucket-1/couple_lorenz63/tar/%s/"
+          % (param1, param2, job_name))
+        os.system("aws s3 cp latex/out.pdf s3://ysdtkm-bucket-1/couple_lorenz63/pdf/%s/%s_%s.pdf"
+          % (job_name, param1, param2))
 
   os.system("mkdir -p verif")
   super_verif.verif(param1s, param2s, param3s_raw, param3s_arr)
