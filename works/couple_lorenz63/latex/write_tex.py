@@ -70,7 +70,7 @@ def main():
 def header(date, last_commit):
   header = """
     \\documentclass{beamer}
-    \\usepackage{xltxtra}
+    % \\usepackage{xltxtra}
     \\usepackage{amsmath}
     \\usepackage{verbatim}
     \\usepackage[subrefformat=parens]{subcaption}
