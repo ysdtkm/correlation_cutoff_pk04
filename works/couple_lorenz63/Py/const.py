@@ -8,7 +8,7 @@ DIMM = 9    # dimension of model variable n
 DIMO = DIMM # dimension of observation variable m
 
 DT = 0.01
-TMAX = 100
+TMAX = 10
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 FCST_LT = 0
@@ -19,14 +19,13 @@ FERR_INI = 10.0
 AINT = 8
 
 rho = "adaptive"
-nmem = 6
+nmem = 4
 amp_b_tdvar = 2.0
 amp_b_fdvar = 1.5
 
 EXPLIST = [ \
-  {"name":"correlation-clim_9", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"correlation-clim", "num_yes":9},
-  {"name":"correlation-clim_45", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"correlation-clim", "num_yes":45},
-  {"name":"correlation-clim_81", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"correlation-clim", "num_yes":81},
+  {"name":"covariance-rms_10", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-rms", "num_yes":10},
+  {"name":"covariance-rms_81", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-rms", "num_yes":81},
 ]
 
 # {"name":"etkf", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"full"},
