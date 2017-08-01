@@ -19,15 +19,14 @@ FERR_INI = 10.0
 AINT = 8
 
 rho = "adaptive"
-nmem = 4
+nmem = 6
 amp_b_tdvar = 2.0
 amp_b_fdvar = 1.5
 
 EXPLIST = [ \
-  {"name":"covariance-mean_9", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-mean", "num_yes":9},
-  {"name":"covariance-mean_10", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-mean", "num_yes":10},
-  {"name":"covariance-mean_11", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-mean", "num_yes":11},
-  {"name":"covariance-mean_81", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-mean", "num_yes":81},
+  {"name":"correlation-clim_9", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"correlation-clim", "num_yes":9},
+  {"name":"correlation-clim_45", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"correlation-clim", "num_yes":45},
+  {"name":"correlation-clim_81", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"correlation-clim", "num_yes":81},
 ]
 
 # {"name":"etkf", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"full"},

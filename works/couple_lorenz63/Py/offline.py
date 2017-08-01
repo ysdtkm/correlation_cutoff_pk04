@@ -159,6 +159,7 @@ def obtain_stats_etkf():
   bhhtri_rms_ij  = cov_rms_ij.dot(ri)
   bhhtri_mean_ij = cov_mean_ij.dot(ri)
   rand_ij        = np.random.randn(DIMM, DIMM)
+  corr_instant_ij = cov_to_corr(cov_instant_ij)
 
   clim_mean = np.mean(nature[STEPS//2:,:], axis=0)
   cov_clim_ij = np.empty((DIMM, DIMM))
@@ -176,7 +177,7 @@ def obtain_stats_etkf():
   data_hash = {"correlation-mean":corr_mean_ij, "correlation-rms":corr_rms_ij, "covariance-mean":cov_mean_ij,
                "covariance-rms":cov_rms_ij, "BHHtRi-mean":bhhtri_mean_ij, "BHHtRi-rms":bhhtri_rms_ij,
                "covariance-clim":cov_clim_ij, "correlation-clim":corr_clim_ij, "random":rand_ij,
-               "covariance-instant":cov_instant_ij}
+               "covariance-instant":cov_instant_ij, "correlation-instant":corr_instant_ij}
   for name in data_hash:
     plot_matrix(data_hash[name], title=name, xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-1)
     plot_matrix(data_hash[name], title=(name+"_linear"), xlabel="grid index i", ylabel="grid index j", logscale=False)
