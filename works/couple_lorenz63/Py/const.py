@@ -8,10 +8,10 @@ DIMM = 9    # dimension of model variable n
 DIMO = DIMM # dimension of observation variable m
 
 DT = 0.01
-TMAX = 1000
+TMAX = 100
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
-FCST_LT = 5
+FCST_LT = 0
 
 OERR_A = 1.0
 OERR_O = 5.0
@@ -24,13 +24,15 @@ amp_b_tdvar = 2.0
 amp_b_fdvar = 1.5
 
 EXPLIST = [ \
-  {"name":"4mem_full", "rho":rho, "nmem":4, "method":"etkf", "couple":"strong", "r_local":"full"},
-  {"name":"6mem_full", "rho":rho, "nmem":6, "method":"etkf", "couple":"strong", "r_local":"full"},
-  {"name":"4mem_enso_coupling", "rho":rho, "nmem":4, "method":"etkf", "couple":"strong", "r_local":"enso_coupling"},
-  {"name":"6mem_enso_coupling", "rho":rho, "nmem":6, "method":"etkf", "couple":"strong", "r_local":"enso_coupling"},
-  # {"name":"tdvar", "rho":rho, "nmem":1, "method":"3dvar", "couple":"strong", "amp_b":amp_b_tdvar},
-  # {"name":"fdvar", "rho":rho, "nmem":1, "method":"4dvar", "couple":"strong", "amp_b":amp_b_fdvar},
+  {"name":"covariance-mean_9", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-mean", "num_yes":9},
+  {"name":"covariance-mean_10", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-mean", "num_yes":10},
+  {"name":"covariance-mean_11", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-mean", "num_yes":11},
+  {"name":"covariance-mean_81", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"covariance-mean", "num_yes":81},
 ]
+
+# {"name":"etkf", "rho":rho, "nmem":nmem, "method":"etkf", "couple":"strong", "r_local":"full"},
+# {"name":"tdvar", "rho":rho, "nmem":1, "method":"3dvar", "couple":"strong", "amp_b":amp_b_tdvar},
+# {"name":"fdvar", "rho":rho, "nmem":1, "method":"4dvar", "couple":"strong", "amp_b":amp_b_fdvar},
 
 Calc_lv = False
 

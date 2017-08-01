@@ -32,25 +32,26 @@ def plot_rmse(rmse_all, param1s, param2s, param3s):
     x = list(map(float, param3s))
   except:
     x = range(len(param3s))
-  colors = ["red", "green", "blue"]
+  colors = ["red", "green", "blue", "yellow", "cyan", "grey"]
   styles = ["solid", "dotted", "dashed", "dashdot"] * 3
   lwidth = [1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3]
 
-  for i, param1 in enumerate(param1s):
-    plt.rcParams["font.size"] = 8
-    fig, ax = plt.subplots()
-    fig.subplots_adjust(top=0.85, bottom=0.2, right=0.67)
-    for ic in range(lenc):
+  for ic in range(lenc):
+    name_c = ["extra", "trop", "ocean"][ic]
+    for i, param1 in enumerate(param1s):
+      plt.rcParams["font.size"] = 8
+      fig, ax = plt.subplots()
+      fig.subplots_adjust(top=0.85, bottom=0.2, right=0.67)
       for j, param2 in enumerate(param2s):
-        ax.plot(x, rmse_all[i,j,:,ic], color=colors[ic], linestyle=styles[j], linewidth=lwidth[j],
-                 label=(["extra", "trop", "ocean"][ic] + "_" + param2))
-    ax.set_ylim(0, max(const.OERR_A, const.OERR_O) * 1.5)
-    ax.set_xlabel("Number of yes (assimilated)")
-    ax.set_ylabel("RMSE")
-    ax.legend(bbox_to_anchor=(1.03,1), loc="upper left")
-    plt.savefig("verif/verif_%s.pdf" % param1)
-    plt.clf()
-    plt.close()
+        ax.plot(x, rmse_all[i,j,:,ic], color=colors[j], label=param2)
+      ax.set_ylim(0, max(const.OERR_A, const.OERR_O) * 1.5)
+      ax.set_xlabel("Number of yes (assimilated)")
+      ax.set_ylabel("RMSE")
+      ax.legend(bbox_to_anchor=(1.03,1), loc="upper left")
+      plt.title(name_c)
+      plt.savefig("verif/verif_%s_%s.pdf" % (param1, name_c))
+      plt.clf()
+      plt.close()
   return 0
 
 def plot_min3(rmse_all, param1s, param2s, param3s):
@@ -60,7 +61,7 @@ def plot_min3(rmse_all, param1s, param2s, param3s):
     x = list(map(float, param1s))
   except:
     x = range(len(param1s))
-  colors = ["red", "green", "blue"]
+  colors = ["red", "green", "blue", "yellow", "cyan", "grey"]
   styles = ["solid", "dotted", "dashed", "dashdot"] * 3
   lwidth = [1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3]
   rmse_min = np.mean(rmse_all, axis=2)
