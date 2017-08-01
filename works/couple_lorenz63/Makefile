@@ -18,17 +18,17 @@ src_calc = Py/main.py Py/const.py Py/model.py Py/etkf.py Py/fdvar.py Py/tdvar.py
            Py/vectors.py
 dep_calc =
 out_calc = data/*.bin
-cmd_calc = rm -rf data; mkdir -p data; $(time) python Py/main.py
+cmd_calc = rm -rf data; mkdir -p data; $(time) python3 Py/main.py
 
 src_plot = Py/plot.py Py/const.py
 dep_plot = calc
 out_plot = image/*
-cmd_plot = rm -rf image; mkdir -p image; $(time) python Py/plot.py
+cmd_plot = rm -rf image; mkdir -p image; $(time) python3 Py/plot.py
 
 src_tex = latex/write_tex.py
 dep_tex = plot
 out_tex =
-cmd_tex = cd latex && python write_tex.py
+cmd_tex = cd latex && python3 write_tex.py
 
 # ===============================================
 # end of settings
