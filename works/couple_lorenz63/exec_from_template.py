@@ -7,7 +7,7 @@ import numpy as np
 from_template = True
 if from_template:
   param1s = ["3", "4", "5", "6"]
-  param2s = ["covariance-rms", "covariance-mean", "covariance-clim"]
+  param2s = ["covariance-rms", "covariance-mean"]
   # param2s = ["correlation-rms", "correlation-mean", "covariance-rms", "covariance-mean",
   #            "BHHtRi-mean", "BHHtRi-rms", "covariance-clim", "correlation-clim"]
   # param3s = ["9", "10", "81"]
