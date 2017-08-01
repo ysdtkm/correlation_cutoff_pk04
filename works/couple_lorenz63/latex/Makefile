@@ -10,6 +10,7 @@ $(obj): $(src)
 	$(tex) $(topt) $(src)
 # 	echo $(src) | sed -e 's/.tex/.xdv/g' | xargs -i xdvipdfmx -o $(obj) {}
 # 	echo $(src) | sed -e 's/.tex/.xdv/g' | xargs rm -f
+	echo $(src) | sed -e 's/.tex/.pdf/g' | xargs -i mv {} out.pdf
 	echo $(src) | sed -e 's/.tex/.aux/g' | xargs rm -f
 	echo $(src) | sed -e 's/.tex/.log/g' | xargs rm -f
 	echo $(src) | sed -e 's/.tex/.ps/g' | xargs rm -f
