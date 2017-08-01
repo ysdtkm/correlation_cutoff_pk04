@@ -64,7 +64,7 @@ def plot_min3(rmse_all, param1s, param2s, param3s):
   colors = ["red", "green", "blue", "yellow", "cyan", "grey"]
   styles = ["solid", "dotted", "dashed", "dashdot"] * 3
   lwidth = [1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3]
-  rmse_min = np.mean(rmse_all, axis=2)
+  rmse_min = np.nanmin(rmse_all, axis=2)
 
   plt.rcParams["font.size"] = 8
   fig, ax = plt.subplots()

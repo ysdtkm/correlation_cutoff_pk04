@@ -43,7 +43,7 @@ def main():
     txt_out += figure_table(exp["name"], filelist, 4, 4, datestr, commit_name)
 
   # conditions
-  txt_out += write_txt(datestr, commit_name, "../Py/const.py", "6pt", "settings")
+  txt_out += write_txt(datestr, commit_name, "../Py/const.py", "5pt", "settings")
   md_raw = subprocess.getoutput('md5sum ../data/*').split("\n")
   md_raw.sort()
   md_txt = ""
