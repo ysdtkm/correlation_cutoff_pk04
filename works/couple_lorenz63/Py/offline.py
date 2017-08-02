@@ -97,7 +97,7 @@ def plot_matrix(data, name="", title="", color=plt.cm.bwr, xlabel="", ylabel="",
   cbar = plt.colorbar(map1)
   plt.title(title)
   plt.gca().invert_yaxis()
-  plt.savefig("./matrix_%s_%s.png" % (name, title))
+  plt.savefig("./matrix_%s_%s.pdf" % (name, title))
   plt.close()
   return 0
 
@@ -176,18 +176,18 @@ def obtain_stats_etkf():
   corr_clim_ij = cov_to_corr(cov_clim_ij)
 
   data_hash = {"correlation-mean":corr_mean_ij, "correlation-rms":corr_rms_ij, "covariance-mean":cov_mean_ij,
-               "covariance-rms":cov_rms_ij, "BHHtRi-mean":bhhtri_mean_ij, "BHHtRi-rms":bhhtri_rms_ij,
-               "covariance-clim":cov_clim_ij, "correlation-clim":corr_clim_ij, "random":rand_ij,
+               "covariance-rms":cov_rms_ij, "covariance-clim":cov_clim_ij, "correlation-clim":corr_clim_ij,
                "covariance-instant":cov_instant_ij, "correlation-instant":corr_instant_ij}
+               # "BHHtRi-mean":bhhtri_mean_ij, "BHHtRi-rms":bhhtri_rms_ij, "random":rand_ij,
   for name in data_hash:
     plot_matrix(data_hash[name], title=name, xlabel="grid index i", ylabel="grid index j", logscale=True, linthresh=1e-1)
     plot_matrix(data_hash[name], title=(name+"_linear"), xlabel="grid index i", ylabel="grid index j", logscale=False)
     print(name)
-    matrix_order(np.abs(data_hash[name]))
+    matrix_order(np.abs(data_hash[name]), name)
 
   return 0
 
-def matrix_order(mat_ij_in, prioritize_diag=False, max_odr=81):
+def matrix_order(mat_ij_in, name, prioritize_diag=False, max_odr=81):
   n = len(mat_ij_in)
   if len(mat_ij_in[0]) != n:
     raise Exception("input matrix non-square")
@@ -229,6 +229,17 @@ def matrix_order(mat_ij_in, prioritize_diag=False, max_odr=81):
       order[i][j] = find_last_order(sorted_vals, mat_ij[i,j])
 
   print_order(order)
+
+  x = np.array(range(1, len(sorted_vals)+1))
+  y = np.array(sorted_vals)
+  plt.bar(x, y / np.max(y), label=name)
+  plt.xlabel("decending order (1-based)")
+  plt.ylabel("relative amplitude")
+  plt.yscale("log")
+  plt.ylim(1.0e-4, 1.0)
+  plt.legend()
+  plt.savefig("histogram_%s.pdf" % name)
+  plt.clf()
 
   return 0
 
