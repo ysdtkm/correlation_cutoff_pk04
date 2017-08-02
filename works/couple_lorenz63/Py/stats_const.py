@@ -2,6 +2,7 @@
 
 import numpy as np
 from const import *
+import better_exceptions
 
 def tdvar_b():
   # return -> np.array[DIMM,DIMM] : background error covariance

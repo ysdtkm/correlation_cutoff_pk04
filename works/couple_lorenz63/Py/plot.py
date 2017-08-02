@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import os, warnings
 from mpl_toolkits.mplot3d import Axes3D
 from const import *
+import better_exceptions
 
 def plot_all():
   Plot_3d = True

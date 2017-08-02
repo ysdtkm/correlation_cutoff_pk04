@@ -2,6 +2,7 @@
 
 import os, subprocess, sys, re, socket
 import numpy as np
+import better_exceptions
 
 # ====================================
 from_template = True

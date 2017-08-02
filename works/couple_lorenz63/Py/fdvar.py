@@ -6,6 +6,7 @@ from scipy.linalg import sqrtm
 from scipy.optimize import fmin, fmin_bfgs
 from const import *
 import stats_const, model
+import better_exceptions
 
 def fdvar(fcst_0, h, r, yo, aint, i_s, i_e, amp_b, bc=None):
   # fcst_0 <- np.array[dimc]       : first guess at beginning of window

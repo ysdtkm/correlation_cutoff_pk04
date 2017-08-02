@@ -4,6 +4,7 @@
 import os, io, textwrap, datetime, sys, subprocess
 sys.path.append("../Py")
 import const
+import better_exceptions
 
 def main():
   git_output = str(subprocess.check_output("git show HEAD | head -n1", shell=True))

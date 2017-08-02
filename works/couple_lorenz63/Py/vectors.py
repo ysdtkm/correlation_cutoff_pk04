@@ -4,6 +4,7 @@ import os
 import numpy as np
 from const import *
 import model
+import better_exceptions
 
 def calc_blv(all_true):
   # all_true <- np.array[STEPS, DIMM]

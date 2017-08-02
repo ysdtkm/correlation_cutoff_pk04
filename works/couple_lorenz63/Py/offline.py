@@ -8,6 +8,7 @@ import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
+import better_exceptions
 
 def obtain_climatology():
   nstep = 100000
