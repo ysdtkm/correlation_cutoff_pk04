@@ -34,7 +34,7 @@ EXPLIST = [ \
 Calc_lv = False
 
 ETKF_vo = 1.0
-ETKF_kappa = 1.01
+ETKF_kappa = 1.03
 ETKF_AI_max = 1.2
 ETKF_AI_min = 0.9
 
