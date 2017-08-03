@@ -57,11 +57,14 @@ def exec_from_template(param1s, param2s, param3s_raw, job_name, flag_local):
       os.system("mv image image_%s_%s" % (param1, param2))
       if flag_local:
         os.system("ssh -t tyoshida@halo.atmos.umd.edu 'mkdir -p ~/data/couple_lorenz63/tar/%s/'" % job_name)
+        os.system("ssh -t tyoshida@halo.atmos.umd.edu 'mkdir -p ~/data/couple_lorenz63/pdf/%s/'" % job_name)
         os.system("scp %s_%s.tar.gz tyoshida@halo.atmos.umd.edu:~/data/couple_lorenz63/tar/%s/"
           % (param1, param2, job_name))
         os.system("scp latex/out.pdf tyoshida@halo.atmos.umd.edu:~/data/couple_lorenz63/pdf/%s/%s_%s.pdf"
           % (job_name, param1, param2))
       else:
+        os.system("mkdir -p ~/data/couple_lorenz63/tar/%s/" % job_name)
+        os.system("mkdir -p ~/data/couple_lorenz63/pdf/%s/" % job_name)
         os.system("mv -f  %s_%s.tar.gz ~/data/couple_lorenz63/tar/%s/" % (param1, param2, job_name))
         os.system("cp -f latex/out.pdf ~/data/couple_lorenz63/pdf/%s/%s_%s.pdf" % (job_name, param1, param2))
 
@@ -70,7 +73,7 @@ def exec_from_template(param1s, param2s, param3s_raw, job_name, flag_local):
   if flag_local:
     os.system("scp -r verif tyoshida@halo.atmos.umd.edu:~/data/couple_lorenz63/pdf/%s" % job_name)
   else:
-    os.system("cp -r verif ~/data/couple_lorenz63/pdf/%s" % job_name)
+    os.system("cp -r verif/* ~/data/couple_lorenz63/pdf/%s/" % job_name)
 
 def write_const_file_from_template(param1, param2, param3s):
   rf = open("aws/template_const.py", "r")
