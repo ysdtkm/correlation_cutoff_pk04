@@ -113,7 +113,7 @@ def obtain_stats_etkf():
   np.random.seed((10**8+7)*12)
   nature = main.exec_nature()
   obs = main.exec_obs(nature)
-  settings = {"name":"etkf",  "rho":"adaptive", "nmem":100,
+  settings = {"name":"etkf",  "rho":"adaptive", "nmem":10,
               "method":"etkf", "couple":"strong", "r_local": "full"}
   np.random.seed((10**8+7)*13)
   free = main.exec_free_run(settings)
