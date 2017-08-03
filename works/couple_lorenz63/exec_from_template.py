@@ -10,7 +10,7 @@ if from_template:
   param2s = ["correlation-rms", "covariance-rms"]
   # param2s = ["correlation-rms", "correlation-mean", "covariance-rms", "covariance-mean",
   #            "BHHtRi-mean", "BHHtRi-rms", "covariance-clim", "correlation-clim"]
-  param3s = list(map(str, range(9, 82)))
+  param3s = ["9", "10", "81"] # list(map(str, range(9, 82)))
 # ====================================
 
 def main():
@@ -26,9 +26,12 @@ def exec_not_from_template(job_name, flag_local):
   os.system("cp -f data/lyapunov.txt image/true/")
   os.system("cp -f latex/out.pdf image/")
   os.system("tar -czf %s.tar.gz image" % job_name)
-  if not flag_local:
-    os.system("aws s3 cp %s.tar.gz s3://ysdtkm-bucket-1/couple_lorenz63/tar/" % job_name)
-    os.system("aws s3 cp latex/out.pdf s3://ysdtkm-bucket-1/couple_lorenz63/pdf/%s.pdf" % job_name)
+  if flag_local:
+    os.system("scp %s.tar.gz tyoshida@halo.atmos.umd.edu:~/data/couple_lorenz63/tar/" % job_name)
+    os.system("scp latex/out.pdf tyoshida@halo.atmos.umd.edu:~/data/couple_lorenz63/pdf/%s.pdf" % job_name)
+  else:
+    os.system("mv -f %s.tar.gz ~/data/couple_lorenz63/tar/" % job_name)
+    os.system("cp -f latex/out.pdf ~/data/couple_lorenz63/pdf/%s.pdf" % job_name)
 
 def exec_from_template(param1s, param2s, param3s_raw, job_name, flag_local):
   sys.path.append('Py')
@@ -52,16 +55,22 @@ def exec_from_template(param1s, param2s, param3s_raw, job_name, flag_local):
       os.system("tar -czf %s_%s.tar.gz image" % (param1, param2))
       os.system("rm -rf image_%s_%s" % (param1, param2))
       os.system("mv image image_%s_%s" % (param1, param2))
-      if not flag_local:
-        os.system("aws s3 cp %s_%s.tar.gz s3://ysdtkm-bucket-1/couple_lorenz63/tar/%s/"
+      if flag_local:
+        os.system("ssh -t tyoshida@halo.atmos.umd.edu 'mkdir -p ~/data/couple_lorenz63/tar/%s/'" % job_name)
+        os.system("scp %s_%s.tar.gz tyoshida@halo.atmos.umd.edu:~/data/couple_lorenz63/tar/%s/"
           % (param1, param2, job_name))
-        os.system("aws s3 cp latex/out.pdf s3://ysdtkm-bucket-1/couple_lorenz63/pdf/%s/%s_%s.pdf"
+        os.system("scp latex/out.pdf tyoshida@halo.atmos.umd.edu:~/data/couple_lorenz63/pdf/%s/%s_%s.pdf"
           % (job_name, param1, param2))
+      else:
+        os.system("mv -f  %s_%s.tar.gz ~/data/couple_lorenz63/tar/%s/" % (param1, param2, job_name))
+        os.system("cp -f latex/out.pdf ~/data/couple_lorenz63/pdf/%s/%s_%s.pdf" % (job_name, param1, param2))
 
   os.system("mkdir -p verif")
   super_verif.verif(param1s, param2s, param3s_raw, param3s_arr)
-  if not flag_local:
-    os.system("aws s3 sync verif s3://ysdtkm-bucket-1/couple_lorenz63/pdf/%s" % job_name)
+  if flag_local:
+    os.system("scp -r verif tyoshida@halo.atmos.umd.edu:~/data/couple_lorenz63/pdf/%s" % job_name)
+  else:
+    os.system("cp -r verif ~/data/couple_lorenz63/pdf/%s" % job_name)
 
 def write_const_file_from_template(param1, param2, param3s):
   rf = open("aws/template_const.py", "r")
