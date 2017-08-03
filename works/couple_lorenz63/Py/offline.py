@@ -129,7 +129,8 @@ def obtain_stats_etkf():
   cov_ijt[:,:,:] = np.nan
   r = getr()
 
-  for it in range(STEPS//2, STEPS):
+  for it in range(STEP_FREE):
+  # ttk for it in range(STEPS//2, STEPS):
     if it % AINT == 0:
       if use_posterior:
         fcst = hist_fcst[it, :, :].copy()
