@@ -1,6 +1,5 @@
 import line_profiler, time
 import main, fdvar, plot
-import better_exceptions
 
 pr = line_profiler.LineProfiler()
 pr.add_function(plot.plot_rmse_spread)

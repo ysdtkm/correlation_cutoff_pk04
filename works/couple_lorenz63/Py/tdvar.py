@@ -5,7 +5,6 @@ import sys
 from scipy.optimize import fmin_bfgs
 from const import *
 import stats_const
-import better_exceptions
 
 def tdvar(fcst, h, r, yo, i_s, i_e, amp_b):
   # fcst   <- np.array[dimc]        : first guess

@@ -2,7 +2,6 @@
 
 import math
 import numpy as np
-import better_exceptions
 
 # note: "dimc" in comments is dimension of component (for non/weakly coupled)
 DIMM = 9    # dimension of model variable n

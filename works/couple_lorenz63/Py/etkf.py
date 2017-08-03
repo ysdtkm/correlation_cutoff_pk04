@@ -4,7 +4,6 @@ import numpy as np
 from scipy.linalg import sqrtm
 from const import *
 import stats_const
-import better_exceptions
 
 def etkf(fcst, h_nda, r_nda, yo_nda, rho_in, nmem, obj_adaptive, localization=False, r_local="", num_yes=None):
   # fcst   <- np.array[nmem, dimc]

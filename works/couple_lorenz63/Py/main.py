@@ -4,7 +4,6 @@ import os
 import numpy as np
 from const import *
 import model, etkf, tdvar, fdvar, vectors
-import better_exceptions
 
 def main():
   np.random.seed((10**9+7)*1)

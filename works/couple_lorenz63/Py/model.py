@@ -2,7 +2,6 @@
 
 import numpy as np
 from const import *
-import better_exceptions
 
 def timestep(x, dt, i_s=0, i_e=DIMM, bc=None):
   # x      <- np.array(dimm)
