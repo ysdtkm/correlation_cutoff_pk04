@@ -232,7 +232,7 @@ def matrix_order(mat_ij_in, name, prioritize_diag=False, max_odr=81):
   x = np.array(range(1, len(sorted_vals)+1))
   y = np.array(sorted_vals)
   plt.bar(x, y / np.max(y), label=name)
-  plt.xlabel("decending order (1-based)")
+  plt.xlabel("descending order (1-based)")
   plt.ylabel("relative amplitude")
   plt.yscale("log")
   plt.ylim(1.0e-4, 1.0)
