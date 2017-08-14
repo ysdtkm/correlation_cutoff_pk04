@@ -60,10 +60,10 @@ def etkf(fcst, h_nda, r_nda, yo_nda, rho_in, nmem, obj_adaptive, localization=Fa
     xai = np.matrix(np.zeros((dimc, nmem)))
 
     if rho_in == "adaptive":
-      delta_this = obtain_delta_this_step(yo, yb, ybpt, r, nmem, True)
+      delta_this = obtain_delta_for_adaptive_inflation(yo, yb, ybpt, r, nmem, True)
       obj_adaptive = update_adaptive_inflation(obj_adaptive, delta_this)
     elif rho_in == "adaptive_each":
-      delta_this = obtain_delta_this_step(yo, yb, ybpt, r, nmem, False)
+      delta_this = obtain_delta_for_adaptive_inflation(yo, yb, ybpt, r, nmem, False)
       obj_adaptive = update_adaptive_inflation(obj_adaptive, delta_this)
 
     for j in range(dimc):
@@ -172,8 +172,8 @@ def init_etkf_adaptive_inflation():
   # return : np.array([[delta_extra, delta_trop, delta_ocean],
   #                    [var_extra, var_trop, var_ocean]])
 
-  if N_MODEL != 9:
-    raise Exception("adaptive inflation is only for 9-variable coupled model")
+  if N_MODEL != 9 or P_OBS != N_MODEL:
+    raise Exception("Adaptive inflation is only for N_MODEL == P_OBS == 9")
 
   obj_adaptive = np.array([[1.05, 1.05, 1.05],
                            [1.0,  1.0,  1.0]])
@@ -185,6 +185,9 @@ def update_adaptive_inflation(obj_adaptive, delta_this_step):
   #             [var_extra, var_trop, var_ocean]])
   # delta_this_step:
   #   np.array([delta_extra, delta_trop, delta_ocean])
+
+  if N_MODEL != 9 or P_OBS != N_MODEL:
+    raise Exception("Adaptive inflation is only for N_MODEL == P_OBS == 9")
 
   # limit delta_this_step
   delta_max = np.ones(3) * ETKF_AI_max
@@ -201,8 +204,8 @@ def update_adaptive_inflation(obj_adaptive, delta_this_step):
 
   return obj_adaptive
 
-def obtain_delta_this_step(yo, yb, ybpt, r, nmem, common):
-  if N_MODEL != 9 or yo.shape[0] != 9:
+def obtain_delta_for_adaptive_inflation(yo, yb, ybpt, r, nmem, common):
+  if N_MODEL != 9 or P_OBS != N_MODEL or yo.shape[0] != 9:
     raise Exception("Adaptive inflation is only for N_MODEL == P_OBS == 9")
 
   delta = np.empty(3)
