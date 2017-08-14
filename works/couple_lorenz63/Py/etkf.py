@@ -7,9 +7,9 @@ import stats_const
 
 def etkf(fcst, h_nda, r_nda, yo_nda, rho_in, nmem, obj_adaptive, localization=False, r_local="", num_yes=None):
   # fcst   <- np.array[nmem, dimc]
-  # h_nda  <- np.array[P_OBS, dimc]
-  # r_nda  <- np.array[P_OBS, P_OBS]
-  # yo_nda <- np.array[P_OBS, 1]
+  # h_nda  <- np.array[pc_obs, dimc]
+  # r_nda  <- np.array[pc_obs, pc_obs]
+  # yo_nda <- np.array[pc_obs, 1]
   # rho    <- float
   # nmem   <- int
   # obj_adaptive
@@ -33,11 +33,11 @@ def etkf(fcst, h_nda, r_nda, yo_nda, rho_in, nmem, obj_adaptive, localization=Fa
   #   xa[dimc,1   ] : ensemble mean analysis xa_bar
   #
   # - obs space
-  #    r[P_OBS,P_OBS] : obs error covariance matrix R
-  #    h[P_OBS,dimc] : linearized observation operator H
-  #   yo[P_OBS,1   ] : observed state yo
-  #   yb[P_OBS,1   ] : mean simulated observation vector yb
-  #  ybm[P_OBS,nmem] : ensemble model simulated observation matrix Yb
+  #    r[pc_obs,pc_obs] : obs error covariance matrix R
+  #    h[pc_obs,dimc] : linearized observation operator H
+  #   yo[pc_obs,1   ] : observed state yo
+  #   yb[pc_obs,1   ] : mean simulated observation vector yb
+  #  ybm[pc_obs,nmem] : ensemble model simulated observation matrix Yb
   #
   # - mem space
   #  wam[nmem,nmem] : optimal weight matrix for each member
@@ -109,69 +109,64 @@ def etkf(fcst, h_nda, r_nda, yo_nda, rho_in, nmem, obj_adaptive, localization=Fa
     return np.real(xam.T.A), (xfpt * xfpt.T).A, (xapt * xapt.T).A, obj_adaptive
 
 def obtain_localization_weight(dimc, j, r_local, num_yes):
-  # dimc   <- int : cimension of analyzed component
+  # dimc   <- int : dimension of analyzed component
   # j      <- int : index of analyzed grid
   # r_local (string): localization pattern of R
   # return -> np.matrix : R-inverse localizaiton weight matrix
 
+  def get_weight_table(r_local, num_yes):
+    # return weight_table[iy, ix] : weight of iy-th obs for ix-th grid
+
+    if r_local in ["covariance-mean", "correlation-mean", "covariance-rms",
+                   "correlation-rms", "random", "BHHtRi-mean", "BHHtRi-rms",
+                   "covariance-clim", "correlation-clim"]:
+      if num_yes == None:
+        num_yes = 37
+      weight_table = weight_based_on_stats(r_local, num_yes)
+    elif r_local == "dynamical": # a38p35
+      weight_table = np.array([
+        [1,1,1,  1,0,0,  0,0,0], [1,1,1,  0,1,0,  0,0,0], [1,1,1,  0,0,0,  0,0,0],
+        [1,0,0,  1,1,1,  1,0,0], [0,1,0,  1,1,1,  0,1,0], [0,0,0,  1,1,1,  0,0,1],
+        [0,0,0,  1,0,0,  1,1,1], [0,0,0,  0,1,0,  1,1,1], [0,0,0,  0,0,1,  1,1,1]], dtype=np.float64)
+    else:
+      weight_table_small = {
+        "individual":        np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]),
+        "atmos_coupling":    np.array([[1.0, 1.0, 0.0], [1.0, 1.0, 0.0], [0.0, 0.0, 1.0]]),
+        "enso_coupling":     np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 1.0], [0.0, 1.0, 1.0]]),
+        "atmos_sees_ocean":  np.array([[1.0, 1.0, 0.0], [1.0, 1.0, 0.0], [1.0, 1.0, 1.0]]),
+        "trop_sees_ocean":   np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 1.0, 1.0]]),
+        "ocean_sees_atmos":  np.array([[1.0, 1.0, 1.0], [1.0, 1.0, 1.0], [0.0, 0.0, 1.0]]),
+        "ocean_sees_trop":   np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 1.0], [0.0, 0.0, 1.0]]),
+        "full":              np.array([[1.0, 1.0, 1.0], [1.0, 1.0, 1.0], [1.0, 1.0, 1.0]]),
+        "adjacent":          np.array([[1.0, 1.0, 0.0], [1.0, 1.0, 1.0], [0.0, 1.0, 1.0]]),
+      }
+      weight_table = np.ones((N_MODEL, N_MODEL))
+      for iyc in range(3):
+        for ixc in range(3):
+          weight_table[iyc*3:iyc*3+3, ixc*3:ixc*3+3] = \
+            weight_table_small[r_local][iyc, ixc]
+    return weight_table
+
+  def weight_based_on_stats(r_local, odr_max=37):
+    order_table = stats_const.stats_order(r_local)
+    return np.float64(order_table < odr_max)
+
   localization_weight = np.ones((dimc, dimc))
 
-  if N_MODEL != 9:
+  if N_MODEL != 9 or P_OBS != N_MODEL:
+    raise Warning("obtain_localization_weight() is only for PK04 and P_OBS == N_MODEL. No localization is done.")
     return localization_weight
-
-  if dimc == N_MODEL: # strongly coupled
-    weight_table = get_weight_table(r_local, num_yes)
-    for iy in range(dimc):
-      localization_weight[iy, :] *= weight_table[iy, j]
-      localization_weight[:, iy] *= weight_table[iy, j]
-
-  elif dimc == 3:
-    pass
-
-  elif dimc == 6:
-    pass
-
-  return np.asmatrix(localization_weight)
-
-def get_weight_table(r_local, num_yes):
-  # return weight_table[iy, ix] : weight of iy-th obs for ix-th grid
-
-  if r_local in ["covariance-mean", "correlation-mean", "covariance-rms",
-                 "correlation-rms", "random", "BHHtRi-mean", "BHHtRi-rms",
-                 "covariance-clim", "correlation-clim"]:
-    if num_yes == None:
-      num_yes = 37
-    weight_table = weight_based_on_stats(r_local, num_yes)
-  elif r_local == "dynamical": # a38p35
-    weight_table = np.array([
-      [1,1,1,  1,0,0,  0,0,0], [1,1,1,  0,1,0,  0,0,0], [1,1,1,  0,0,0,  0,0,0],
-      [1,0,0,  1,1,1,  1,0,0], [0,1,0,  1,1,1,  0,1,0], [0,0,0,  1,1,1,  0,0,1],
-      [0,0,0,  1,0,0,  1,1,1], [0,0,0,  0,1,0,  1,1,1], [0,0,0,  0,0,1,  1,1,1]], dtype=np.float64)
   else:
-    weight_table_small = {
-      "individual":        np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]),
-      "atmos_coupling":    np.array([[1.0, 1.0, 0.0], [1.0, 1.0, 0.0], [0.0, 0.0, 1.0]]),
-      "enso_coupling":     np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 1.0], [0.0, 1.0, 1.0]]),
-      "atmos_sees_ocean":  np.array([[1.0, 1.0, 0.0], [1.0, 1.0, 0.0], [1.0, 1.0, 1.0]]),
-      "trop_sees_ocean":   np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 1.0, 1.0]]),
-      "ocean_sees_atmos":  np.array([[1.0, 1.0, 1.0], [1.0, 1.0, 1.0], [0.0, 0.0, 1.0]]),
-      "ocean_sees_trop":   np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 1.0], [0.0, 0.0, 1.0]]),
-      "full":              np.array([[1.0, 1.0, 1.0], [1.0, 1.0, 1.0], [1.0, 1.0, 1.0]]),
-      "adjacent":          np.array([[1.0, 1.0, 0.0], [1.0, 1.0, 1.0], [0.0, 1.0, 1.0]]),
-    }
-    weight_table = np.ones((N_MODEL, N_MODEL))
-    for iyc in range(3):
-      for ixc in range(3):
-        weight_table[iyc*3:iyc*3+3, ixc*3:ixc*3+3] = \
-          weight_table_small[r_local][iyc, ixc]
-  return weight_table
-
-def weight_based_on_stats(r_local, odr_max=37):
-  if N_MODEL != 9:
-    raise Exception("stats_weight_order() is only for 9-variable PK04 model")
-
-  order_table = stats_const.stats_order(r_local)
-  return np.float64(order_table < odr_max)
+    if dimc == N_MODEL: # strongly coupled
+      weight_table = get_weight_table(r_local, num_yes)
+      for iy in range(dimc):
+        localization_weight[iy, :] *= weight_table[iy, j]
+        localization_weight[:, iy] *= weight_table[iy, j]
+    elif dimc == 3:
+      pass
+    elif dimc == 6:
+      pass
+    return np.asmatrix(localization_weight)
 
 def init_etkf_adaptive_inflation():
   # return : np.array([[delta_extra, delta_trop, delta_ocean],
