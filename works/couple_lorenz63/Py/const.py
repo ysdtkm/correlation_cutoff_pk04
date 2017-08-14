@@ -47,17 +47,22 @@ ETKF_AI_max = 1.2
 ETKF_AI_min = 0.9
 
 def getr():
+  # note: Non-diagonal element in R is ignored in exec_obs()
   r = np.identity(P_OBS) * OERR_A ** 2
   if N_MODEL == 9:
-    for i in range(6, 9):
-      r[i,i] = OERR_O ** 2
+    if P_OBS == N_MODEL:
+      for i in range(6, 9):
+        r[i,i] = OERR_O ** 2
+    else:
+      raise Warning("getr() ignores OERR_O if P_OBS != N_MODEL. P_OBS=%d, N_MODEL=%d was passed." % (P_OBS, N_MODEL))
   return r
 
 def geth():
-  # P_OBS == N_MODEL is assumed
   h = np.zeros((P_OBS,N_MODEL))
-  for i in range(0, N_MODEL):
+  for i in range(0, max(N_MODEL, P_OBS)):
     h[i,i] = 1.0
+  if P_OBS != N_MODEL:
+    raise Warning("geth() cannot correctly deal with P_OBS != N_MODEL. P_OBS=%d, N_MODEL=%d was passed." % (P_OBS, N_MODEL))
   return h
 
 def debug_obj_print(obj, scope):

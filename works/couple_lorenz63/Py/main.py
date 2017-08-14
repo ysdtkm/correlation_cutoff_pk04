@@ -43,16 +43,14 @@ def exec_nature():
   return all_true
 
 def exec_obs(nature):
+  ### note: currently this method cannot handle non-diagonal element of R
   # nature   <- np.array[STEPS, N_MODEL]
   # return   -> np.array[STEPS, P_OBS]
 
   all_obs = np.empty((STEPS, P_OBS))
+  r = getr()
   for i in range(0, STEPS):
-    if N_MODEL == 9:
-      all_obs[i,:6] = nature[i,:6] + np.random.randn(6) * OERR_A
-      all_obs[i,6:] = nature[i,6:] + np.random.randn(3) * OERR_O
-    else:
-      all_obs[i,:] = nature[i,:] + np.random.randn(P_OBS) * OERR_A
+    all_obs[i,:] = nature[i,:] + np.random.randn(P_OBS) * r.diagonal()**0.5
 
   all_obs.tofile("data/obs.bin")
   return all_obs
@@ -73,6 +71,9 @@ def exec_assim_cycle(settings, all_fcst, all_obs):
   # all_fcst <- np.array[STEPS, nmem, N_MODEL]
   # all_obs  <- np.array[STEPS, P_OBS]
   # return   -> np.array[STEPS, nmem, N_MODEL]
+
+  n_atm = 6
+  p_atm = 6 # ttk, It should be specified in const.py
 
   # prepare containers
   r = getr()
@@ -106,8 +107,8 @@ def exec_assim_cycle(settings, all_fcst, all_obs):
         if (settings["couple"] == "strong" or settings["couple"] == "weak"):
           fcst[m,:] = model.timestep(all_fcst[i-1,m,:], DT)
         elif (settings["couple"] == "none"):
-          fcst[m,0:6] = model.timestep(all_fcst[i-1,m,0:6], DT, 0, 6, persis_bc)
-          fcst[m,6:9] = model.timestep(all_fcst[i-1,m,6:9], DT, 6, 9, persis_bc)
+          fcst[m, :n_atm] = model.timestep(all_fcst[i-1, m, :n_atm], DT, 0, n_atm, persis_bc)
+          fcst[m, n_atm:] = model.timestep(all_fcst[i-1, m, n_atm:], DT, n_atm, N_MODEL, persis_bc)
 
       if (i % AINT == 0):
         obs_used[i,:] = all_obs[i,:]
@@ -117,17 +118,16 @@ def exec_assim_cycle(settings, all_fcst, all_obs):
           fcst[:,:], all_bf[i,:,:], all_ba[i,:,:], obj_adaptive = \
             analyze_one_window(fcst, fcst_pre, all_obs[i,:], h, r, settings, obj_adaptive)
         elif (settings["couple"] == "weak" or settings["couple"] == "none"):
-          dim_atm = 6
           # atmospheric assimilation
-          fcst[:, :dim_atm], all_bf[i, :dim_atm, :dim_atm], all_ba[i, :dim_atm, :dim_atm], obj_adaptive \
-              = analyze_one_window(fcst[:, :dim_atm], fcst_pre[:, :dim_atm],
-                                   all_obs[i, :dim_atm], h[:dim_atm, :dim_atm],
-                                   r[:dim_atm, :dim_atm], settings, obj_adaptive, 0, 6, persis_bc)
+          fcst[:, :n_atm], all_bf[i, :n_atm, :n_atm], all_ba[i, :n_atm, :n_atm], obj_adaptive \
+              = analyze_one_window(fcst[:, :n_atm], fcst_pre[:, :n_atm],
+                                   all_obs[i, :p_atm], h[:p_atm, :n_atm],
+                                   r[:p_atm, :p_atm], settings, obj_adaptive, 0, n_atm, persis_bc)
           # oceanic assimilation
-          fcst[:, dim_atm:], all_bf[i, dim_atm:, dim_atm:], all_ba[i, dim_atm:, dim_atm:], obj_adaptive  \
-              = analyze_one_window(fcst[:, dim_atm:], fcst_pre[:, dim_atm:],
-                                   all_obs[i, dim_atm:], h[dim_atm:, dim_atm:],
-                                   r[dim_atm:, dim_atm:], settings, obj_adaptive, 6, 9, persis_bc)
+          fcst[:, n_atm:], all_bf[i, n_atm:, n_atm:], all_ba[i, n_atm:, n_atm:], obj_adaptive  \
+              = analyze_one_window(fcst[:, n_atm:], fcst_pre[:, n_atm:],
+                                   all_obs[i, p_atm:], h[p_atm:, n_atm:],
+                                   r[p_atm:, p_atm:], settings, obj_adaptive, n_atm, N_MODEL, persis_bc)
 
       all_fcst[i,:,:] = fcst[:,:]
       if settings["method"] == "etkf" and (settings["rho"] == "adaptive" or settings["rho"] == "adaptive_each"):
