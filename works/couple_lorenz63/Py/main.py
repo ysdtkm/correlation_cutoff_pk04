@@ -155,9 +155,9 @@ def exec_assim_cycle(settings, all_fcst, all_obs):
 def analyze_one_window(fcst, fcst_pre, obs, h, r, settings, obj_adaptive, i_s=0, i_e=N_MODEL, bc=None):
   # fcst     <- np.array[nmem, dimc]
   # fcst_pre <- np.array[nmem, dimc]
-  # obs      <- np.array[P_OBS]
-  # h        <- np.array[P_OBS, dimc]
-  # r        <- np.array[P_OBS, P_OBS]
+  # obs      <- np.array[pc_obs]
+  # h        <- np.array[pc_obs, dimc]
+  # r        <- np.array[pc_obs, pc_obs]
   # settings <- hash
   # obj_adaptive
   #          <- object created by etkf/init_etkf_adaptive_inflation(), or None
