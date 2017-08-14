@@ -42,11 +42,9 @@ def plot_all():
 
     hist_fcst = np.fromfile("data/%s_cycle.bin" % name, np.float64)
     hist_fcst = hist_fcst.reshape((STEPS, nmem, N_MODEL))
-    hist_obs = np.fromfile("data/%s_obs.bin" % name, np.float64)
-    hist_obs = hist_obs.reshape((STEPS, P_OBS))
 
     plot_rmse_spread(hist_true, hist_fcst, name, nmem)
-    plot_time_value(hist_true, hist_fcst, hist_obs, name, nmem)
+    plot_time_value(hist_true, hist_fcst, name, nmem)
     if Plot_3d:
       plot_3d_trajectory(hist_true, hist_fcst, name, nmem)
 
@@ -291,10 +289,9 @@ def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
     plt.close()
   return 0
 
-def plot_time_value(hist_true, hist_fcst, hist_obs, name, nmem):
+def plot_time_value(hist_true, hist_fcst, name, nmem):
   # hist_true  <- np.array[STEPS, N_MODEL]
   # hist_fcst  <- np.array[STEPS, nmem, N_MODEL]
-  # hist_obs   <- np.array[STEPS, P_OBS]
   # name       <- string
   # nmem       <- int
 
@@ -311,19 +308,13 @@ def plot_time_value(hist_true, hist_fcst, hist_obs, name, nmem):
       ax1.set_title("%s %s" % (name, name_component))
       ax1.plot(hist_true[:,0+i_adjust], label="true")
       ax1.plot(hist_fcst_mean[:,0+i_adjust], label="DA cycle")
-      if "x" in name:
-        ax1.plot(hist_obs[:,0+i_adjust], label="obs", linestyle='None', marker=".")
       ax1.set_ylabel("x")
       ax1.legend(loc="upper right")
       ax2.plot(hist_true[:,1+i_adjust], label="true")
       ax2.plot(hist_fcst_mean[:,1+i_adjust], label="DA cycle")
-      if "y" in name:
-        ax2.plot(hist_obs[:,1+i_adjust], label="obs", linestyle='None', marker=".")
       ax2.set_ylabel("y")
       ax3.plot(hist_true[:,2+i_adjust], label="true")
       ax3.plot(hist_fcst_mean[:,2+i_adjust], label="DA cycle")
-      if "z" in name:
-        ax3.plot(hist_obs[:,2+i_adjust], label="obs", linestyle='None', marker=".")
       ax3.set_ylabel("z")
       plt.xlabel("timestep")
       plt.savefig("./image/%s/%s_%s_%s.pdf" % (name, name, name_component, "val"))
@@ -335,7 +326,6 @@ def plot_time_value(hist_true, hist_fcst, hist_obs, name, nmem):
     ax1.set_title(name)
     ax1.plot(hist_true[:,0], label="true")
     ax1.plot(hist_fcst_mean[:,0], label="DA cycle")
-    ax1.plot(hist_obs[:,0], label="obs", linestyle='None', marker=".")
     ax1.set_ylabel("0th element")
     ax1.legend(loc="upper right")
     plt.xlabel("timestep")
