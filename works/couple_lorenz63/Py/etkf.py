@@ -45,7 +45,7 @@ def etkf(fcst, h_nda, r_nda, yo_nda, rho_in, nmem, obj_adaptive, localization=Fa
   #   pa[nmem,nmem] : approx. anl error covariance matrix Pa in ens space
   #
   # note :
-  #   DIMM > DIMO >> nmem in typical LETKF application
+  #   N_MODEL > DIMO >> nmem in typical LETKF application
   ###
   I_mm = np.matrix(np.identity(nmem))
   I_1m = np.matrix(np.ones((1,nmem)))
@@ -116,10 +116,10 @@ def obtain_localization_weight(dimc, j, r_local, num_yes):
 
   localization_weight = np.ones((dimc, dimc))
 
-  if DIMM != 9:
+  if N_MODEL != 9:
     return localization_weight
 
-  if dimc == DIMM: # strongly coupled
+  if dimc == N_MODEL: # strongly coupled
     weight_table = get_weight_table(r_local, num_yes)
     for iy in range(dimc):
       localization_weight[iy, :] *= weight_table[iy, j]
@@ -159,7 +159,7 @@ def get_weight_table(r_local, num_yes):
       "full":              np.array([[1.0, 1.0, 1.0], [1.0, 1.0, 1.0], [1.0, 1.0, 1.0]]),
       "adjacent":          np.array([[1.0, 1.0, 0.0], [1.0, 1.0, 1.0], [0.0, 1.0, 1.0]]),
     }
-    weight_table = np.ones((DIMM, DIMM))
+    weight_table = np.ones((N_MODEL, N_MODEL))
     for iyc in range(3):
       for ixc in range(3):
         weight_table[iyc*3:iyc*3+3, ixc*3:ixc*3+3] = \
@@ -167,7 +167,7 @@ def get_weight_table(r_local, num_yes):
   return weight_table
 
 def weight_based_on_stats(r_local, odr_max=37):
-  if DIMM != 9:
+  if N_MODEL != 9:
     raise Exception("stats_weight_order() is only for 9-variable PK04 model")
 
   order_table = stats_const.stats_order(r_local)
@@ -177,7 +177,7 @@ def init_etkf_adaptive_inflation():
   # return : np.array([[delta_extra, delta_trop, delta_ocean],
   #                    [var_extra, var_trop, var_ocean]])
 
-  if DIMM != 9:
+  if N_MODEL != 9:
     raise Exception("adaptive inflation is only for 9-variable coupled model")
 
   obj_adaptive = np.array([[1.05, 1.05, 1.05],
@@ -208,8 +208,8 @@ def update_adaptive_inflation(obj_adaptive, delta_this_step):
 
 def obtain_delta_this_step(yo, yb, ybpt, r, nmem, common):
 
-  if DIMM != 9 or yo.shape[0] != 9:
-    raise Exception("this method is only used when DIMM == 9")
+  if N_MODEL != 9 or yo.shape[0] != 9:
+    raise Exception("this method is only used when N_MODEL == 9")
 
   delta = np.empty(3)
 

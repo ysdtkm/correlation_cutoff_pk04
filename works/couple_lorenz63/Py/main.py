@@ -20,10 +20,10 @@ def main():
     exec_deterministic_fcst(settings, anl)
 
 def exec_nature():
-  # return   -> np.array[STEPS, DIMM]
+  # return   -> np.array[STEPS, N_MODEL]
 
-  all_true = np.empty((STEPS, DIMM))
-  true = np.random.randn(DIMM) * FERR_INI
+  all_true = np.empty((STEPS, N_MODEL))
+  true = np.random.randn(N_MODEL) * FERR_INI
 
   # forward integration i-1 -> i
   for i in range(0, STEPS):
@@ -43,12 +43,12 @@ def exec_nature():
   return all_true
 
 def exec_obs(nature):
-  # nature   <- np.array[STEPS, DIMM]
+  # nature   <- np.array[STEPS, N_MODEL]
   # return   -> np.array[STEPS, DIMO]
 
   all_obs = np.empty((STEPS, DIMO))
   for i in range(0, STEPS):
-    if DIMM == 9:
+    if N_MODEL == 9:
       all_obs[i,:6] = nature[i,:6] + np.random.randn(6) * OERR_A
       all_obs[i,6:] = nature[i,6:] + np.random.randn(3) * OERR_O
     else:
@@ -59,28 +59,28 @@ def exec_obs(nature):
 
 def exec_free_run(settings):
   # settings <- hash
-  # return   -> np.array[STEPS, nmem, DIMM]
+  # return   -> np.array[STEPS, nmem, N_MODEL]
 
-  free_run = np.empty((STEPS, settings["nmem"], DIMM))
+  free_run = np.empty((STEPS, settings["nmem"], N_MODEL))
   for m in range(0, settings["nmem"]):
-    free_run[0,m,:] = np.random.randn(DIMM) * FERR_INI
+    free_run[0,m,:] = np.random.randn(N_MODEL) * FERR_INI
     for i in range(1, STEP_FREE):
       free_run[i,m,:] = model.timestep(free_run[i-1,m,:], DT)
   return free_run
 
 def exec_assim_cycle(settings, all_fcst, all_obs):
   # settings <- hash
-  # all_fcst <- np.array[STEPS, nmem, DIMM]
+  # all_fcst <- np.array[STEPS, nmem, N_MODEL]
   # all_obs  <- np.array[STEPS, DIMO]
-  # return   -> np.array[STEPS, nmem, DIMM]
+  # return   -> np.array[STEPS, nmem, N_MODEL]
 
   # prepare containers
   r = getr()
   h = geth()
-  fcst = np.empty((settings["nmem"], DIMM))
-  all_ba = np.empty((STEPS, DIMM, DIMM))
+  fcst = np.empty((settings["nmem"], N_MODEL))
+  all_ba = np.empty((STEPS, N_MODEL, N_MODEL))
   all_ba[:,:,:] = np.nan
-  all_bf = np.empty((STEPS, DIMM, DIMM))
+  all_bf = np.empty((STEPS, N_MODEL, N_MODEL))
   all_bf[:,:,:] = np.nan
   obs_used = np.empty((STEPS, DIMO))
   obs_used[:,:] = np.nan
@@ -152,7 +152,7 @@ def exec_assim_cycle(settings, all_fcst, all_obs):
 
   return all_fcst
 
-def analyze_one_window(fcst, fcst_pre, obs, h, r, settings, obj_adaptive, i_s=0, i_e=DIMM, bc=None):
+def analyze_one_window(fcst, fcst_pre, obs, h, r, settings, obj_adaptive, i_s=0, i_e=N_MODEL, bc=None):
   # fcst     <- np.array[nmem, dimc]
   # fcst_pre <- np.array[nmem, dimc]
   # obs      <- np.array[DIMO]
@@ -163,7 +163,7 @@ def analyze_one_window(fcst, fcst_pre, obs, h, r, settings, obj_adaptive, i_s=0,
   #          <- object created by etkf/init_etkf_adaptive_inflation(), or None
   # i_s      <- int                  : model grid number, assimilate only [i_s, i_e)
   # i_e      <- int
-  # bc       <- np.array[DIMM]
+  # bc       <- np.array[N_MODEL]
   # return1  -> np.array[nmem, dimc]
   # return2  -> np.array[dimc, dimc]
   # return3  -> np.array[dimc, dimc]
@@ -191,13 +191,13 @@ def analyze_one_window(fcst, fcst_pre, obs, h, r, settings, obj_adaptive, i_s=0,
 
 def exec_deterministic_fcst(settings, anl):
   # settings <- hash
-  # anl      <- np.array[STEPS, nmem, DIMM]
-  # return   -> np.array[STEPS, FCST_LT, DIMM]
+  # anl      <- np.array[STEPS, nmem, N_MODEL]
+  # return   -> np.array[STEPS, FCST_LT, N_MODEL]
 
   if FCST_LT == 0:
     return 0
 
-  fcst_all = np.empty((STEPS, FCST_LT, DIMM))
+  fcst_all = np.empty((STEPS, FCST_LT, N_MODEL))
   for i in range(STEP_FREE, STEPS):
     if (i % AINT == 0):
       fcst_all[i,0,:] = np.mean(anl[i,:,:], axis=0)

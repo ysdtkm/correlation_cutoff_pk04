@@ -4,9 +4,9 @@ import numpy as np
 from const import *
 
 def tdvar_b():
-  # return -> np.array[DIMM,DIMM] : background error covariance
+  # return -> np.array[N_MODEL,N_MODEL] : background error covariance
 
-  if DIMM == 9:
+  if N_MODEL == 9:
     # obtained by unit_test.py/obtain_tdvar_b(), 8a66120, 100000 timesteps
     b = np.array([
     [ 0.151366652,  0.217993747, 0.00074922173, 0.000654576057, 0.00266310433, -0.00218875723, 0.000794892471, 0.00598052358, -0.00862711731],
@@ -20,7 +20,7 @@ def tdvar_b():
     [-0.00862711731, -0.0124801346, -0.00485325959, 0.0786195063,  0.139336958, 0.0943891795,  0.465250176,  0.227404405,   3.04948996]
     ])
 
-  elif DIMM == 3:
+  elif N_MODEL == 3:
     b = np.array([ \
       [ 0.34897187,0.5587116,-0.08293288], \
       [ 0.5587116, 1.10975806,0.00229167], \
@@ -28,12 +28,12 @@ def tdvar_b():
     ])
 
   else:
-    b = np.diag(np.ones(DIMM)) * 1.5
+    b = np.diag(np.ones(N_MODEL)) * 1.5
 
   return b
 
 def stats_order(r_local):
-  if DIMM != 9:
+  if N_MODEL != 9:
     raise Exception("stats_order() is only for 9-variable PK04 model")
 
   # order_table obtained from 5f4e847, offline.py, 1000TU

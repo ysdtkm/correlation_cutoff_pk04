@@ -12,7 +12,7 @@ def plot_all():
   Plot_3d = True
 
   hist_true = np.fromfile("data/true.bin", np.float64)
-  hist_true = hist_true.reshape((STEPS, DIMM))
+  hist_true = hist_true.reshape((STEPS, N_MODEL))
   if Calc_lv:
     vectors = ["blv", "flv", "clv", "fsv", "isv"]
   else:
@@ -22,7 +22,7 @@ def plot_all():
   hist_vector = {}
   for vec in vectors:
     hist_vector[vec] = np.fromfile("data/%s.bin" % vec, np.float64)
-    hist_vector[vec] = hist_vector[vec].reshape((STEPS, DIMM, DIMM))
+    hist_vector[vec] = hist_vector[vec].reshape((STEPS, N_MODEL, N_MODEL))
 
   os.system("mkdir -p image/true")
 
@@ -41,7 +41,7 @@ def plot_all():
     os.system("mkdir -p image/%s" % name)
 
     hist_fcst = np.fromfile("data/%s_cycle.bin" % name, np.float64)
-    hist_fcst = hist_fcst.reshape((STEPS, nmem, DIMM))
+    hist_fcst = hist_fcst.reshape((STEPS, nmem, N_MODEL))
     hist_obs = np.fromfile("data/%s_obs.bin" % name, np.float64)
     hist_obs = hist_obs.reshape((STEPS, DIMO))
 
@@ -60,7 +60,7 @@ def plot_all():
 
       for sel in ["back", "anl"]:
         hist_covar = np.fromfile("data/%s_covr_%s.bin" % (name, sel), np.float64)
-        hist_covar = hist_covar.reshape((STEPS, DIMM, DIMM))
+        hist_covar = hist_covar.reshape((STEPS, N_MODEL, N_MODEL))
         plot_covariance_matr(hist_covar, name, sel)
   plot_rmse_bar(hist_true)
 
@@ -71,10 +71,10 @@ def plot_le():
   hist_fse = np.fromfile("data/fse.bin", np.float64)
   hist_ise = np.fromfile("data/ise.bin", np.float64)
 
-  hist_ble = hist_ble.reshape((STEPS, DIMM))
-  hist_fle = hist_fle.reshape((STEPS, DIMM))
-  hist_fse = hist_fse.reshape((STEPS, DIMM))
-  hist_ise = hist_ise.reshape((STEPS, DIMM))
+  hist_ble = hist_ble.reshape((STEPS, N_MODEL))
+  hist_fle = hist_fle.reshape((STEPS, N_MODEL))
+  hist_fse = hist_fse.reshape((STEPS, N_MODEL))
+  hist_ise = hist_ise.reshape((STEPS, N_MODEL))
 
   mean_ble = np.mean(hist_ble[STEPS//4:(STEPS*3)//4,:], axis=0)
   mean_fle = np.mean(hist_fle[STEPS//4:(STEPS*3)//4,:], axis=0)
@@ -96,7 +96,7 @@ def plot_le():
   plt.close()
 
 def plot_lv_time(hist_lv, name):
-  # hist_lv <- np.array[STEPS, DIMM, DIMM]
+  # hist_lv <- np.array[STEPS, N_MODEL, N_MODEL]
   # name    <- string
   plt.rcParams["font.size"] = 12
   fig, ax1 = plt.subplots(1)
@@ -111,14 +111,14 @@ def plot_lv_time(hist_lv, name):
   plt.close()
 
 def plot_lv_projection(hist_lv, hist_fcst, name, title, nmem, is_oblique):
-  # hist_lv    <- np.array[STEPS, DIMM, DIMM]
-  # hist_fcst  <- np.array[STEPS, nmem, DIMM]
+  # hist_lv    <- np.array[STEPS, N_MODEL, N_MODEL]
+  # hist_fcst  <- np.array[STEPS, nmem, N_MODEL]
   # name       <- string
   # title      <- string
   # nmem       <- int
   # is_oblique <- bool
 
-  projection = np.zeros((DIMM, nmem))
+  projection = np.zeros((N_MODEL, nmem))
   hist_fcst_mean = np.mean(hist_fcst, axis=1)
 
   for i in range(STEPS//4, (STEPS*3)//4):
@@ -126,7 +126,7 @@ def plot_lv_projection(hist_lv, hist_fcst, name, title, nmem, is_oblique):
       for k in range(nmem):
         projection[:,k] += np.abs(oblique_projection(hist_fcst[i,k,:] - hist_fcst_mean[i,:], hist_lv[i,:,:]))
     else:
-      for j in range(DIMM):
+      for j in range(N_MODEL):
         for k in range(nmem):
           projection[j,k] += np.abs(np.dot(hist_lv[i,:,j], \
               hist_fcst[i,k,:] - hist_fcst_mean[i,:]))
@@ -152,17 +152,17 @@ def plot_lv_projection(hist_lv, hist_fcst, name, title, nmem, is_oblique):
   return 0
 
 def plot_trajectory_lv(hist_true, hist_lv, name):
-  # hist_true <- np.array[STEPS, DIMM]
-  # hist_lv   <- np.array[STEPS, DIMM, DIMM]
+  # hist_true <- np.array[STEPS, N_MODEL]
+  # hist_lv   <- np.array[STEPS, N_MODEL, N_MODEL]
   # name      <- string
 
-  if not (DIMM == 3 or DIMM == 9):
+  if not (N_MODEL == 3 or N_MODEL == 9):
     return 0
-  for i_component in range(DIMM//3):
+  for i_component in range(N_MODEL//3):
     i_adjust = i_component * 3
     name_component = ["extra", "trop", "ocean"][i_component]
 
-    if (DIMM == 9):
+    if (N_MODEL == 9):
       colors = ["#008000", "#0000ff", "#8080ff", \
                 "#80bb80", "#ff0000", "#ff8080", \
                 "#000080", "#800000", "#004000"]
@@ -191,7 +191,7 @@ def plot_trajectory_lv(hist_true, hist_lv, name):
         ax.set_zlabel("z")
         ax.plot(hist_true[itmin:it+1,0+i_adjust], hist_true[itmin:it+1,1+i_adjust], \
                 hist_true[itmin:it+1,2+i_adjust])
-        for k in range(DIMM): # LE index
+        for k in range(N_MODEL): # LE index
           vector = [hist_true[it,0+i_adjust], hist_true[it,1+i_adjust], \
                     hist_true[it,2+i_adjust], hist_lv[it,k,0+i_adjust], \
                     hist_lv[it,k,1+i_adjust], hist_lv[it,k,2+i_adjust]]
@@ -207,14 +207,14 @@ def plot_trajectory_lv(hist_true, hist_lv, name):
 
 def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
   ## refer to a32p23
-  # hist_true <- np.array[STEPS, DIMM]
-  # hist_fcst <- np.array[STEPS, nmem, DIMM]
+  # hist_true <- np.array[STEPS, N_MODEL]
+  # hist_fcst <- np.array[STEPS, nmem, N_MODEL]
   # name <- string
   # nmem <- int
 
   # Error and Spread_square for each grid and time
   hist_fcst_mean = np.mean(hist_fcst, axis=1)
-  hist_fcst_sprd2 = np.zeros((STEPS, DIMM))
+  hist_fcst_sprd2 = np.zeros((STEPS, N_MODEL))
   if (nmem > 1):
     for i in range(nmem):
       hist_fcst_sprd2[:,:] = hist_fcst_sprd2[:,:] + \
@@ -223,9 +223,9 @@ def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
 
   global rmse_hash
 
-  if (DIMM == 3 or DIMM == 9):
+  if (N_MODEL == 3 or N_MODEL == 9):
     rmse_component = []
-    for i_component in range(DIMM//3):
+    for i_component in range(N_MODEL//3):
       grid_from = 3 * i_component
       name_component = ["extra", "trop", "ocean"][i_component]
 
@@ -292,16 +292,16 @@ def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
   return 0
 
 def plot_time_value(hist_true, hist_fcst, hist_obs, name, nmem):
-  # hist_true  <- np.array[STEPS, DIMM]
-  # hist_fcst  <- np.array[STEPS, nmem, DIMM]
+  # hist_true  <- np.array[STEPS, N_MODEL]
+  # hist_fcst  <- np.array[STEPS, nmem, N_MODEL]
   # hist_obs   <- np.array[STEPS, DIMO]
   # name       <- string
   # nmem       <- int
 
   hist_fcst_mean = np.mean(hist_fcst, axis=1)
 
-  if (DIMM == 3 or DIMM == 9):
-    for i_component in range(DIMM//3):
+  if (N_MODEL == 3 or N_MODEL == 9):
+    for i_component in range(N_MODEL//3):
       i_adjust = i_component * 3
       name_component = ["extra", "trop", "ocean"][i_component]
 
@@ -345,16 +345,16 @@ def plot_time_value(hist_true, hist_fcst, hist_obs, name, nmem):
   return 0
 
 def plot_3d_trajectory(hist_true, hist_fcst, name, nmem):
-  # hist_true  <- np.array[STEPS, DIMM]
-  # hist_fcst  <- np.array[STEPS, nmem, DIMM]
+  # hist_true  <- np.array[STEPS, N_MODEL]
+  # hist_fcst  <- np.array[STEPS, nmem, N_MODEL]
   # name <- string
   # nmem <- int
 
   hist_fcst_mean = np.mean(hist_fcst, axis=1)
 
-  if not (DIMM == 3 or DIMM == 9):
+  if not (N_MODEL == 3 or N_MODEL == 9):
     return 0
-  for i_component in range(DIMM//3):
+  for i_component in range(N_MODEL//3):
     i_adjust = i_component * 3
     name_component = ["extra", "trop", "ocean"][i_component]
 
@@ -382,7 +382,7 @@ def plot_3d_trajectory(hist_true, hist_fcst, name, nmem):
   return 0
 
 def plot_covariance_matr(hist_covar, name, sel):
-  # hist_covar <- np.array[STEPS, DIMM, DIMM]
+  # hist_covar <- np.array[STEPS, N_MODEL, N_MODEL]
   # name       <- string
   # sel        <- string
 
@@ -392,7 +392,7 @@ def plot_covariance_matr(hist_covar, name, sel):
     mean_covar = np.nan_to_num(np.nanmean(hist_covar[STEPS//2:STEPS,:,:], axis=0))
     rms_log = np.log(rms_covar)
     mean_cosine = np.copy(mean_covar)
-    for i in range(DIMM):
+    for i in range(N_MODEL):
       mean_cosine[i,:] /= np.sqrt(mean_covar[i,i])
       mean_cosine[:,i] /= np.sqrt(mean_covar[i,i])
 
@@ -426,9 +426,9 @@ def plot_matrix(data, name, title, color=plt.cm.bwr):
   return 0
 
 def oblique_projection(vector, obl_basis):
-  # vector    <- np.array[DIMM]
-  # obl_basis <- np.array[DIMM, DIMM]
-  # return    -> np.array[DIMM]
+  # vector    <- np.array[N_MODEL]
+  # obl_basis <- np.array[N_MODEL, N_MODEL]
+  # return    -> np.array[N_MODEL]
 
   if not ((obl_basis.shape[0] == obl_basis.shape[1]) and (obl_basis.shape[0] == vector.shape[0])):
     print(vector.shape)
@@ -441,12 +441,12 @@ def oblique_projection(vector, obl_basis):
   try:
     coefs = np.dot(np.linalg.inv(r), orth_coefs)
   except np.linalg.linalg.LinAlgError:
-    coefs = np.zeros(DIMM)
+    coefs = np.zeros(N_MODEL)
 
   return coefs
 
 def plot_rmse_bar(hist_true):
-  if DIMM != 9:
+  if N_MODEL != 9:
     return 0
 
   global rmse_hash

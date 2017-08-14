@@ -4,8 +4,8 @@ import math
 import numpy as np
 
 # note: "dimc" in comments is dimension of component (for non/weakly coupled)
-DIMM = 9    # dimension of model variable n
-DIMO = DIMM # dimension of observation variable m
+N_MODEL = 9    # dimension of model variable n
+DIMO = N_MODEL # dimension of observation variable m
 
 DT = 0.01
 TMAX = 10
@@ -40,15 +40,15 @@ ETKF_AI_min = 0.9
 
 def getr():
   r = np.identity(DIMO) * OERR_A ** 2
-  if DIMM == 9:
+  if N_MODEL == 9:
     for i in range(6, 9):
       r[i,i] = OERR_O ** 2
   return r
 
 def geth():
-  # DIMO == DIMM is assumed
-  h = np.zeros((DIMO,DIMM))
-  for i in range(0, DIMM):
+  # DIMO == N_MODEL is assumed
+  h = np.zeros((DIMO,N_MODEL))
+  for i in range(0, N_MODEL):
     h[i,i] = 1.0
   return h
 

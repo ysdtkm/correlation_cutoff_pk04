@@ -36,7 +36,7 @@ def test_fdvar_overflow():
     [117.90228464480583]] \
   )
 
-  fdvar.fdvar(fcst_0, h, r, yo, AINT, 0, DIMM, amp_b_fdvar)
+  fdvar.fdvar(fcst_0, h, r, yo, AINT, 0, N_MODEL, amp_b_fdvar)
   return 0
 
 def test_tangent_model():
@@ -44,7 +44,7 @@ def test_tangent_model():
   step_verif = 10
 
   # initialization (verification t0 -> t1)
-  x_t0 = np.random.randn(DIMM) * FERR_INI
+  x_t0 = np.random.randn(N_MODEL) * FERR_INI
   for i in range(STEPS):
     x_t0 = model.timestep(x_t0, DT)
   x_t1 = np.copy(x_t0)
@@ -56,7 +56,7 @@ def test_tangent_model():
   # m = model.finite_time_tangent_using_nonlinear(x_t0, DT/1.0, step_verif*1)
 
   sum_sq_diff = 0.0
-  for i in range(DIMM):
+  for i in range(N_MODEL):
     # nonlinear perturbation
     x_t0_ptb = np.copy(x_t0)
     x_t0_ptb[i] = x_t0[i] + ptb
@@ -81,7 +81,7 @@ def test_tangent_model():
 def test_tangent_sv():
   step_verif = 10
 
-  x_t0 = np.random.randn(DIMM) * FERR_INI
+  x_t0 = np.random.randn(N_MODEL) * FERR_INI
   for i in range(STEPS):
     x_t0 = model.timestep(x_t0, DT)
   m_finite = model.finite_time_tangent(x_t0, DT/4.0, step_verif*4)
@@ -101,8 +101,8 @@ def test_tangent_sv():
   return 0
 
 def test_cost_function_grad():
-  if DIMM != 3:
-    sys.exit("Set DIMM = 3 for test_cost_function_grad")
+  if N_MODEL != 3:
+    sys.exit("Set N_MODEL = 3 for test_cost_function_grad")
 
   aint = 25
   fcst = np.array([-5.83559367, -6.1021729, 23.42678068])
@@ -112,15 +112,15 @@ def test_cost_function_grad():
   yo = np.array([[-8.27064106], [-1.06064404], [34.80718227]])
   eps = 1.0
 
-  twoj = fdvar.fdvar_2j(anl, fcst, h, r, yo, aint, 0, DIMM)
-  twoj_grad = np.zeros(DIMM)
-  for i in range(DIMM):
+  twoj = fdvar.fdvar_2j(anl, fcst, h, r, yo, aint, 0, N_MODEL)
+  twoj_grad = np.zeros(N_MODEL)
+  for i in range(N_MODEL):
     anl = np.copy(fcst)
     anl[i] += eps
-    twoj_grad[i] = (fdvar.fdvar_2j(anl, fcst, h, r, yo, aint, 0, DIMM) - twoj) / eps
+    twoj_grad[i] = (fdvar.fdvar_2j(anl, fcst, h, r, yo, aint, 0, N_MODEL) - twoj) / eps
   print(twoj_grad)
 
-  twoj_grad_anl = fdvar.fdvar_2j_deriv(anl, fcst, h, r, yo, aint, 0, DIMM)
+  twoj_grad_anl = fdvar.fdvar_2j_deriv(anl, fcst, h, r, yo, aint, 0, N_MODEL)
   print(twoj_grad_anl)
 
   return 0
@@ -204,10 +204,10 @@ def compare_coupled_vs_persistent_bc():
   leadtime = 100
 
   np.random.seed((10**9+7)*12)
-  all_true = np.empty((nstep, DIMM))
-  lrue = np.random.randn(DIMM) * FERR_INI
-  fcst_cp = np.empty((DIMM))
-  fcst_bc = np.empty((DIMM))
+  all_true = np.empty((nstep, N_MODEL))
+  lrue = np.random.randn(N_MODEL) * FERR_INI
+  fcst_cp = np.empty((N_MODEL))
+  fcst_bc = np.empty((N_MODEL))
   msd_extra = np.zeros((leadtime))
   msd_trop = np.zeros((leadtime))
   msd_ocean = np.zeros((leadtime))

@@ -16,7 +16,7 @@ def fdvar(fcst_0, h, r, yo, aint, i_s, i_e, amp_b, bc=None):
   # i_s    <- int                  : model grid number, assimilate only [i_s, i_e)
   # i_e    <- int
   # amp_b  <- float
-  # bc     <- np.array[DIMM]       : boundary condition if needed
+  # bc     <- np.array[N_MODEL]       : boundary condition if needed
   # return -> np.array[dimc]       : assimilated field
 
   # only assimilate one set of obs at t1 = t0+dt*aint
@@ -45,10 +45,10 @@ def fdvar_analytical(fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e, amp_b, bc
   # i_s        <- int                  : model grid number, assimilate only [i_s, i_e)
   # i_e        <- int
   # amp_b      <- float
-  # bc         <- np.array[DIMM]       : boundary condition if needed
+  # bc         <- np.array[N_MODEL]       : boundary condition if needed
   # return     -> np.array[dimc]       : assimilated field
 
-  if not (i_s == 0 and i_e == DIMM):
+  if not (i_s == 0 and i_e == N_MODEL):
     raise Exception("fdvar_analytical_innerloop() is not for non-coupled. i_s = %d and i_e = %d is given." % (i_s, i_e))
 
   m = np.asmatrix(finite_time_tangent_using_nonlinear(fcst_0_nda, DT, aint))
@@ -79,7 +79,7 @@ def fdvar_2j(anl_0_nda, fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e, amp_b,
   # i_s        <- int                  : model grid number, assimilate only [i_s, i_e)
   # i_e        <- int
   # amp_b      <- float
-  # bc         <- np.array[DIMM]       : boundary condition if needed
+  # bc         <- np.array[N_MODEL]       : boundary condition if needed
   # return     -> float                : cost function 2J
 
   h  = np.asmatrix(h_nda)
@@ -111,7 +111,7 @@ def fdvar_2j_deriv(anl_0_nda, fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e, 
   # amp_b      <- float
   # return     -> np.array[dimc]       : gradient of cost function 2J
 
-  if i_s != 0 or i_e != DIMM:
+  if i_s != 0 or i_e != N_MODEL:
     raise Exception("method fdvar_2j_deriv does not support non/weakly coupled DA")
 
   h  = np.asmatrix(h_nda)

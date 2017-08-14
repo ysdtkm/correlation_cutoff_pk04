@@ -11,10 +11,10 @@ import matplotlib.colors as colors
 
 def obtain_climatology():
   nstep = 100000
-  all_true = np.empty((nstep, DIMM))
+  all_true = np.empty((nstep, N_MODEL))
 
   np.random.seed((10**8+7)*11)
-  true = np.random.randn(DIMM) * FERR_INI
+  true = np.random.randn(N_MODEL) * FERR_INI
 
   for i in range(0, nstep):
     true[:] = model.timestep(true[:], DT)
@@ -42,19 +42,19 @@ def obtain_tdvar_b():
   free = main.exec_free_run(settings)
   anl  = main.exec_assim_cycle(settings, free, obs)
   hist_bf = np.fromfile("data/%s_covr_back.bin" % settings["name"], np.float64)
-  hist_bf = hist_bf.reshape((STEPS, DIMM, DIMM))
+  hist_bf = hist_bf.reshape((STEPS, N_MODEL, N_MODEL))
   mean_bf = np.nanmean(hist_bf[STEPS//2:, :, :], axis=0)
   trace = np.trace(mean_bf)
-  mean_bf *= (DIMM / trace)
+  mean_bf *= (N_MODEL / trace)
 
   print("[ \\")
-  for i in range(DIMM):
+  for i in range(N_MODEL):
     print("[", end="")
-    for j in range(DIMM):
+    for j in range(N_MODEL):
       print("%12.9g" % mean_bf[i,j], end="")
-      if j < (DIMM - 1):
+      if j < (N_MODEL - 1):
         print(", ", end="")
-    if i < (DIMM - 1):
+    if i < (N_MODEL - 1):
       print("], \\")
     else:
       print("]  \\")
@@ -103,8 +103,8 @@ def plot_matrix(data, name="", title="", color=plt.cm.bwr, xlabel="", ylabel="",
 def obtain_stats_etkf():
   def cov_to_corr(cov):
     corr = cov.copy()
-    for i in range(DIMM):
-      for j in range(DIMM):
+    for i in range(N_MODEL):
+      for j in range(N_MODEL):
         corr[i,j] /= np.sqrt(cov[i,i] * cov[j,j])
     return corr
 
@@ -121,11 +121,11 @@ def obtain_stats_etkf():
 
   nmem = settings["nmem"]
   hist_fcst = np.fromfile("data/%s_cycle.bin" % settings["name"], np.float64)
-  hist_fcst = hist_fcst.reshape((STEPS, nmem, DIMM))
+  hist_fcst = hist_fcst.reshape((STEPS, nmem, N_MODEL))
 
-  corr_ijt = np.empty((STEPS, DIMM, DIMM))
+  corr_ijt = np.empty((STEPS, N_MODEL, N_MODEL))
   corr_ijt[:,:,:] = np.nan
-  cov_ijt = np.empty((STEPS, DIMM, DIMM))
+  cov_ijt = np.empty((STEPS, N_MODEL, N_MODEL))
   cov_ijt[:,:,:] = np.nan
   r = getr()
 
@@ -138,8 +138,8 @@ def obtain_stats_etkf():
         for jt in range(AINT):
           for k in range(nmem):
             fcst[k, :] = model.timestep(fcst[k,:], DT)
-      for i in range(DIMM):
-        for j in range(DIMM):
+      for i in range(N_MODEL):
+        for j in range(N_MODEL):
           # a38p40
           vector_i = np.copy(fcst[:, i])
           vector_j = np.copy(fcst[:, j])
@@ -158,15 +158,15 @@ def obtain_stats_etkf():
   ri             = np.linalg.inv(getr())
   bhhtri_rms_ij  = cov_rms_ij.dot(ri)
   bhhtri_mean_ij = cov_mean_ij.dot(ri)
-  rand_ij        = np.random.randn(DIMM, DIMM)
+  rand_ij        = np.random.randn(N_MODEL, N_MODEL)
   corr_instant_ij = cov_to_corr(cov_instant_ij)
 
   clim_mean = np.mean(nature[STEPS//2:,:], axis=0)
-  cov_clim_ij = np.empty((DIMM, DIMM))
+  cov_clim_ij = np.empty((N_MODEL, N_MODEL))
   k = 0
   for it in range(STEPS//2, STEPS):
     anom = nature[it,:] - clim_mean[:]
-    for i in range(DIMM):
+    for i in range(N_MODEL):
       cov_clim_ij[i,:] += anom[i] * anom[:]
     k += 1
   tmp = cov_clim_ij # to remove assymetry caused by numerical errors

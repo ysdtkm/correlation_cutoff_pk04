@@ -3,12 +3,12 @@
 import numpy as np
 from const import *
 
-def timestep(x, dt, i_s=0, i_e=DIMM, bc=None):
+def timestep(x, dt, i_s=0, i_e=N_MODEL, bc=None):
   # x      <- np.array(dimm)
   # dt     <- float
   # i_s    <- int
   # i_e    <- int
-  # bc     <- np.array(DIMM)       : boundary condition
+  # bc     <- np.array(N_MODEL)       : boundary condition
   # return -> np.array(dimm)
 
   x0 = np.copy(x)
@@ -21,15 +21,15 @@ def timestep(x, dt, i_s=0, i_e=DIMM, bc=None):
   k4 = tendency(x4, i_s, i_e, bc)
   return x0 + (k1 + 2.0 * k2 + 2.0 * k3 + k4) * dt / 6.0
 
-def tendency(x_in, i_s=0, i_e=DIMM, bc=None):
-  ### here, (dimm = i_e - i_s <= DIMM) unless strongly coupled
+def tendency(x_in, i_s=0, i_e=N_MODEL, bc=None):
+  ### here, (dimm = i_e - i_s <= N_MODEL) unless strongly coupled
   # a31p63-64
   # x      <- np.array(dimm)
   # i_s    <- int
   # i_e    <- int
   # return -> np.array(dimm)
 
-  if (DIMM == 3):
+  if (N_MODEL == 3):
     sigma = 10.0
     r = 28.0
     b = 8.0 / 3.0
@@ -39,7 +39,7 @@ def tendency(x_in, i_s=0, i_e=DIMM, bc=None):
     k[2] =   x_in[0] * x_in[1] - b * x_in[2]
     return k
 
-  elif (DIMM == 9):
+  elif (N_MODEL == 9):
     ### model constants
     # dynamic
     sigma = 10.0
@@ -56,7 +56,7 @@ def tendency(x_in, i_s=0, i_e=DIMM, bc=None):
     k2    = -11.0
 
     # set boundary conditions
-    if i_s == 0 and i_e == DIMM:
+    if i_s == 0 and i_e == N_MODEL:
       x = np.copy(x_in)
     else:
       if not (bc is None):
@@ -67,7 +67,7 @@ def tendency(x_in, i_s=0, i_e=DIMM, bc=None):
                        29.22828843, 14.33420545,  0.65398139, 16.64817181])
       x[i_s:i_e] = x_in[:]
 
-    dx = np.empty((DIMM))
+    dx = np.empty((N_MODEL))
     # extratropic atm
     dx[0] =           -sigma * x[0] + sigma * x[1] - ce * (s * x[3] + k1)
     dx[1] = -x[0] * x[2] + r * x[0] -         x[1] + ce * (s * x[4] + k1)
@@ -89,13 +89,13 @@ def tendency(x_in, i_s=0, i_e=DIMM, bc=None):
 
 def tangent_linear(x, dt):
   # Return one-timestep tangent linear matrix, currently not for non/weakly coupled
-  # x      <- np.array(DIMM)       : state vector at the beginning
+  # x      <- np.array(N_MODEL)       : state vector at the beginning
   # dt     <- float                : infinitesimal time
-  # return -> np.array(DIMM,DIMM)  : instantaneous tangent linear matrix M
+  # return -> np.array(N_MODEL,N_MODEL)  : instantaneous tangent linear matrix M
 
-  dx = np.zeros((DIMM,DIMM))
+  dx = np.zeros((N_MODEL,N_MODEL))
 
-  if (DIMM == 3):
+  if (N_MODEL == 3):
     sigma = 10.0
     r = 28.0
     b = 8.0 / 3.0
@@ -112,7 +112,7 @@ def tangent_linear(x, dt):
     dx[2,1] = x[0]
     dx[2,2] = -b
 
-  elif (DIMM == 9):
+  elif (N_MODEL == 9):
     sigma = 10.0
     r     = 28.0
     b     = 8.0 / 3.0
@@ -170,17 +170,17 @@ def tangent_linear(x, dt):
     dx[8,7] = tau * (s * x[6])
     dx[8,8] = tau * (-b)
 
-  m = np.identity(DIMM) + dx[:,:] * dt
+  m = np.identity(N_MODEL) + dx[:,:] * dt
   return m
 
 def finite_time_tangent(x0, dt, iw):
   # Return finite time tangent linear matrix (t0 -> t0 + dt * iw)
-  # x0     <- np.array(DIMM)       : state vector at the beginning of the window
+  # x0     <- np.array(N_MODEL)       : state vector at the beginning of the window
   # dt     <- float                : timestep
   # iw     <- int                  : integration window (time in steps)
-  # return -> np.array(DIMM,DIMM)  : finite time tangent linear matrix M
+  # return -> np.array(N_MODEL,N_MODEL)  : finite time tangent linear matrix M
 
-  m_finite = np.identity(DIMM)
+  m_finite = np.identity(N_MODEL)
   x = np.copy(x0)
   for i in range(iw):
     m_inst = tangent_linear(x, dt)
@@ -191,14 +191,14 @@ def finite_time_tangent(x0, dt, iw):
 def finite_time_tangent_using_nonlinear(x0, dt, iw):
   ### todo: boundary conditions needed if used for 4DVar
   # Return tangent linear matrix, calculated numerically using the NL model
-  # x0     <- np.array(DIMM)       : state vector at t0
+  # x0     <- np.array(N_MODEL)       : state vector at t0
   # dt     <- float                : timestep
   # iw     <- int                  : integration window (time in steps)
-  # return -> np.array(DIMM,DIMM)  : finite time (t0 -> t0 + iw*DT) tangent linear matrix M
+  # return -> np.array(N_MODEL,N_MODEL)  : finite time (t0 -> t0 + iw*DT) tangent linear matrix M
 
-  m_finite = np.identity(DIMM)
+  m_finite = np.identity(N_MODEL)
   eps = 1.0e-9
-  for j in range(DIMM):
+  for j in range(N_MODEL):
     xctl = np.copy(x0)
     xptb = np.copy(x0)
     xptb[j] += eps
