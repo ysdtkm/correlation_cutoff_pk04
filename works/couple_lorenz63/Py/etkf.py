@@ -202,9 +202,8 @@ def update_adaptive_inflation(obj_adaptive, delta_this_step):
   return obj_adaptive
 
 def obtain_delta_this_step(yo, yb, ybpt, r, nmem, common):
-
   if N_MODEL != 9 or yo.shape[0] != 9:
-    raise Exception("this method is only used when N_MODEL == 9")
+    raise Exception("Adaptive inflation is only for N_MODEL == P_OBS == 9")
 
   delta = np.empty(3)
 
@@ -213,10 +212,12 @@ def obtain_delta_this_step(yo, yb, ybpt, r, nmem, common):
     delta[:] = (dob.T.dot(dob) - np.trace(r)) / np.trace(ybpt.dot(ybpt.T) / (nmem-1))
   else:
     for i in range(3):
-      yol = yo[i*3:i*3+3]
-      ybl = yb[i*3:i*3+3]
-      ybptl = ybpt[i*3:i*3+3,:]
-      rl = r[i*3:i*3+3,i*3:i*3+3]
+      i_s = i * 3
+      i_e = i * 3 + 3
+      yol = yo[i_s:i_e]
+      ybl = yb[i_s:i_e]
+      ybptl = ybpt[i_s:i_e, :]
+      rl = r[i_s:i_e, i_s:i_e]
       dob = yol - ybl
       delta[i] = (dob.T.dot(dob) - np.trace(rl)) / np.trace(ybptl.dot(ybptl.T) / (nmem-1))
   return delta
