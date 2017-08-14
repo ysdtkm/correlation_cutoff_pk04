@@ -5,7 +5,7 @@ import numpy as np
 
 # note: "dimc" in comments is dimension of component (for non/weakly coupled)
 N_MODEL = 9    # dimension of model variable n
-P_OBS = N_MODEL # dimension of observation variable m
+P_OBS = 3 # ttk N_MODEL # dimension of observation variable m
 
 DT = 0.01
 TMAX = 2
@@ -49,22 +49,27 @@ ETKF_AI_min = 0.9
 def getr():
   # note: Non-diagonal element in R is ignored in exec_obs()
   r = np.identity(P_OBS) * OERR_A ** 2
-  if N_MODEL == 9:
-    if P_OBS == N_MODEL:
-      for i in range(6, 9):
-        r[i,i] = OERR_O ** 2
-    else:
-      import warnings
-      warnings.warn("getr() ignores OERR_O if P_OBS != N_MODEL. P_OBS=%d, N_MODEL=%d was passed." % (P_OBS, N_MODEL))
+  r[2,2] = OERR_O ** 2
+  # ttk if N_MODEL == 9:
+  #   if P_OBS == N_MODEL:
+  #     for i in range(6, 9):
+  #       r[i,i] = OERR_O ** 2
+  #   else:
+  #     import warnings
+  #     warnings.warn("getr() ignores OERR_O if P_OBS != N_MODEL. P_OBS=%d, N_MODEL=%d was passed." % (P_OBS, N_MODEL))
   return r
 
 def geth():
-  h = np.zeros((P_OBS,N_MODEL))
-  for i in range(0, min(N_MODEL, P_OBS)):
-    h[i,i] = 1.0
-  if P_OBS != N_MODEL:
-    import warnings
-    warnings.warn("geth() cannot correctly deal with P_OBS != N_MODEL. P_OBS=%d, N_MODEL=%d was passed." % (P_OBS, N_MODEL))
+  # ttk h = np.zeros((P_OBS,N_MODEL))
+  # for i in range(0, min(N_MODEL, P_OBS)):
+  #   h[i,i] = 1.0
+  # if P_OBS != N_MODEL:
+  #   import warnings
+  #   warnings.warn("geth() cannot correctly deal with P_OBS != N_MODEL. P_OBS=%d, N_MODEL=%d was passed." % (P_OBS, N_MODEL))
+  h = np.array([
+    [0, 1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 1, 0]])
   return h
 
 def debug_obj_print(obj, scope):
