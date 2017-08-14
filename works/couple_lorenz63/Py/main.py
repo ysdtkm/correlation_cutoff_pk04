@@ -48,9 +48,10 @@ def exec_obs(nature):
   # return   -> np.array[STEPS, P_OBS]
 
   all_obs = np.empty((STEPS, P_OBS))
+  h = geth()
   r = getr()
   for i in range(0, STEPS):
-    all_obs[i,:] = nature[i,:] + np.random.randn(P_OBS) * r.diagonal()**0.5
+    all_obs[i,:] = h.dot(nature[i,:]) + np.random.randn(P_OBS) * r.diagonal()**0.5
 
   all_obs.tofile("data/obs.bin")
   return all_obs
@@ -174,7 +175,7 @@ def analyze_one_window(fcst, fcst_pre, obs, h, r, settings, obj_adaptive, i_s=0,
   bf[:,:] = np.nan
   ba[:,:] = np.nan
 
-  yo = np.dot(h[:,:], obs[:, np.newaxis])
+  yo = obs[:, np.newaxis]
 
   if (settings["method"] == "etkf"):
     anl[:,:], bf[:,:], ba[:,:], obj_adaptive = \

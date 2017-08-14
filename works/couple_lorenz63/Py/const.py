@@ -54,15 +54,17 @@ def getr():
       for i in range(6, 9):
         r[i,i] = OERR_O ** 2
     else:
-      raise Warning("getr() ignores OERR_O if P_OBS != N_MODEL. P_OBS=%d, N_MODEL=%d was passed." % (P_OBS, N_MODEL))
+      import warnings
+      warnings.warn("getr() ignores OERR_O if P_OBS != N_MODEL. P_OBS=%d, N_MODEL=%d was passed." % (P_OBS, N_MODEL))
   return r
 
 def geth():
   h = np.zeros((P_OBS,N_MODEL))
-  for i in range(0, max(N_MODEL, P_OBS)):
+  for i in range(0, min(N_MODEL, P_OBS)):
     h[i,i] = 1.0
   if P_OBS != N_MODEL:
-    raise Warning("geth() cannot correctly deal with P_OBS != N_MODEL. P_OBS=%d, N_MODEL=%d was passed." % (P_OBS, N_MODEL))
+    import warnings
+    warnings.warn("geth() cannot correctly deal with P_OBS != N_MODEL. P_OBS=%d, N_MODEL=%d was passed." % (P_OBS, N_MODEL))
   return h
 
 def debug_obj_print(obj, scope):

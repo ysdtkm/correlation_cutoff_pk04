@@ -151,12 +151,14 @@ def obtain_localization_weight(dimc, j, r_local, num_yes):
     order_table = stats_const.stats_order(r_local)
     return np.float64(order_table < odr_max)
 
-  localization_weight = np.ones((dimc, dimc))
-
   if N_MODEL != 9 or P_OBS != N_MODEL:
-    raise Warning("obtain_localization_weight() is only for PK04 and P_OBS == N_MODEL. No localization is done.")
-    return localization_weight
+    import warnings
+    warnings.warn("obtain_localization_weight() is only for PK04 and P_OBS == N_MODEL. No localization is done.")
+
+    localization_weight = np.ones((P_OBS, P_OBS)) # ttk
+    return np.asmatrix(localization_weight)
   else:
+    localization_weight = np.ones((dimc, dimc))
     if dimc == N_MODEL: # strongly coupled
       weight_table = get_weight_table(r_local, num_yes)
       for iy in range(dimc):
