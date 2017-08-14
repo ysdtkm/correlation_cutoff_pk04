@@ -7,9 +7,9 @@ import stats_const
 
 def etkf(fcst, h_nda, r_nda, yo_nda, rho_in, nmem, obj_adaptive, localization=False, r_local="", num_yes=None):
   # fcst   <- np.array[nmem, dimc]
-  # h_nda  <- np.array[DIMO, dimc]
-  # r_nda  <- np.array[DIMO, DIMO]
-  # yo_nda <- np.array[DIMO, 1]
+  # h_nda  <- np.array[P_OBS, dimc]
+  # r_nda  <- np.array[P_OBS, P_OBS]
+  # yo_nda <- np.array[P_OBS, 1]
   # rho    <- float
   # nmem   <- int
   # obj_adaptive
@@ -33,11 +33,11 @@ def etkf(fcst, h_nda, r_nda, yo_nda, rho_in, nmem, obj_adaptive, localization=Fa
   #   xa[dimc,1   ] : ensemble mean analysis xa_bar
   #
   # - obs space
-  #    r[DIMO,DIMO] : obs error covariance matrix R
-  #    h[DIMO,dimc] : linearized observation operator H
-  #   yo[DIMO,1   ] : observed state yo
-  #   yb[DIMO,1   ] : mean simulated observation vector yb
-  #  ybm[DIMO,nmem] : ensemble model simulated observation matrix Yb
+  #    r[P_OBS,P_OBS] : obs error covariance matrix R
+  #    h[P_OBS,dimc] : linearized observation operator H
+  #   yo[P_OBS,1   ] : observed state yo
+  #   yb[P_OBS,1   ] : mean simulated observation vector yb
+  #  ybm[P_OBS,nmem] : ensemble model simulated observation matrix Yb
   #
   # - mem space
   #  wam[nmem,nmem] : optimal weight matrix for each member
@@ -45,7 +45,7 @@ def etkf(fcst, h_nda, r_nda, yo_nda, rho_in, nmem, obj_adaptive, localization=Fa
   #   pa[nmem,nmem] : approx. anl error covariance matrix Pa in ens space
   #
   # note :
-  #   N_MODEL > DIMO >> nmem in typical LETKF application
+  #   N_MODEL > P_OBS >> nmem in typical LETKF application
   ###
   I_mm = np.matrix(np.identity(nmem))
   I_1m = np.matrix(np.ones((1,nmem)))

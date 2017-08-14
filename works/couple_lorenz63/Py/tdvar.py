@@ -8,9 +8,9 @@ import stats_const
 
 def tdvar(fcst, h, r, yo, i_s, i_e, amp_b):
   # fcst   <- np.array[dimc]        : first guess
-  # h      <- np.array[DIMO, dimc]  : observation operator
-  # r      <- np.array[DIMO, DIMO]  : observation error covariance
-  # yo     <- np.array[DIMO, 1]     : observation
+  # h      <- np.array[P_OBS, dimc]  : observation operator
+  # r      <- np.array[P_OBS, P_OBS]  : observation error covariance
+  # yo     <- np.array[P_OBS, 1]     : observation
   # i_s    <- int
   # i_e    <- int
   # amp_b  <- float
@@ -22,9 +22,9 @@ def tdvar(fcst, h, r, yo, i_s, i_e, amp_b):
 def tdvar_2j(anl_nda, fcst_nda, h_nda, r_nda, yo_nda, i_s, i_e, amp_b):
   # anl_nda  <- np.array[dimc]        : temporary analysis field
   # fcst_nda <- np.array[dimc]        : first guess field
-  # h_nda    <- np.array[DIMO, dimc]  : observation operator
-  # r_nda    <- np.array[DIMO, DIMO]  : observation error covariance
-  # yo_nda   <- np.array[DIMO, 1]     : observation
+  # h_nda    <- np.array[P_OBS, dimc]  : observation operator
+  # r_nda    <- np.array[P_OBS, P_OBS]  : observation error covariance
+  # yo_nda   <- np.array[P_OBS, 1]     : observation
   # i_s      <- int                   : first model grid to assimilate
   # i_e      <- int                   : last model grid to assimilate
   # amp_b    <- float
@@ -44,9 +44,9 @@ def tdvar_2j(anl_nda, fcst_nda, h_nda, r_nda, yo_nda, i_s, i_e, amp_b):
 def tdvar_interpol(fcst, h_nda, r_nda, yo_nda, i_s, i_e, amp_b):
   # Return same analysis with tdvar(), not by minimization but analytical interpolation
   # fcst   <- np.array[dimc]        : first guess
-  # h_nda  <- np.array[DIMO, dimc]  : observation operator
-  # r_nda  <- np.array[DIMO, DIMO]  : observation error covariance
-  # yo_nda <- np.array[DIMO, 1]     : observation
+  # h_nda  <- np.array[P_OBS, dimc]  : observation operator
+  # r_nda  <- np.array[P_OBS, P_OBS]  : observation error covariance
+  # yo_nda <- np.array[P_OBS, 1]     : observation
   # i_s    <- int
   # i_e    <- int
   # amp_b  <- float

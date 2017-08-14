@@ -43,7 +43,7 @@ def plot_all():
     hist_fcst = np.fromfile("data/%s_cycle.bin" % name, np.float64)
     hist_fcst = hist_fcst.reshape((STEPS, nmem, N_MODEL))
     hist_obs = np.fromfile("data/%s_obs.bin" % name, np.float64)
-    hist_obs = hist_obs.reshape((STEPS, DIMO))
+    hist_obs = hist_obs.reshape((STEPS, P_OBS))
 
     plot_rmse_spread(hist_true, hist_fcst, name, nmem)
     plot_time_value(hist_true, hist_fcst, hist_obs, name, nmem)
@@ -294,7 +294,7 @@ def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
 def plot_time_value(hist_true, hist_fcst, hist_obs, name, nmem):
   # hist_true  <- np.array[STEPS, N_MODEL]
   # hist_fcst  <- np.array[STEPS, nmem, N_MODEL]
-  # hist_obs   <- np.array[STEPS, DIMO]
+  # hist_obs   <- np.array[STEPS, P_OBS]
   # name       <- string
   # nmem       <- int
 

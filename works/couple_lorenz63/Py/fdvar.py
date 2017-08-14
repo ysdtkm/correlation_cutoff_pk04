@@ -9,9 +9,9 @@ import stats_const, model
 
 def fdvar(fcst_0, h, r, yo, aint, i_s, i_e, amp_b, bc=None):
   # fcst_0 <- np.array[dimc]       : first guess at beginning of window
-  # h      <- np.array[DIMO, dimc] : observation operator
-  # r      <- np.array[DIMO, DIMO] : observation error covariance
-  # yo     <- np.array[DIMO, 1]    : observation
+  # h      <- np.array[P_OBS, dimc] : observation operator
+  # r      <- np.array[P_OBS, P_OBS] : observation error covariance
+  # yo     <- np.array[P_OBS, 1]    : observation
   # aint   <- int                  : assimilation interval
   # i_s    <- int                  : model grid number, assimilate only [i_s, i_e)
   # i_e    <- int
@@ -38,9 +38,9 @@ def fdvar(fcst_0, h, r, yo, aint, i_s, i_e, amp_b, bc=None):
 
 def fdvar_analytical(fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e, amp_b, bc=None):
   # fcst_0_nda <- np.array[dimc]       : first guess at beginning of window
-  # h_nda      <- np.array[DIMO, dimc] : observation operator
-  # r_nda      <- np.array[DIMO, DIMO] : observation error covariance
-  # yo_nda     <- np.array[DIMO, 1]    : observation
+  # h_nda      <- np.array[P_OBS, dimc] : observation operator
+  # r_nda      <- np.array[P_OBS, P_OBS] : observation error covariance
+  # yo_nda     <- np.array[P_OBS, 1]    : observation
   # aint       <- int                  : assimilation interval
   # i_s        <- int                  : model grid number, assimilate only [i_s, i_e)
   # i_e        <- int
@@ -72,9 +72,9 @@ def fdvar_analytical(fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e, amp_b, bc
 def fdvar_2j(anl_0_nda, fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e, amp_b, bc):
   # anl_0_nda  <- np.array[dimc]       : temporary analysis field
   # fcst_0_nda <- np.array[dimc]       : first guess field
-  # h_nda      <- np.array[DIMO, dimc] : observation operator
-  # r_nda      <- np.array[DIMO, DIMO] : observation error covariance
-  # yo_nda     <- np.array[DIMO, 1]    : observation
+  # h_nda      <- np.array[P_OBS, dimc] : observation operator
+  # r_nda      <- np.array[P_OBS, P_OBS] : observation error covariance
+  # yo_nda     <- np.array[P_OBS, 1]    : observation
   # aint       <- int                  : assimilation interval
   # i_s        <- int                  : model grid number, assimilate only [i_s, i_e)
   # i_e        <- int
@@ -102,9 +102,9 @@ def fdvar_2j(anl_0_nda, fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e, amp_b,
 def fdvar_2j_deriv(anl_0_nda, fcst_0_nda, h_nda, r_nda, yo_nda, aint, i_s, i_e, amp_b, bc=None):
   # anl_0_nda  <- np.array[dimc]       : temporary analysis field
   # fcst_0_nda <- np.array[dimc]       : first guess field
-  # h_nda      <- np.array[DIMO, dimc] : observation operator
-  # r_nda      <- np.array[DIMO, DIMO] : observation error covariance
-  # yo_nda     <- np.array[DIMO, 1]    : observation
+  # h_nda      <- np.array[P_OBS, dimc] : observation operator
+  # r_nda      <- np.array[P_OBS, P_OBS] : observation error covariance
+  # yo_nda     <- np.array[P_OBS, 1]    : observation
   # aint       <- int                  : assimilation interval
   # i_s        <- int                  : model grid number, assimilate only [i_s, i_e)
   # i_e        <- int

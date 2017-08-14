@@ -44,15 +44,15 @@ def exec_nature():
 
 def exec_obs(nature):
   # nature   <- np.array[STEPS, N_MODEL]
-  # return   -> np.array[STEPS, DIMO]
+  # return   -> np.array[STEPS, P_OBS]
 
-  all_obs = np.empty((STEPS, DIMO))
+  all_obs = np.empty((STEPS, P_OBS))
   for i in range(0, STEPS):
     if N_MODEL == 9:
       all_obs[i,:6] = nature[i,:6] + np.random.randn(6) * OERR_A
       all_obs[i,6:] = nature[i,6:] + np.random.randn(3) * OERR_O
     else:
-      all_obs[i,:] = nature[i,:] + np.random.randn(DIMO) * OERR_A
+      all_obs[i,:] = nature[i,:] + np.random.randn(P_OBS) * OERR_A
 
   all_obs.tofile("data/obs.bin")
   return all_obs
@@ -71,7 +71,7 @@ def exec_free_run(settings):
 def exec_assim_cycle(settings, all_fcst, all_obs):
   # settings <- hash
   # all_fcst <- np.array[STEPS, nmem, N_MODEL]
-  # all_obs  <- np.array[STEPS, DIMO]
+  # all_obs  <- np.array[STEPS, P_OBS]
   # return   -> np.array[STEPS, nmem, N_MODEL]
 
   # prepare containers
@@ -82,7 +82,7 @@ def exec_assim_cycle(settings, all_fcst, all_obs):
   all_ba[:,:,:] = np.nan
   all_bf = np.empty((STEPS, N_MODEL, N_MODEL))
   all_bf[:,:,:] = np.nan
-  obs_used = np.empty((STEPS, DIMO))
+  obs_used = np.empty((STEPS, P_OBS))
   obs_used[:,:] = np.nan
 
   all_inflation = np.empty((STEPS, 3))
@@ -155,9 +155,9 @@ def exec_assim_cycle(settings, all_fcst, all_obs):
 def analyze_one_window(fcst, fcst_pre, obs, h, r, settings, obj_adaptive, i_s=0, i_e=N_MODEL, bc=None):
   # fcst     <- np.array[nmem, dimc]
   # fcst_pre <- np.array[nmem, dimc]
-  # obs      <- np.array[DIMO]
-  # h        <- np.array[DIMO, dimc]
-  # r        <- np.array[DIMO, DIMO]
+  # obs      <- np.array[P_OBS]
+  # h        <- np.array[P_OBS, dimc]
+  # r        <- np.array[P_OBS, P_OBS]
   # settings <- hash
   # obj_adaptive
   #          <- object created by etkf/init_etkf_adaptive_inflation(), or None
