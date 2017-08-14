@@ -22,6 +22,7 @@ def etkf(fcst, h_nda, r_nda, yo_nda, rho_in, nmem, obj_adaptive, localization=Fa
   r  = np.asmatrix(r_nda)
   yo = np.asmatrix(yo_nda)
   dimc = fcst.shape[1]
+  pc_obs = yo_nda.shape[0]
 
   ### DA variables (np.matrix)
   # - model space
@@ -68,7 +69,7 @@ def etkf(fcst, h_nda, r_nda, yo_nda, rho_in, nmem, obj_adaptive, localization=Fa
 
     for j in range(dimc):
       # step 3
-      localization_weight = obtain_localization_weight(dimc, j, r_local, num_yes)
+      localization_weight = obtain_localization_weight(pc_obs, j, r_local, num_yes)
       yol = yo[:,:].copy()
       ybl = yb[:,:].copy()
       ybptl = ybpt[:,:].copy()
@@ -108,11 +109,11 @@ def etkf(fcst, h_nda, r_nda, yo_nda, rho_in, nmem, obj_adaptive, localization=Fa
     xam  = xapt + xa * I_1m
     return np.real(xam.T.A), (xfpt * xfpt.T).A, (xapt * xapt.T).A, obj_adaptive
 
-def obtain_localization_weight(dimc, j, r_local, num_yes):
-  # dimc   <- int : dimension of analyzed component
+def obtain_localization_weight(pc_obs, j, r_local, num_yes):
+  # pc_obs <- int : number of obs
   # j      <- int : index of analyzed grid
   # r_local (string): localization pattern of R
-  # return -> np.matrix : R-inverse localizaiton weight matrix
+  # return -> np.matrix[pc_obs,pc_obs] : localizaiton weight matrix for R-inverse
 
   def get_weight_table(r_local, num_yes):
     # return weight_table[iy, ix] : weight of iy-th obs for ix-th grid
@@ -151,22 +152,22 @@ def obtain_localization_weight(dimc, j, r_local, num_yes):
     order_table = stats_const.stats_order(r_local)
     return np.float64(order_table < odr_max)
 
-  if N_MODEL != 9 or P_OBS != N_MODEL:
+  if not (P_OBS == N_MODEL == 9):
     import warnings
     warnings.warn("obtain_localization_weight() is only for PK04 and P_OBS == N_MODEL. No localization is done.")
 
-    localization_weight = np.ones((P_OBS, P_OBS)) # ttk
+    localization_weight = np.ones((pc_obs, pc_obs)) # ttk
     return np.asmatrix(localization_weight)
   else:
-    localization_weight = np.ones((dimc, dimc))
-    if dimc == N_MODEL: # strongly coupled
+    localization_weight = np.ones((pc_obs, pc_obs))
+    if pc_obs == N_MODEL: # strongly coupled, full-ranked obs
       weight_table = get_weight_table(r_local, num_yes)
-      for iy in range(dimc):
+      for iy in range(pc_obs):
         localization_weight[iy, :] *= weight_table[iy, j]
         localization_weight[:, iy] *= weight_table[iy, j]
-    elif dimc == 3:
+    elif pc_obs == 3:
       pass
-    elif dimc == 6:
+    elif pc_obs == 6:
       pass
     return np.asmatrix(localization_weight)
 
