@@ -227,4 +227,9 @@ def exec_deterministic_fcst(settings: dict, anl: np.ndarray) -> int:
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("process interrupted by keyboard.")
+        import sys
+        sys.exit(1)

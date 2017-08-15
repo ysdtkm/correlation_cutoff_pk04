@@ -27,7 +27,7 @@ def fdvar(fcst_0: np.ndarray, h: np.ndarray, r: np.ndarray, yo: np.ndarray, aint
     try:
         anl_0 = np.copy(fcst_0)
         anl_0 = fmin_bfgs(fdvar_2j, anl_0, args=(fcst_0, h, r, yo, aint, i_s, i_e, amp_b, bc), disp=False)
-    except:  # todo: set proper exception
+    except ValueError:
         print("Method fmin_bfgs failed to converge. Use fmin for this step instead.")
         anl_0 = np.copy(fcst_0)
         anl_0 = fmin(fdvar_2j, anl_0, args=(fcst_0, h, r, yo, aint, i_s, i_e, amp_b, bc), disp=False)
