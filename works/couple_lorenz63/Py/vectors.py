@@ -6,11 +6,12 @@ from const import *
 import model
 
 
-def calc_blv(all_true):
-    # all_true <- np.array[STEPS, N_MODEL]
-    # all_blv  -> np.array[STEPS, N_MODEL, N_MODEL] : column backward lvs
-    # all_ble  -> np.array[STEPS, N_MODEL]       : backward lyapunov exponents, zero for the first step
-
+def calc_blv(all_true: np.ndarray) -> tuple:
+    """
+    :param all_true: [STEPS, N_MODEL]
+    :return all_blv: [STEPS, N_MODEL, N_MODEL] column backward lvs
+    :return all_ble: [STEPS, N_MODEL] backward lyapunov exponents, zero for the first step
+    """
     orth_int = 1
 
     blv = np.random.randn(N_MODEL, N_MODEL)
@@ -22,7 +23,7 @@ def calc_blv(all_true):
         true = all_true[i - 1, :].copy()
         m = model.finite_time_tangent_using_nonlinear(true, DT, 1)
         blv = np.dot(m, blv)
-        if (i % orth_int == 0):
+        if i % orth_int == 0:
             blv, ble = orth_norm_vectors(blv)
             all_ble[i, :] = ble[:] / DT
         all_blv[i, :, :] = blv[:, :]
@@ -32,10 +33,12 @@ def calc_blv(all_true):
     return all_blv, all_ble
 
 
-def calc_flv(all_true):
-    # all_true <- np.array[STEPS, N_MODEL]
-    # all_flv  -> np.array[STEPS, N_MODEL, N_MODEL] : column forward lvs
-    # all_fle  -> np.array[STEPS, N_MODEL]       : forward lyapunov exponents, zero for the last step
+def calc_flv(all_true: np.ndarray) -> tuple:
+    """
+    :param all_true: [STEPS, N_MODEL]
+    :return all_flv: [STEPS, N_MODEL, N_MODEL] column forward lvs
+    :return all_fle: [STEPS, N_MODEL] forward lyapunov exponents, zero for the last step
+    """
 
     orth_int = 1
 
@@ -48,7 +51,7 @@ def calc_flv(all_true):
         true = all_true[i - 1, :].copy()
         m = model.finite_time_tangent_using_nonlinear(true, DT, 1)
         flv = np.dot(m.T, flv)
-        if (i % orth_int == 0):
+        if i % orth_int == 0:
             flv, fle = orth_norm_vectors(flv)
             all_fle[i - 1, :] = fle[:] / DT
         all_flv[i - 1, :, :] = flv[:, :]
@@ -59,11 +62,13 @@ def calc_flv(all_true):
     return all_flv, all_fle
 
 
-def calc_clv(all_true, all_blv, all_flv):
-    # all_true <- np.array[STEPS, N_MODEL]
-    # all_blv  <- np.array[STEPS, N_MODEL, N_MODEL] : column backward lvs
-    # all_flv  <- np.array[STEPS, N_MODEL, N_MODEL] : column forward lvs
-    # all_clv  -> np.array[STEPS, N_MODEL, N_MODEL] : column charactetistic lvs, zero for the first and last step
+def calc_clv(all_true: np.ndarray, all_blv: np.ndarray, all_flv: np.ndarray) -> np.ndarray:
+    """
+    :param all_true: [STEPS, N_MODEL]
+    :param all_blv:  [STEPS, N_MODEL, N_MODEL] column backward lvs
+    :param all_flv:  [STEPS, N_MODEL, N_MODEL] column forward lvs
+    :return all_clv: [STEPS, N_MODEL, N_MODEL] column charactetistic lvs, zero for the first and last step
+    """
 
     all_clv = np.zeros((STEPS, N_MODEL, N_MODEL))
 
@@ -72,22 +77,25 @@ def calc_clv(all_true, all_blv, all_flv):
             all_clv[i, :, k] = vector_common(all_blv[i, :, :k + 1], all_flv[i, :, k:], k)
 
         # directional continuity
-        if (i >= 2):
+        if i >= 2:
             m = model.finite_time_tangent_using_nonlinear(all_true[i - 1, :], DT, 1)
             for k in range(0, N_MODEL):
                 clv_approx = np.dot(m, all_clv[i - 1, :, k, np.newaxis]).flatten()
-                if (np.dot(clv_approx, all_clv[i, :, k]) < 0):
+                if np.dot(clv_approx, all_clv[i, :, k]) < 0:
                     all_clv[i, :, k] *= -1
 
     all_clv.tofile("data/clv.bin")
     return all_clv
 
 
-def calc_fsv(all_true):
-    ### refer to 658Ep15 about exponents
-    # all_true <- np.array[STEPS, N_MODEL]
-    # all_fsv  -> np.array[STEPS, N_MODEL, N_MODEL] : column final SVs, zero for the first (window) steps
-    # all_fse  -> np.array[STEPS, N_MODEL]       : Singular exponents (1/window) * ln(sigma)
+def calc_fsv(all_true: np.ndarray) -> np.ndarray:
+    """
+    refer to 658Ep15 about exponents
+
+    :param all_true: [STEPS, N_MODEL]
+    :return all_fsv: [STEPS, N_MODEL, N_MODEL] column final SVs, zero for the first (window) steps
+    :return all_fse: [STEPS, N_MODEL] Singular exponents (1/window) * ln(sigma)
+    """
 
     all_fsv = np.zeros((STEPS, N_MODEL, N_MODEL))
     all_fse = np.zeros((STEPS, N_MODEL))
@@ -103,11 +111,14 @@ def calc_fsv(all_true):
     return all_fsv
 
 
-def calc_isv(all_true):
-    ### refer to 658Ep15 about exponents
-    # all_true <- np.array[STEPS, N_MODEL]
-    # all_isv  -> np.array[STEPS, N_MODEL, N_MODEL] : column initial SVs, zero for the last (window) steps
-    # all_ise  -> np.array[STEPS, N_MODEL]       : Singular exponents (1/window) * ln(sigma)
+def calc_isv(all_true: np.ndarray) -> np.ndarray:
+    """
+    refer to 658Ep15 about exponents
+
+    :param all_true: [STEPS, N_MODEL]
+    :return all_isv: [STEPS, N_MODEL, N_MODEL] column initial SVs, zero for the last (window) steps
+    :return all_ise: [STEPS, N_MODEL] Singular exponents (1/window) * ln(sigma)
+    """
 
     all_isv = np.zeros((STEPS, N_MODEL, N_MODEL))
     all_ise = np.zeros((STEPS, N_MODEL))
@@ -123,10 +134,12 @@ def calc_isv(all_true):
     return all_isv
 
 
-def write_lyapunov_exponents(all_ble, all_fle, all_clv):
-    # all_ble <- np.array[STEPS, N_MODEL]
-    # all_fle <- np.array[STEPS, N_MODEL]
-    # all_clv <- np.array[STEPS, N_MODEL, N_MODEL]
+def write_lyapunov_exponents(all_ble: np.ndarray, all_fle: np.ndarray, all_clv: np.ndarray) -> int:
+    """
+    :param all_ble: [STEPS, N_MODEL]
+    :param all_fle: [STEPS, N_MODEL]
+    :param all_clv: [STEPS, N_MODEL, N_MODEL]
+    """
 
     f = open("data/lyapunov.txt", "w")
     f.write("backward LEs:\n")
@@ -142,20 +155,21 @@ def write_lyapunov_exponents(all_ble, all_fle, all_clv):
     return 0
 
 
-def orth_norm_vectors(lv):
-    # lv     <- np.array[N_MODEL,N_MODEL] : Lyapunov vectors (column)
-    # return -> np.array[N_MODEL,N_MODEL] : orthonormalized LVs in descending order
-    # return -> np.array[N_MODEL]      : ordered Lyapunov Exponents
+def orth_norm_vectors(lv: np.ndarray) -> tuple:
+    """
+    :param lv:       [N_MODEL,N_MODEL] Lyapunov vectors (column)
+    :return lv_orth: [N_MODEL,N_MODEL] orthonormalized LVs in descending order
+    :return le:      [N_MODEL] ordered Lyapunov Exponents
+    """
 
     q, r = np.linalg.qr(lv)
 
-    le = np.zeros(N_MODEL)
     eigvals = np.abs(np.diag(r))
 
     # for t-continuity, align
     for i in range(N_MODEL):
         inner_prod = np.dot(q[:, i].T, lv[:, i])
-        if (inner_prod < 0):
+        if inner_prod < 0:
             q[:, i] *= -1.0
 
     lv_orth = q.copy()
@@ -163,12 +177,16 @@ def orth_norm_vectors(lv):
     return lv_orth, le
 
 
-def vector_common(blv, flv, k):
-    ### Note658E p19
-    # blv     <- np.array[N_MODEL,k]        : backward Lyapunov vectors (column)
-    # flv     <- np.array[N_MODEL,N_MODEL-k+1] : forward Lyapunov vectors (column)
-    # k       <- int                     : [1,N_MODEL)
-    # return  -> np.array[N_MODEL]          : k+1 th characteristic Lyapunov vectors (unit length)
+def vector_common(blv: np.ndarray, flv: np.ndarray, k: int) -> np.ndarray:
+    """
+    Note658E p19
+
+    :param blv:  [N_MODEL,k] backward Lyapunov vectors (column)
+    :param flv:  [N_MODEL,N_MODEL-k+1] forward Lyapunov vectors (column)
+    :param k:    int [1,N_MODEL)
+    :return clv: [N_MODEL] k+1 th characteristic Lyapunov vectors (unit length)
+    """
+
     ab = np.empty((N_MODEL, N_MODEL + 1))
     ab[:, :k + 1] = blv[:, :]
     ab[:, k + 1:] = - flv[:, :]
@@ -178,17 +196,22 @@ def vector_common(blv, flv, k):
     return clv / clv_len
 
 
-def nullspace(a):
-    # refer to 658Ep19
-    # a      <- np.array[N_MODEL,N_MODEL+1]
-    # return <- np.array[N_MODEL]
+def nullspace(a: np.ndarray) -> np.ndarray:
+    """
+    Note658E p19
+
+    :param a: [N_MODEL,N_MODEL+1]
+    :return:  [N_MODEL] column vectors (orthogonal basis of null space)
+    """
     u, s, vh = np.linalg.svd(a)
     return vh.T[:, -1].copy()
 
 
-def str_vector(arr):
-    # arr    <- np.array[n]
-    # return -> string
+def str_vector(arr: np.ndarray) -> str:
+    """
+    :param arr: 1-dimensional, arbitrary length
+    :return:
+    """
     n = len(arr)
     st = ""
     for i in range(n):
