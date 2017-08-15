@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import numpy as np
-from const import *
+from const import N_MODEL, STEPS, AINT, DT, FERR_INI, getr
 import model
 import main
 import matplotlib as mpl

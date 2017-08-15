@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import numpy as np
-from const import *
+from const import N_MODEL
 
 
 def tdvar_b() -> np.ndarray:

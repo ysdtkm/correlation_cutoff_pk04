@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
 from scipy.optimize import fmin, fmin_bfgs
-
+import numpy as np
 import model
 import stats_const
-from const import *
+from const import N_MODEL, DT
 
 
 def fdvar(fcst_0: np.ndarray, h: np.ndarray, r: np.ndarray, yo: np.ndarray, aint: int,
@@ -122,6 +122,7 @@ def fdvar_2j_deriv(anl_0_nda: np.ndarray, fcst_0_nda: np.ndarray, h_nda: np.ndar
     :param i_s:         model grid number, assimilate only [i_s, i_e)
     :param i_e:
     :param amp_b:
+    :param bc:
     :return:            [dimc] gradient of cost function 2J
     """
 

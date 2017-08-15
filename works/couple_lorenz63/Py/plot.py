@@ -5,7 +5,7 @@ import matplotlib as mpl
 import sys
 import os
 import warnings
-from const import *
+from const import N_MODEL, STEPS, OERR_A, OERR_O, Calc_lv, EXPLIST
 
 mpl.use('Agg')
 import matplotlib.pyplot as plt

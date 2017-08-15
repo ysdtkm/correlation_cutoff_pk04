@@ -2,7 +2,7 @@
 
 import numpy as np
 from scipy.linalg import sqrtm
-from const import *
+from const import N_MODEL, P_OBS, ETKF_AI_max, ETKF_AI_min, ETKF_kappa, ETKF_vo
 import stats_const
 
 

@@ -2,7 +2,7 @@
 
 import os
 import numpy as np
-from const import *
+from const import N_MODEL, STEPS, DT
 import model
 
 

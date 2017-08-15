@@ -5,7 +5,9 @@ import fdvar
 import model
 import tdvar
 import vectors
-from const import *
+import numpy as np
+from const import EXPLIST, DT, STEPS, STEP_FREE, N_MODEL, N_ATM, P_OBS, P_ATM, FERR_INI, Calc_lv, FCST_LT, AINT
+from const import geth, getr
 
 
 def main():

@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-from scipy.optimize import fmin_bfgs
 
 import stats_const
-from const import *
+import numpy as np
+from scipy.optimize import fmin_bfgs
 
 
 def tdvar(fcst: np.ndarray, h: np.ndarray, r: np.ndarray, yo: np.ndarray,

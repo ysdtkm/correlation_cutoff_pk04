@@ -2,17 +2,16 @@
 
 import sys
 import numpy as np
-from const import *
-import model, fdvar, main
+from const import N_MODEL, AINT, FERR_INI, STEPS, DT, amp_b_fdvar, geth, getr, OERR_A, EXPLIST
+import model
+import fdvar
 import matplotlib as mpl
-
 mpl.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 
 
 def test_fdvar_overflow():
-    exp = EXPLIST[1]
     h = geth()
     r = getr()
     fcst_0 = np.array(

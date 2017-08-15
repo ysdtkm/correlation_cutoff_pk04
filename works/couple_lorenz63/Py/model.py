@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import numpy as np
-from const import *
+from const import N_MODEL
 
 
 def timestep(x: np.ndarray, dt: float, i_s: int = 0, i_e: int = N_MODEL, bc: np.ndarray = None) -> np.ndarray:
@@ -47,7 +47,6 @@ def tendency(x_in: np.ndarray, i_s: int = 0, i_e: int = N_MODEL, bc: np.ndarray 
 
     elif N_MODEL == 9:
         # model constants
-        # dynamic
         sigma = 10.0
         r = 28.0
         b = 8.0 / 3.0
@@ -63,12 +62,12 @@ def tendency(x_in: np.ndarray, i_s: int = 0, i_e: int = N_MODEL, bc: np.ndarray 
         if i_s == 0 and i_e == N_MODEL:
             x = np.copy(x_in)
         else:
-            if not (bc is None):
-                x = np.copy(bc)
-            else:
-                # B.C. for non-coupled. Obtained from (a757b4e) unit_test.py
+            if bc is None:
+                # climatology B.C. for non-coupled. Obtained from (a757b4e) unit_test.py
                 x = np.array([0.35128345, 0.41208204, 23.57932048, -2.68240888, -2.26472921,
                               29.22828843, 14.33420545, 0.65398139, 16.64817181])
+            else:
+                x = np.copy(bc)
             x[i_s:i_e] = x_in[:]
 
         dx = np.empty(N_MODEL)
@@ -130,8 +129,9 @@ def tangent_linear(x: np.ndarray, dt: float) -> np.ndarray:
         cz = 1.0
         ce = 0.08
         s = 1.0
-        k1 = 10.0  # todo: need to be checked why this is not used
-        k2 = -11.0
+        # these parameters are not used because they are constants
+        # k1 = 10.0
+        # k2 = -11.0
 
         # extratropic atm
         dx[0, 0] = -sigma
