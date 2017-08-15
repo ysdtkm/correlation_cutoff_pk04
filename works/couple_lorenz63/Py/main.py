@@ -78,8 +78,8 @@ def exec_assim_cycle(settings, all_fcst, all_obs):
     # all_obs  <- np.array[STEPS, P_OBS]
     # return   -> np.array[STEPS, nmem, N_MODEL]
 
-    n_atm = 6
-    p_atm = 6  # ttk, It should be specified in const.py
+    n_atm = N_ATM
+    p_atm = P_ATM
 
     # prepare containers
     r = getr()

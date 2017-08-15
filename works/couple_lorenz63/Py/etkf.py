@@ -158,7 +158,7 @@ def obtain_localization_weight(pc_obs, j, r_local, num_yes):
         import warnings
         warnings.warn("obtain_localization_weight() is only for PK04 and P_OBS == N_MODEL. No localization is done.")
 
-        localization_weight = np.ones((pc_obs, pc_obs))  # ttk
+        localization_weight = np.ones((pc_obs, pc_obs))
         return np.asmatrix(localization_weight)
     else:
         localization_weight = np.ones((pc_obs, pc_obs))
