@@ -19,7 +19,7 @@ OERR_O = 5.0
 FERR_INI = 10.0
 AINT = 8
 
-rho = 1.05 # "adaptive"
+rho = 1.05  # "adaptive"
 nmem = 6
 amp_b_tdvar = 2.0
 amp_b_fdvar = 1.5
@@ -73,13 +73,13 @@ def geth() -> np.ndarray:
     """
     :return h: [P_OBS, N_MODEL]
     """
-    h = np.zeros((P_OBS,N_MODEL))
+    h = np.zeros((P_OBS, N_MODEL))
     for i in range(0, min(N_MODEL, P_OBS)):
-        h[i,i] = 1.0
+        h[i, i] = 1.0
     if P_OBS != N_MODEL:
         import warnings
         warnings.warn("geth() cannot correctly deal with P_OBS != N_MODEL. P_OBS=%d, N_MODEL=%d was passed."
-            % (P_OBS, N_MODEL))
+                      % (P_OBS, N_MODEL))
     # h = np.diag([0, 1, 0, 0, 1, 0, 0, 1, 0])  # y-only
     # h = np.diag([0, 0, 1, 0, 0, 1, 0, 0, 1])  # z-only
     return h

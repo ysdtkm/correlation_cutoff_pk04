@@ -17,7 +17,7 @@ def etkf(fcst: np.ndarray, h_nda: np.ndarray, r_nda: np.ndarray, yo_nda: np.ndar
     :param nmem:
     :param obj_adaptive: object created by etkf/init_etkf_adaptive_inflation(), or None
     :param localization:
-    :param r_local:      localization pattern of R
+    :param r_local:      localization pattern name of R
     :param num_yes:
     :return xa:          [dimc, nmem]
     :return xfpt:        [dimc, dimc]
@@ -33,27 +33,25 @@ def etkf(fcst: np.ndarray, h_nda: np.ndarray, r_nda: np.ndarray, yo_nda: np.ndar
 
     # DA variables (np.matrix)
     # - model space
-    #  xfm[dimc,nmem] : each member's forecast Xf
-    # xfpt[dimc,nmem] : forecast perturbation Xbp
-    #  xam[dimc,nmem] : each member's analysis Xa
-    # xapt[dimc,nmem] : analysis perturbation Xap
-    #   xf[dimc,1   ] : ensemble mean forecast xf_bar
-    #   xa[dimc,1   ] : ensemble mean analysis xa_bar
+    #    xfm[dimc,nmem] : each member's forecast Xf
+    #   xfpt[dimc,nmem] : forecast perturbation Xbp
+    #    xam[dimc,nmem] : each member's analysis Xa
+    #   xapt[dimc,nmem] : analysis perturbation Xap
+    #     xf[dimc,1   ] : ensemble mean forecast xf_bar
+    #     xa[dimc,1   ] : ensemble mean analysis xa_bar
     #
     # - obs space
-    #    r[pc_obs,pc_obs] : obs error covariance matrix R
-    #    h[pc_obs,dimc] : linearized observation operator H
-    #   yo[pc_obs,1   ] : observed state yo
-    #   yb[pc_obs,1   ] : mean simulated observation vector yb
-    #  ybm[pc_obs,nmem] : ensemble model simulated observation matrix Yb
+    #   r[pc_obs,pc_obs] : obs error covariance matrix R
+    #     h[pc_obs,dimc] : linearized observation operator H
+    #    yo[pc_obs,1   ] : observed state yo
+    #    yb[pc_obs,1   ] : mean simulated observation vector yb
+    #   ybm[pc_obs,nmem] : ensemble model simulated observation matrix Yb
     #
     # - mem space
-    #  wam[nmem,nmem] : optimal weight matrix for each member
-    #   wa[nmem,1   ] : optimal weight for each member
-    #   pa[nmem,nmem] : approx. anl error covariance matrix Pa in ens space
-    #
-    # note :
-    #   N_MODEL > P_OBS >> nmem in typical LETKF application
+    #   wam[nmem,nmem] : optimal weight matrix for each member
+    #    wa[nmem,1   ] : optimal weight for each member
+    #    pa[nmem,nmem] : approx. anl error covariance matrix Pa in ens space
+
     i_mm = np.matrix(np.identity(nmem))
     i_1m = np.matrix(np.ones((1, nmem)))
 
@@ -142,15 +140,15 @@ def obtain_localization_weight(pc_obs: int, j: int, r_local: str, num_yes: int) 
                 dtype=np.float64)
         else:
             weight_table_small = {
-                "individual": np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]),
-                "atmos_coupling": np.array([[1.0, 1.0, 0.0], [1.0, 1.0, 0.0], [0.0, 0.0, 1.0]]),
-                "enso_coupling": np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 1.0], [0.0, 1.0, 1.0]]),
+                "individual":       np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]),
+                "atmos_coupling":   np.array([[1.0, 1.0, 0.0], [1.0, 1.0, 0.0], [0.0, 0.0, 1.0]]),
+                "enso_coupling":    np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 1.0], [0.0, 1.0, 1.0]]),
                 "atmos_sees_ocean": np.array([[1.0, 1.0, 0.0], [1.0, 1.0, 0.0], [1.0, 1.0, 1.0]]),
-                "trop_sees_ocean": np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 1.0, 1.0]]),
+                "trop_sees_ocean":  np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 1.0, 1.0]]),
                 "ocean_sees_atmos": np.array([[1.0, 1.0, 1.0], [1.0, 1.0, 1.0], [0.0, 0.0, 1.0]]),
-                "ocean_sees_trop": np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 1.0], [0.0, 0.0, 1.0]]),
-                "full": np.array([[1.0, 1.0, 1.0], [1.0, 1.0, 1.0], [1.0, 1.0, 1.0]]),
-                "adjacent": np.array([[1.0, 1.0, 0.0], [1.0, 1.0, 1.0], [0.0, 1.0, 1.0]]),
+                "ocean_sees_trop":  np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 1.0], [0.0, 0.0, 1.0]]),
+                "full":             np.array([[1.0, 1.0, 1.0], [1.0, 1.0, 1.0], [1.0, 1.0, 1.0]]),
+                "adjacent":         np.array([[1.0, 1.0, 0.0], [1.0, 1.0, 1.0], [0.0, 1.0, 1.0]]),
             }
             weight_table_stat = np.ones((N_MODEL, N_MODEL))
             for iyc in range(3):
