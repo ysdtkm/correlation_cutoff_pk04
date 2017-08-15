@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 
-import os
-import numpy as np
+import etkf
+import fdvar
+import model
+import tdvar
+import vectors
 from const import *
-import model, etkf, tdvar, fdvar, vectors
 
 
 def main():
@@ -21,9 +23,10 @@ def main():
         exec_deterministic_fcst(settings, anl)
 
 
-def exec_nature():
-    # return   -> np.array[STEPS, N_MODEL]
-
+def exec_nature() -> np.ndarray:
+    """
+    :return all_true: [STEPS, N_MODEL]
+    """
     all_true = np.empty((STEPS, N_MODEL))
     true = np.random.randn(N_MODEL) * FERR_INI
 
@@ -45,11 +48,13 @@ def exec_nature():
     return all_true
 
 
-def exec_obs(nature):
-    # note: currently this method cannot handle non-diagonal element of R
-    # nature   <- np.array[STEPS, N_MODEL]
-    # return   -> np.array[STEPS, P_OBS]
+def exec_obs(nature: np.ndarray) -> np.ndarray:
+    """
+    note: this method currently cannot handle non-diagonal element of R
 
+    :param nature:   [STEPS, N_MODEL]
+    :return all_obs: [STEPS, P_OBS]
+    """
     all_obs = np.empty((STEPS, P_OBS))
     h = geth()
     r = getr()
@@ -60,10 +65,11 @@ def exec_obs(nature):
     return all_obs
 
 
-def exec_free_run(settings):
-    # settings <- hash
-    # return   -> np.array[STEPS, nmem, N_MODEL]
-
+def exec_free_run(settings: dict) -> np.ndarray:
+    """
+    :param settings:
+    :return free_run: [STEPS, nmem, N_MODEL]
+    """
     free_run = np.empty((STEPS, settings["nmem"], N_MODEL))
     for m in range(0, settings["nmem"]):
         free_run[0, m, :] = np.random.randn(N_MODEL) * FERR_INI
@@ -72,11 +78,13 @@ def exec_free_run(settings):
     return free_run
 
 
-def exec_assim_cycle(settings, all_fcst, all_obs):
-    # settings <- hash
-    # all_fcst <- np.array[STEPS, nmem, N_MODEL]
-    # all_obs  <- np.array[STEPS, P_OBS]
-    # return   -> np.array[STEPS, nmem, N_MODEL]
+def exec_assim_cycle(settings: dict, all_fcst: np.ndarray, all_obs: np.ndarray) -> np.ndarray:
+    """
+    :param settings:
+    :param all_fcst:  [STEPS, nmem, N_MODEL]
+    :param all_obs:   [STEPS, P_OBS]
+    :return all_fcst: [STEPS, nmem, N_MODEL]
+    """
 
     n_atm = N_ATM
     p_atm = P_ATM
@@ -110,20 +118,20 @@ def exec_assim_cycle(settings, all_fcst, all_obs):
                 persis_bc = np.mean(all_fcst[i - 1, :, :], axis=0)
 
             for m in range(0, settings["nmem"]):
-                if (settings["couple"] == "strong" or settings["couple"] == "weak"):
+                if settings["couple"] == "strong" or settings["couple"] == "weak":
                     fcst[m, :] = model.timestep(all_fcst[i - 1, m, :], DT)
-                elif (settings["couple"] == "none"):
+                elif settings["couple"] == "none":
                     fcst[m, :n_atm] = model.timestep(all_fcst[i - 1, m, :n_atm], DT, 0, n_atm, persis_bc)
                     fcst[m, n_atm:] = model.timestep(all_fcst[i - 1, m, n_atm:], DT, n_atm, N_MODEL, persis_bc)
 
-            if (i % AINT == 0):
+            if i % AINT == 0:
                 obs_used[i, :] = all_obs[i, :]
                 fcst_pre = all_fcst[i - AINT, :, :].copy()
 
-                if (settings["couple"] == "strong"):
+                if settings["couple"] == "strong":
                     fcst[:, :], all_bf[i, :, :], all_ba[i, :, :], obj_adaptive = \
                         analyze_one_window(fcst, fcst_pre, all_obs[i, :], h, r, settings, obj_adaptive)
-                elif (settings["couple"] == "weak" or settings["couple"] == "none"):
+                elif settings["couple"] == "weak" or settings["couple"] == "none":
                     # atmospheric assimilation
                     fcst[:, :n_atm], all_bf[i, :n_atm, :n_atm], all_ba[i, :n_atm, :n_atm], obj_adaptive \
                         = analyze_one_window(fcst[:, :n_atm], fcst_pre[:, :n_atm],
@@ -159,21 +167,24 @@ def exec_assim_cycle(settings, all_fcst, all_obs):
     return all_fcst
 
 
-def analyze_one_window(fcst, fcst_pre, obs, h, r, settings, obj_adaptive, i_s=0, i_e=N_MODEL, bc=None):
-    # fcst     <- np.array[nmem, dimc]
-    # fcst_pre <- np.array[nmem, dimc]
-    # obs      <- np.array[pc_obs]
-    # h        <- np.array[pc_obs, dimc]
-    # r        <- np.array[pc_obs, pc_obs]
-    # settings <- hash
-    # obj_adaptive
-    #          <- object created by etkf/init_etkf_adaptive_inflation(), or None
-    # i_s      <- int                  : model grid number, assimilate only [i_s, i_e)
-    # i_e      <- int
-    # bc       <- np.array[N_MODEL]
-    # return1  -> np.array[nmem, dimc]
-    # return2  -> np.array[dimc, dimc]
-    # return3  -> np.array[dimc, dimc]
+def analyze_one_window(fcst: np.ndarray, fcst_pre: np.ndarray, obs: np.ndarray, h: np.ndarray, r: np.ndarray,
+                       settings: dict, obj_adaptive: object, i_s: int = 0, i_e: int = N_MODEL, bc=None) -> tuple:
+    """
+    :param  fcst:         [nmem, dimc]
+    :param  fcst_pre:     [nmem, dimc]
+    :param  obs:          [pc_obs]
+    :param  h:            [pc_obs, dimc]
+    :param  r:            [pc_obs, pc_obs]
+    :param  settings:
+    :param  obj_adaptive: object created by etkf.init_etkf_adaptive_inflation(), or None
+    :param  i_s:          model grid number, assimilate only [i_s, i_e)
+    :param  i_e:
+    :param  bc:           [N_MODEL]
+    :return anl:          [nmem, dimc]
+    :return bf:           [dimc, dimc]
+    :return ba:           [dimc, dimc]
+    :return obj_adaptive:
+    """
 
     anl = np.empty((settings["nmem"], i_e - i_s))
     bf = np.empty((i_e - i_s, i_e - i_s))
@@ -183,13 +194,13 @@ def analyze_one_window(fcst, fcst_pre, obs, h, r, settings, obj_adaptive, i_s=0,
 
     yo = obs[:, np.newaxis]
 
-    if (settings["method"] == "etkf"):
+    if settings["method"] == "etkf":
         anl[:, :], bf[:, :], ba[:, :], obj_adaptive = \
             etkf.etkf(fcst[:, :], h[:, :], r[:, :], yo[:, :], settings["rho"],
                       settings["nmem"], obj_adaptive, True, settings["r_local"], settings.get("num_yes"))
-    elif (settings["method"] == "3dvar"):
+    elif settings["method"] == "3dvar":
         anl[0, :] = tdvar.tdvar(fcst[0, :].T, h[:, :], r[:, :], yo[:, :], i_s, i_e, settings["amp_b"])
-    elif (settings["method"] == "4dvar"):
+    elif settings["method"] == "4dvar":
         anl[0, :] = fdvar.fdvar(fcst_pre[0, :], h[:, :], r[:, :], yo[:, :], AINT, i_s, i_e, settings["amp_b"], bc)
     else:
         raise Exception("analysis method mis-specified: %s" % settings["method"])
@@ -197,20 +208,19 @@ def analyze_one_window(fcst, fcst_pre, obs, h, r, settings, obj_adaptive, i_s=0,
     return anl[:, :], bf[:, :], ba[:, :], obj_adaptive
 
 
-def exec_deterministic_fcst(settings, anl):
-    # settings <- hash
-    # anl      <- np.array[STEPS, nmem, N_MODEL]
-    # return   -> np.array[STEPS, FCST_LT, N_MODEL]
-
+def exec_deterministic_fcst(settings: dict, anl: np.ndarray) -> int:
+    """
+    :param settings:
+    :param anl:      [STEPS, nmem, N_MODEL]
+    """
     if FCST_LT == 0:
         return 0
 
     fcst_all = np.empty((STEPS, FCST_LT, N_MODEL))
     for i in range(STEP_FREE, STEPS):
-        if (i % AINT == 0):
+        if i % AINT == 0:
             fcst_all[i, 0, :] = np.mean(anl[i, :, :], axis=0)
             for lt in range(1, FCST_LT):
-                # todo: uncoupled forecast
                 fcst_all[i, lt, :] = model.timestep(fcst_all[i - 1, lt, :], DT)
     fcst_all.tofile("data/%s_fcst.bin" % settings["name"])
     return 0

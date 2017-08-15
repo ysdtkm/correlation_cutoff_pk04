@@ -9,7 +9,7 @@ N_ATM = 6
 P_ATM = N_ATM
 
 DT = 0.01
-TMAX = 100
+TMAX = 1
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 FCST_LT = 0
@@ -52,8 +52,11 @@ ETKF_AI_max = 1.2
 ETKF_AI_min = 0.9
 
 
-def getr():
-    # note: Non-diagonal element in R is ignored in exec_obs()
+def getr() -> np.ndarray:
+    """
+    note: Non-diagonal element in R is ignored in main.exec_obs()
+    :return r: [P_OBS, P_OBS]
+    """
     r = np.identity(P_OBS) * OERR_A ** 2
     if N_MODEL == 9:
         if P_OBS == N_MODEL:
@@ -66,7 +69,10 @@ def getr():
     return r
 
 
-def geth():
+def geth() -> np.ndarray:
+    """
+    :return h: [P_OBS, N_MODEL]
+    """
     # ttk
     # h = np.zeros((P_OBS,N_MODEL))
     # for i in range(0, min(N_MODEL, P_OBS)):
@@ -75,8 +81,8 @@ def geth():
     #     import warnings
     #     warnings.warn("geth() cannot correctly deal with P_OBS != N_MODEL. P_OBS=%d, N_MODEL=%d was passed."
     #         % (P_OBS, N_MODEL))
-    # h = np.diag([0, 1, 0, 0, 1, 0, 0, 1, 0]) # y-only
-    h = np.diag([0, 0, 1, 0, 0, 1, 0, 0, 1]) # z-only
+    # h = np.diag([0, 1, 0, 0, 1, 0, 0, 1, 0])  # y-only
+    h = np.diag([0, 0, 1, 0, 0, 1, 0, 0, 1])  # z-only
     return h
 
 
