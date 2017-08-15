@@ -2,16 +2,17 @@
 
 import numpy as np
 import matplotlib as mpl
+import sys
+import os
+import warnings
+from const import *
 
 mpl.use('Agg')
 import matplotlib.pyplot as plt
-import os, warnings
-from mpl_toolkits.mplot3d import Axes3D
-from const import *
 
 
 def plot_all():
-    Plot_3d = True
+    plot_3d = True
 
     hist_true = np.fromfile("data/true.bin", np.float64)
     hist_true = hist_true.reshape((STEPS, N_MODEL))
@@ -19,7 +20,7 @@ def plot_all():
         vectors = ["blv", "flv", "clv", "fsv", "isv"]
     else:
         vectors = []
-    vector_name = {"blv": "Backward_LV", "flv": "Forward_LV", "clv": "Characteristic_LV", \
+    vector_name = {"blv": "Backward_LV", "flv": "Forward_LV", "clv": "Characteristic_LV",
                    "fsv": "Final_SV", "isv": "Initial_SV"}
     hist_vector = {}
     for vec in vectors:
@@ -32,7 +33,8 @@ def plot_all():
         plot_le()
     for vec in vectors:
         plot_lv_time(hist_vector[vec], vector_name[vec])
-        # plot_trajectory_lv(hist_true, hist_vector[vec], vector_name[vec])
+        if plot_3d:
+            plot_trajectory_lv(hist_true, hist_vector[vec], vector_name[vec])
 
     global rmse_hash
     rmse_hash = {}
@@ -47,10 +49,10 @@ def plot_all():
 
         plot_rmse_spread(hist_true, hist_fcst, name, nmem)
         plot_time_value(hist_true, hist_fcst, name, nmem)
-        if Plot_3d:
+        if plot_3d:
             plot_3d_trajectory(hist_true, hist_fcst, name, nmem)
 
-        if (exp["method"] == "etkf"):
+        if exp["method"] == "etkf":
             if exp["rho"] == "adaptive" or exp["rho"] == "adaptive_each":
                 plot_adaptive_inflation(name, exp["rho"])
 
@@ -132,7 +134,7 @@ def plot_lv_projection(hist_lv, hist_fcst, name, title, nmem, is_oblique):
         else:
             for j in range(N_MODEL):
                 for k in range(nmem):
-                    projection[j, k] += np.abs(np.dot(hist_lv[i, :, j], \
+                    projection[j, k] += np.abs(np.dot(hist_lv[i, :, j],
                                                       hist_fcst[i, k, :] - hist_fcst_mean[i, :]))
     projection /= (STEPS / 2.0)
 
@@ -167,9 +169,9 @@ def plot_trajectory_lv(hist_true, hist_lv, name):
         i_adjust = i_component * 3
         name_component = ["extra", "trop", "ocean"][i_component]
 
-        if (N_MODEL == 9):
-            colors = ["#008000", "#0000ff", "#8080ff", \
-                      "#80bb80", "#ff0000", "#ff8080", \
+        if N_MODEL == 9:
+            colors = ["#008000", "#0000ff", "#8080ff",
+                      "#80bb80", "#ff0000", "#ff8080",
                       "#000080", "#800000", "#004000"]
         else:
             colors = ["#ff0000", "#008000", "#0000ff"]
@@ -179,7 +181,7 @@ def plot_trajectory_lv(hist_true, hist_lv, name):
         for it in range(0, STEPS, 4):
             itmin = max(0, it - 50)
             fig = plt.figure(figsize=(5.0, 2.5))
-            fig.subplots_adjust(left=0.02, bottom=0.02, right=0.98, top=0.98, \
+            fig.subplots_adjust(left=0.02, bottom=0.02, right=0.98, top=0.98,
                                 wspace=0.04, hspace=0.04)
             ax1 = fig.add_subplot(121, projection='3d')
             ax2 = fig.add_subplot(122, projection='3d')
@@ -187,18 +189,18 @@ def plot_trajectory_lv(hist_true, hist_lv, name):
                 ax.set_xlim([-30, 30])
                 ax.set_ylim([-30, 30])
                 ax.set_zlim([0, 50])
-                if (ax is ax1):
+                if ax is ax1:
                     ax.view_init(elev=30, azim=-45)
                 else:
                     ax.view_init(elev=30, azim=-40)
                 ax.set_xlabel("x")
                 ax.set_ylabel("y")
                 ax.set_zlabel("z")
-                ax.plot(hist_true[itmin:it + 1, 0 + i_adjust], hist_true[itmin:it + 1, 1 + i_adjust], \
+                ax.plot(hist_true[itmin:it + 1, 0 + i_adjust], hist_true[itmin:it + 1, 1 + i_adjust],
                         hist_true[itmin:it + 1, 2 + i_adjust])
                 for k in range(N_MODEL):  # LE index
-                    vector = [hist_true[it, 0 + i_adjust], hist_true[it, 1 + i_adjust], \
-                              hist_true[it, 2 + i_adjust], hist_lv[it, k, 0 + i_adjust], \
+                    vector = [hist_true[it, 0 + i_adjust], hist_true[it, 1 + i_adjust],
+                              hist_true[it, 2 + i_adjust], hist_lv[it, k, 0 + i_adjust],
                               hist_lv[it, k, 1 + i_adjust], hist_lv[it, k, 2 + i_adjust]]
                     vec_len = np.sqrt(np.sum(hist_lv[it, k, 0 + i_adjust:3 + i_adjust] ** 2))
                     ax.quiver(*vector, length=(10.0 / 1.0e-9 * vec_len), pivot="tail", color=colors[k])
@@ -221,7 +223,7 @@ def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
     # Error and Spread_square for each grid and time
     hist_fcst_mean = np.mean(hist_fcst, axis=1)
     hist_fcst_sprd2 = np.zeros((STEPS, N_MODEL))
-    if (nmem > 1):
+    if nmem > 1:
         for i in range(nmem):
             hist_fcst_sprd2[:, :] = hist_fcst_sprd2[:, :] + \
                                     1.0 / (nmem - 1.0) * (hist_fcst[:, i, :] ** 2 - hist_fcst_mean[:, :] ** 2)
@@ -229,7 +231,7 @@ def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
 
     global rmse_hash
 
-    if (N_MODEL == 3 or N_MODEL == 9):
+    if N_MODEL == 3 or N_MODEL == 9:
         rmse_component = []
         for i_component in range(N_MODEL // 3):
             grid_from = 3 * i_component
@@ -252,7 +254,7 @@ def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
             else:
                 plt.axhline(y=OERR_A, label="sqrt(R)", alpha=0.5)
             plt.plot(np.sqrt(mse_time), label="RMSE")
-            if (nmem > 1):
+            if nmem > 1:
                 plt.plot(np.sqrt(sprd2_time), label="Spread")
             plt.legend()
             plt.xlabel("timestep")
@@ -287,7 +289,7 @@ def plot_rmse_spread(hist_true, hist_fcst, name, nmem):
         plt.rcParams["font.size"] = 16
         plt.yscale('log')
         plt.plot(np.sqrt(mse_time), label="RMSE")
-        if (nmem > 1):
+        if nmem > 1:
             plt.plot(np.sqrt(sprd2_time), label="Spread")
         plt.legend()
         plt.xlabel("timestep")
@@ -306,7 +308,7 @@ def plot_time_value(hist_true, hist_fcst, name, nmem):
 
     hist_fcst_mean = np.mean(hist_fcst, axis=1)
 
-    if (N_MODEL == 3 or N_MODEL == 9):
+    if N_MODEL == 3 or N_MODEL == 9:
         for i_component in range(N_MODEL // 3):
             i_adjust = i_component * 3
             name_component = ["extra", "trop", "ocean"][i_component]
@@ -361,13 +363,13 @@ def plot_3d_trajectory(hist_true, hist_fcst, name, nmem):
         # 3D trajectory
         plt.rcParams["font.size"] = 16
         fig = plt.figure()
-        fig.subplots_adjust(left=0.02, bottom=0.02, right=0.98, top=0.98, \
+        fig.subplots_adjust(left=0.02, bottom=0.02, right=0.98, top=0.98,
                             wspace=0.04, hspace=0.04)
         ax = fig.add_subplot(111, projection='3d')
         st = STEPS // 2  # step to start plotting
-        ax.plot(hist_true[st:, 0 + i_adjust], hist_true[st:, 1 + i_adjust], \
+        ax.plot(hist_true[st:, 0 + i_adjust], hist_true[st:, 1 + i_adjust],
                 hist_true[st:, 2 + i_adjust], label="true")
-        ax.plot(hist_fcst_mean[st:, 0 + i_adjust], hist_fcst_mean[st:, 1 + i_adjust], \
+        ax.plot(hist_fcst_mean[st:, 0 + i_adjust], hist_fcst_mean[st:, 1 + i_adjust],
                 hist_fcst_mean[st:, 2 + i_adjust], label="DA cycle")
         ax.legend()
         # ax.set_xlim([-30,30])
@@ -414,7 +416,7 @@ def plot_matrix(data, name, title, color=plt.cm.bwr):
     fig.subplots_adjust(left=0.12, right=0.95, bottom=0.12, top=0.92)
     cmax = np.max(np.abs(data))
     map1 = ax.pcolor(data, cmap=color)
-    if (color == plt.cm.bwr):
+    if color == plt.cm.bwr:
         map1.set_clim(-1.0 * cmax, cmax)
     x0, x1 = ax.get_xlim()
     y0, y1 = ax.get_ylim()

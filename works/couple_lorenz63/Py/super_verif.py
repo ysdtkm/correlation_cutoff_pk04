@@ -2,11 +2,11 @@
 
 import numpy as np
 import matplotlib as mpl
+import const
+import re
 
 mpl.use('Agg')
 import matplotlib.pyplot as plt
-import const
-import re
 
 
 def verif(param1s, param2s, param3s_raw, param3s_arr):
@@ -44,8 +44,6 @@ def verif(param1s, param2s, param3s_raw, param3s_arr):
 def plot_rmse(rmse_all, param1s, param2s, param3_npa):
     lenc = 3  # extra, trop, ocean
     colors = ["red", "green", "blue", "yellow", "cyan", "grey"]
-    styles = ["solid", "dotted", "dashed", "dashdot"] * 3
-    lwidth = [1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3]
 
     for ic in range(lenc):
         name_c = ["extra", "trop", "ocean"][ic]
