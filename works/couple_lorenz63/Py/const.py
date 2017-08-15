@@ -9,7 +9,7 @@ N_ATM = 6
 P_ATM = N_ATM
 
 DT = 0.01
-TMAX = 1
+TMAX = 2
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 FCST_LT = 0
@@ -19,25 +19,25 @@ OERR_O = 5.0
 FERR_INI = 10.0
 AINT = 8
 
-rho = "adaptive"
+rho = 1.05 # "adaptive"
 nmem = 6
 amp_b_tdvar = 2.0
 amp_b_fdvar = 1.5
 
 EXPLIST = [
     dict(name="full", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="full"),
-    dict(name="enso", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="enso_coupling"),
-    dict(name="atmos", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="atmos_coupling"),
-    dict(name="adjacent", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="adjacent"),
-    dict(name="individual", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="individual"),
-    # dict(name="weak", rho=rho, nmem=nmem, method="etkf", couple="weak", r_local="full"),
-    # dict(name="non", rho=rho, nmem=nmem, method="etkf", couple="none", r_local="full", bc="persistence"),
-    # dict(name="tdvar_strong", nmem=1, method="3dvar", couple="strong", amp_b=amp_b_tdvar),
-    # dict(name="fdvar_strong", nmem=1, method="4dvar", couple="strong", amp_b=amp_b_fdvar),
-    # dict(name="tdvar_weak", nmem=1, method="3dvar", couple="weak", amp_b=amp_b_tdvar),
-    # dict(name="fdvar_weak", nmem=1, method="4dvar", couple="weak", amp_b=amp_b_fdvar),
-    # dict(name="tdvar_non", nmem=1, method="3dvar", couple="none", amp_b=amp_b_tdvar, bc="persistence"),
-    # dict(name="fdvar_non", nmem=1, method="4dvar", couple="none", amp_b=amp_b_fdvar, bc="persistence"),
+    # dict(name="enso", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="enso_coupling"),
+    # dict(name="atmos", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="atmos_coupling"),
+    # dict(name="adjacent", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="adjacent"),
+    # dict(name="individual", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="individual"),
+    dict(name="weak", rho=rho, nmem=nmem, method="etkf", couple="weak", r_local="full"),
+    dict(name="non", rho=rho, nmem=nmem, method="etkf", couple="none", r_local="full", bc="persistence"),
+    dict(name="tdvar_strong", nmem=1, method="3dvar", couple="strong", amp_b=amp_b_tdvar),
+    dict(name="fdvar_strong", nmem=1, method="4dvar", couple="strong", amp_b=amp_b_fdvar),
+    dict(name="tdvar_weak", nmem=1, method="3dvar", couple="weak", amp_b=amp_b_tdvar),
+    dict(name="fdvar_weak", nmem=1, method="4dvar", couple="weak", amp_b=amp_b_fdvar),
+    dict(name="tdvar_non", nmem=1, method="3dvar", couple="none", amp_b=amp_b_tdvar, bc="persistence"),
+    dict(name="fdvar_non", nmem=1, method="4dvar", couple="none", amp_b=amp_b_fdvar, bc="persistence"),
 ]
 
 # dict(name="etkf", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="full"),
@@ -73,16 +73,15 @@ def geth() -> np.ndarray:
     """
     :return h: [P_OBS, N_MODEL]
     """
-    # ttk
-    # h = np.zeros((P_OBS,N_MODEL))
-    # for i in range(0, min(N_MODEL, P_OBS)):
-    #     h[i,i] = 1.0
-    # if P_OBS != N_MODEL:
-    #     import warnings
-    #     warnings.warn("geth() cannot correctly deal with P_OBS != N_MODEL. P_OBS=%d, N_MODEL=%d was passed."
-    #         % (P_OBS, N_MODEL))
+    h = np.zeros((P_OBS,N_MODEL))
+    for i in range(0, min(N_MODEL, P_OBS)):
+        h[i,i] = 1.0
+    if P_OBS != N_MODEL:
+        import warnings
+        warnings.warn("geth() cannot correctly deal with P_OBS != N_MODEL. P_OBS=%d, N_MODEL=%d was passed."
+            % (P_OBS, N_MODEL))
     # h = np.diag([0, 1, 0, 0, 1, 0, 0, 1, 0])  # y-only
-    h = np.diag([0, 0, 1, 0, 0, 1, 0, 0, 1])  # z-only
+    # h = np.diag([0, 0, 1, 0, 0, 1, 0, 0, 1])  # z-only
     return h
 
 
