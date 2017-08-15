@@ -62,14 +62,14 @@ def getr():
 
 
 def geth():
-    # ttk h = np.zeros((P_OBS,N_MODEL))
-    # for i in range(0, min(N_MODEL, P_OBS)):
-    #   h[i,i] = 1.0
-    # if P_OBS != N_MODEL:
-    #   import warnings
-    #   warnings.warn("geth() cannot correctly deal with P_OBS != N_MODEL. P_OBS=%d, N_MODEL=%d was passed."
-    #     % (P_OBS, N_MODEL))
-    h = np.diag([0, 1, 0, 0, 1, 0, 0, 1, 0])
+    h = np.zeros((P_OBS,N_MODEL))
+    for i in range(0, min(N_MODEL, P_OBS)):
+        h[i,i] = 1.0
+    if P_OBS != N_MODEL:
+        import warnings
+        warnings.warn("geth() cannot correctly deal with P_OBS != N_MODEL. P_OBS=%d, N_MODEL=%d was passed."
+            % (P_OBS, N_MODEL))
+    # h = np.diag([0, 1, 0, 0, 1, 0, 0, 1, 0])
     return h
 
 
