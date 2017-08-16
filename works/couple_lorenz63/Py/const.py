@@ -47,7 +47,7 @@ EXPLIST = [
 Calc_lv = False
 
 ETKF_vo = 1.0
-ETKF_kappa = 1.01
+ETKF_kappa = 1.03 # ttk
 ETKF_AI_max = 1.2
 ETKF_AI_min = 0.9
 
@@ -81,9 +81,9 @@ def geth() -> np.ndarray:
     #     warnings.warn("geth() cannot correctly deal with P_OBS != N_MODEL. P_OBS=%d, N_MODEL=%d was passed."
     #                   % (P_OBS, N_MODEL))
     # ttk
-    h = np.diag([0, 1, 0, 0, 1, 0, 0, 1, 0])  # y-only
+    # h = np.diag([0, 1, 0, 0, 1, 0, 0, 1, 0])  # y-only
     # h = np.diag([0, 0, 1, 0, 0, 1, 0, 0, 1])  # z-only
-    # h = np.diag([1, 1, 1, 1, 1, 1, 1, 1, 1])
+    h = np.diag([1, 1, 1, 1, 1, 1, 1, 1, 1])
     return h
 
 
