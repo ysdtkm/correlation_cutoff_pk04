@@ -20,7 +20,7 @@ FERR_INI = 10.0
 AINT = 8
 
 rho = "adaptive"
-nmem = 6
+nmem = 10
 amp_b_tdvar = 2.0
 amp_b_fdvar = 1.5
 
@@ -47,7 +47,7 @@ EXPLIST = [
 Calc_lv = False
 
 ETKF_vo = 1.0
-ETKF_kappa = 1.03 # ttk
+ETKF_kappa = 1.01
 ETKF_AI_max = 1.2
 ETKF_AI_min = 0.9
 
