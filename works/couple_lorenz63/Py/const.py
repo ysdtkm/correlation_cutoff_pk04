@@ -9,7 +9,7 @@ N_ATM = 6
 P_ATM = N_ATM
 
 DT = 0.01
-TMAX = 100
+TMAX = 1000
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 FCST_LT = 0
