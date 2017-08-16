@@ -71,5 +71,5 @@ def tdvar_interpol(fcst: np.ndarray, h_nda: np.ndarray, r_nda: np.ndarray, yo_nd
     d = yo - h * xb
 
     inc_model = (b.I + h.T * r.I * h).I * h.T * r.I * d
-    anl = (xb + inc_model).A.flatten()
+    anl = (xb + inc_model).A.flatten()[:i_e-i_s]
     return anl
