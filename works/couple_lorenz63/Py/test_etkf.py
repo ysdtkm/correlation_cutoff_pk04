@@ -50,5 +50,5 @@ class TestEtkf(TestCase):
 
             wins = anl_wins_fcst.count(True)
             loses = anl_wins_fcst.count(False)
-            print("wins:", wins, "loses:", loses)
+            # print("wins:", wins, "loses:", loses)
             self.assertTrue(wins > loses)
