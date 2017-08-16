@@ -17,7 +17,7 @@ def main():
     commit_name = last_commit + " " + expname
 
     # rmse and lyapunov exponents
-    txt_out += figure_table("", ["../image/true/rmse_bar.pdf"], 1, 1, datestr, commit_name)
+    txt_out += figure_table("", ["../image/true/rmse_bar.png"], 1, 1, datestr, commit_name)
     txt_out += write_txt(datestr, commit_name,
                          "../image/true/rmse_for_tex.txt", "9pt", "rmse")
     txt_out += write_txt(datestr, commit_name,
@@ -27,7 +27,7 @@ def main():
     for strx in ["extra", "trop", "ocean"]:
         filelist = []
         for exp in const.EXPLIST:
-            filelist.append("../image/%s/%s_%s_time.pdf" % (exp["name"], exp["name"], strx))
+            filelist.append("../image/%s/%s_%s_time.png" % (exp["name"], exp["name"], strx))
         if len(filelist) <= 9:
             txt_out += figure_table(strx, filelist, 3, 3, datestr, commit_name)
         else:
@@ -41,7 +41,7 @@ def main():
                    "extra_val", "trop_val", "ocean_val", "anl_cosine_mean",
                    "extra_time", "trop_time", "ocean_time", "inflation"]
         for imgname in imglist:
-            filelist.append("../image/%s/%s_%s.pdf" % (exp["name"], exp["name"], imgname))
+            filelist.append("../image/%s/%s_%s.png" % (exp["name"], exp["name"], imgname))
         txt_out += figure_table(exp["name"], filelist, 4, 4, datestr, commit_name)
 
     # conditions
