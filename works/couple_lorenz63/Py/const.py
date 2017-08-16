@@ -19,8 +19,8 @@ OERR_O = 5.0
 FERR_INI = 10.0
 AINT = 8
 
-rho = "adaptive"
-nmem = 10
+rho = "adaptive_each"
+nmem = 6
 amp_b_tdvar = 2.0
 amp_b_fdvar = 1.5
 
