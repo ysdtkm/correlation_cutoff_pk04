@@ -81,8 +81,8 @@ def geth() -> np.ndarray:
     #     warnings.warn("geth() cannot correctly deal with P_OBS != N_MODEL. P_OBS=%d, N_MODEL=%d was passed."
     #                   % (P_OBS, N_MODEL))
     # ttk
-    h = np.diag([0, 1, 0, 0, 1, 0, 0, 1, 0])  # y-only
-    # h = np.diag([0, 0, 1, 0, 0, 1, 0, 0, 1])  # z-only
+    # h = np.diag([0, 1, 0, 0, 1, 0, 0, 1, 0])  # y-only
+    h = np.diag([0, 0, 1, 0, 0, 1, 0, 0, 1])  # z-only
     # h = np.diag([1, 1, 1, 1, 1, 1, 1, 1, 1])
     return h
 
