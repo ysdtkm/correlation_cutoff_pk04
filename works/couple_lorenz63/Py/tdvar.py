@@ -1,37 +1,41 @@
 #!/usr/bin/env python
 
-import numpy as np
-import sys
-from scipy.optimize import fmin_bfgs
-from const import *
+
 import stats_const
+import numpy as np
+from scipy.optimize import fmin_bfgs
 
 
-def tdvar(fcst, h, r, yo, i_s, i_e, amp_b):
-    # fcst   <- np.array[dimc]        : first guess
-    # h      <- np.array[pc_obs, dimc]  : observation operator
-    # r      <- np.array[pc_obs, pc_obs]  : observation error covariance
-    # yo     <- np.array[pc_obs, 1]     : observation
-    # i_s    <- int
-    # i_e    <- int
-    # amp_b  <- float
-    # return -> np.array[dimc]        : assimilated field
+def tdvar(fcst: np.ndarray, h: np.ndarray, r: np.ndarray, yo: np.ndarray,
+          i_s: int, i_e: int, amp_b: float) -> np.ndarray:
+    """
+    :param fcst:  [dimc] first guess
+    :param h:     [pc_obs, dimc] observation operator
+    :param r:     [pc_obs, pc_obs] observation error covariance
+    :param yo:    [pc_obs, 1] observation
+    :param i_s:
+    :param i_e:
+    :param amp_b:
+    :return anl:  [dimc] assimilated field
+    """
     anl = np.copy(fcst)
     anl = fmin_bfgs(tdvar_2j, anl, args=(fcst, h, r, yo, i_s, i_e, amp_b), disp=False)
     return anl.flatten()
 
 
-def tdvar_2j(anl_nda, fcst_nda, h_nda, r_nda, yo_nda, i_s, i_e, amp_b):
-    # anl_nda  <- np.array[dimc]        : temporary analysis field
-    # fcst_nda <- np.array[dimc]        : first guess field
-    # h_nda    <- np.array[pc_obs, dimc]  : observation operator
-    # r_nda    <- np.array[pc_obs, pc_obs]  : observation error covariance
-    # yo_nda   <- np.array[pc_obs, 1]     : observation
-    # i_s      <- int                   : first model grid to assimilate
-    # i_e      <- int                   : last model grid to assimilate
-    # amp_b    <- float
-    # return   -> float                 : cost function 2J
-
+def tdvar_2j(anl_nda: np.ndarray, fcst_nda: np.ndarray, h_nda: np.ndarray, r_nda: np.ndarray,
+             yo_nda: np.ndarray, i_s: int, i_e: int, amp_b: float) -> np.ndarray:
+    """
+    :param anl_nda:  [dimc] temporary analysis field
+    :param fcst_nda: [dimc] first guess field
+    :param h_nda:    [pc_obs, dimc] observation operator
+    :param r_nda:    [pc_obs, pc_obs] observation error covariance
+    :param yo_nda:   [pc_obs, 1] observation
+    :param i_s:      first model grid to assimilate
+    :param i_e:      last model grid to assimilate
+    :param amp_b:
+    :return:         cost function 2J
+    """
     h = np.asmatrix(h_nda)
     r = np.asmatrix(r_nda)
     yo = np.asmatrix(yo_nda)
@@ -44,17 +48,20 @@ def tdvar_2j(anl_nda, fcst_nda, h_nda, r_nda, yo_nda, i_s, i_e, amp_b):
     return twoj[0, 0]
 
 
-def tdvar_interpol(fcst, h_nda, r_nda, yo_nda, i_s, i_e, amp_b):
-    # Return same analysis with tdvar(), not by minimization but analytical interpolation
-    # fcst   <- np.array[dimc]        : first guess
-    # h_nda  <- np.array[pc_obs, dimc]  : observation operator
-    # r_nda  <- np.array[pc_obs, pc_obs]  : observation error covariance
-    # yo_nda <- np.array[pc_obs, 1]     : observation
-    # i_s    <- int
-    # i_e    <- int
-    # amp_b  <- float
-    # return -> np.array[dimc]        : assimilated field
+def tdvar_interpol(fcst: np.ndarray, h_nda: np.ndarray, r_nda: np.ndarray, yo_nda: np.ndarray,
+                   i_s: int, i_e: int, amp_b: float) -> np.ndarray:
+    """
+    Return same analysis with tdvar(), not by minimization but analytical interpolation
 
+    :param fcst:    [dimc] first guess
+    :param h_nda:   [pc_obs, dimc] observation operator
+    :param r_nda:   [pc_obs, pc_obs] observation error covariance
+    :param yo_nda:  [pc_obs, 1] observation
+    :param i_s:
+    :param i_e:
+    :param amp_b:
+    :return anl:    [dimc] assimilated field
+    """
     xb = np.asmatrix(fcst).T
     h = np.asmatrix(h_nda)
     r = np.asmatrix(r_nda)

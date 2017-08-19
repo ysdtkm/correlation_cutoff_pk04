@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 
-import sys
 import numpy as np
-from const import *
-import model, fdvar, main
+from const import N_MODEL, STEPS, AINT, DT, FERR_INI, getr
+import model
+import main
 import matplotlib as mpl
-
 mpl.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
@@ -39,7 +38,7 @@ def obtain_tdvar_b():
     np.random.seed((10 ** 8 + 7) * 12)
     nature = main.exec_nature()
     obs = main.exec_obs(nature)
-    settings = {"name": "etkf_strong_int8", "rho": 1.1, "aint": 8, "nmem": 10, \
+    settings = {"name": "etkf_strong_int8", "rho": 1.1, "aint": 8, "nmem": 10,
                 "method": "etkf", "couple": "strong", "r_local": "full"}
     np.random.seed((10 ** 8 + 7) * 13)
     free = main.exec_free_run(settings)
@@ -91,7 +90,7 @@ def plot_matrix(data, name="", title="", color=plt.cm.bwr, xlabel="", ylabel="",
         map1 = ax.pcolor(data, cmap=color, norm=colors.SymLogNorm(linthresh=linthresh * cmax))
     else:
         map1 = ax.pcolor(data, cmap=color)
-    if (color == plt.cm.bwr):
+    if color == plt.cm.bwr:
         map1.set_clim(-1.0 * cmax, cmax)
     x0, x1 = ax.get_xlim()
     y0, y1 = ax.get_ylim()

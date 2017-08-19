@@ -9,7 +9,7 @@ N_ATM = 6
 P_ATM = N_ATM
 
 DT = 0.01
-TMAX = 100
+TMAX = 1000
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 FCST_LT = 0
@@ -20,15 +20,15 @@ FERR_INI = 10.0
 AINT = 8
 
 rho = "adaptive"
-nmem = 6
+nmem = 10
 amp_b_tdvar = 2.0
 amp_b_fdvar = 1.5
 
 EXPLIST = [
     dict(name="full", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="full"),
-    dict(name="enso", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="enso_coupling"),
-    dict(name="atmos", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="atmos_coupling"),
     dict(name="adjacent", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="adjacent"),
+    dict(name="ENSO_coupling", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="enso_coupling"),
+    dict(name="atmos_coupling", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="atmos_coupling"),
     dict(name="individual", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="individual"),
     # dict(name="weak", rho=rho, nmem=nmem, method="etkf", couple="weak", r_local="full"),
     # dict(name="non", rho=rho, nmem=nmem, method="etkf", couple="none", r_local="full", bc="persistence"),
@@ -52,8 +52,11 @@ ETKF_AI_max = 1.2
 ETKF_AI_min = 0.9
 
 
-def getr():
-    # note: Non-diagonal element in R is ignored in exec_obs()
+def getr() -> np.ndarray:
+    """
+    note: Non-diagonal element in R is ignored in main.exec_obs()
+    :return r: [P_OBS, P_OBS]
+    """
     r = np.identity(P_OBS) * OERR_A ** 2
     if N_MODEL == 9:
         if P_OBS == N_MODEL:
@@ -66,17 +69,21 @@ def getr():
     return r
 
 
-def geth():
-    # ttk
-    # h = np.zeros((P_OBS,N_MODEL))
+def geth() -> np.ndarray:
+    """
+    :return h: [P_OBS, N_MODEL]
+    """
+    # h = np.zeros((P_OBS, N_MODEL))
     # for i in range(0, min(N_MODEL, P_OBS)):
-    #     h[i,i] = 1.0
+    #     h[i, i] = 1.0
     # if P_OBS != N_MODEL:
     #     import warnings
     #     warnings.warn("geth() cannot correctly deal with P_OBS != N_MODEL. P_OBS=%d, N_MODEL=%d was passed."
-    #         % (P_OBS, N_MODEL))
-    # h = np.diag([0, 1, 0, 0, 1, 0, 0, 1, 0]) # y-only
-    h = np.diag([0, 0, 1, 0, 0, 1, 0, 0, 1]) # z-only
+    #                   % (P_OBS, N_MODEL))
+    # ttk
+    # h = np.diag([0, 1, 0, 0, 1, 0, 0, 1, 0])  # y-only
+    h = np.diag([0, 0, 1, 0, 0, 1, 0, 0, 1])  # z-only
+    # h = np.diag([1, 1, 1, 1, 1, 1, 1, 1, 1])
     return h
 
 

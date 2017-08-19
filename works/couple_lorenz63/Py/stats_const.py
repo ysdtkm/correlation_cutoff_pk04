@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 
 import numpy as np
-from const import *
+from const import N_MODEL
 
 
-def tdvar_b():
-    # return -> np.array[N_MODEL,N_MODEL] : background error covariance
-
+def tdvar_b() -> np.ndarray:
+    """
+    Return background error covariance for 3D/4D-Var
+    :return b: [N_MODEL,N_MODEL]
+    """
     if N_MODEL == 9:
         # obtained by unit_test.py/obtain_tdvar_b(), 8a66120, 100000 timesteps
         b = np.array([
@@ -31,10 +33,10 @@ def tdvar_b():
         ])
 
     elif N_MODEL == 3:
-        b = np.array([ \
-            [0.34897187, 0.5587116, -0.08293288], \
-            [0.5587116, 1.10975806, 0.00229167], \
-            [-0.08293288, 0.00229167, 0.60078791] \
+        b = np.array([
+            [0.34897187, 0.5587116, -0.08293288],
+            [0.5587116, 1.10975806, 0.00229167],
+            [-0.08293288, 0.00229167, 0.60078791]
             ])
 
     else:
@@ -43,7 +45,12 @@ def tdvar_b():
     return b
 
 
-def stats_order(r_local):
+def stats_order(r_local: str) -> np.ndarray:
+    """
+    :param r_local:
+    :return order_table: [N_MODEL, N_MODEL]
+    """
+
     if N_MODEL != 9:
         raise Exception("stats_order() is only for 9-variable PK04 model")
 

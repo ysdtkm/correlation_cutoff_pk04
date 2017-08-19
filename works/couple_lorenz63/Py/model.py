@@ -1,16 +1,18 @@
 #!/usr/bin/env python
 
 import numpy as np
-from const import *
+from const import N_MODEL
 
 
-def timestep(x, dt, i_s=0, i_e=N_MODEL, bc=None):
-    # x      <- np.array(dimm)
-    # dt     <- float
-    # i_s    <- int
-    # i_e    <- int
-    # bc     <- np.array(N_MODEL)       : boundary condition
-    # return -> np.array(dimm)
+def timestep(x: np.ndarray, dt: float, i_s: int = 0, i_e: int = N_MODEL, bc: np.ndarray = None) -> np.ndarray:
+    """
+    :param x:   [dimm]
+    :param dt:
+    :param i_s:
+    :param i_e:
+    :param bc:  [N_MODEL] boundary condition
+    :return x:  [dimm]
+    """
 
     x0 = np.copy(x)
     k1 = tendency(x0, i_s, i_e, bc)
@@ -23,36 +25,35 @@ def timestep(x, dt, i_s=0, i_e=N_MODEL, bc=None):
     return x0 + (k1 + 2.0 * k2 + 2.0 * k3 + k4) * dt / 6.0
 
 
-def tendency(x_in, i_s=0, i_e=N_MODEL, bc=None):
-    ### here, (dimm = i_e - i_s <= N_MODEL) unless strongly coupled
-    # a31p63-64
-    # x      <- np.array(dimm)
-    # i_s    <- int
-    # i_e    <- int
-    # return -> np.array(dimm)
+def tendency(x_in: np.ndarray, i_s: int = 0, i_e: int = N_MODEL, bc: np.ndarray = None) -> np.ndarray:
+    """
+    (dimm = i_e - i_s <= N_MODEL) unless strongly coupled, a31p63-64
 
-    if (N_MODEL == 3):
+    :param x_in: [dimm]
+    :param i_s:
+    :param i_e:
+    :param bc:   [N_MODEL]
+    :return dx:  [dimm]
+    """
+    if N_MODEL == 3:
         sigma = 10.0
         r = 28.0
         b = 8.0 / 3.0
-        k = np.empty((3))
+        k = np.empty(3)
         k[0] = -sigma * x_in[0] + sigma * x_in[1]
         k[1] = -x_in[0] * x_in[2] + r * x_in[0] - x_in[1]
         k[2] = x_in[0] * x_in[1] - b * x_in[2]
         return k
 
-    elif (N_MODEL == 9):
-        ### model constants
-        # dynamic
+    elif N_MODEL == 9:
+        # model constants
         sigma = 10.0
         r = 28.0
         b = 8.0 / 3.0
-        # coupling
         tau = 0.1
         c = 1.0
         cz = 1.0
         ce = 0.08
-        # offset and scaling
         s = 1.0
         k1 = 10.0
         k2 = -11.0
@@ -61,15 +62,15 @@ def tendency(x_in, i_s=0, i_e=N_MODEL, bc=None):
         if i_s == 0 and i_e == N_MODEL:
             x = np.copy(x_in)
         else:
-            if not (bc is None):
-                x = np.copy(bc)
-            else:
-                # B.C. for non-coupled. Obtained from (a757b4e) unit_test.py
-                x = np.array([0.35128345, 0.41208204, 23.57932048, -2.68240888, -2.26472921, \
+            if bc is None:
+                # climatology B.C. for non-coupled. Obtained from (a757b4e) unit_test.py
+                x = np.array([0.35128345, 0.41208204, 23.57932048, -2.68240888, -2.26472921,
                               29.22828843, 14.33420545, 0.65398139, 16.64817181])
+            else:
+                x = np.copy(bc)
             x[i_s:i_e] = x_in[:]
 
-        dx = np.empty((N_MODEL))
+        dx = np.empty(N_MODEL)
         # extratropic atm
         dx[0] = -sigma * x[0] + sigma * x[1] - ce * (s * x[3] + k1)
         dx[1] = -x[0] * x[2] + r * x[0] - x[1] + ce * (s * x[4] + k1)
@@ -90,15 +91,19 @@ def tendency(x_in, i_s=0, i_e=N_MODEL, bc=None):
         return k
 
 
-def tangent_linear(x, dt):
-    # Return one-timestep tangent linear matrix, currently not for non/weakly coupled
-    # x      <- np.array(N_MODEL)       : state vector at the beginning
-    # dt     <- float                : infinitesimal time
-    # return -> np.array(N_MODEL,N_MODEL)  : instantaneous tangent linear matrix M
+def tangent_linear(x: np.ndarray, dt: float) -> np.ndarray:
+    """
+    Return one-timestep tangent linear matrix, currently not for non/weakly coupled
+    Uses Eular-forward. Similar to Jacobian.
+
+    :param x:  [N_MODEL] state vector at the beginning
+    :param dt: infinitesimal time
+    :return:   [N_MODEL,N_MODEL] instantaneous tangent linear matrix M
+    """
 
     dx = np.zeros((N_MODEL, N_MODEL))
 
-    if (N_MODEL == 3):
+    if N_MODEL == 3:
         sigma = 10.0
         r = 28.0
         b = 8.0 / 3.0
@@ -115,7 +120,7 @@ def tangent_linear(x, dt):
         dx[2, 1] = x[0]
         dx[2, 2] = -b
 
-    elif (N_MODEL == 9):
+    elif N_MODEL == 9:
         sigma = 10.0
         r = 28.0
         b = 8.0 / 3.0
@@ -124,8 +129,9 @@ def tangent_linear(x, dt):
         cz = 1.0
         ce = 0.08
         s = 1.0
-        k1 = 10.0
-        k2 = -11.0
+        # these parameters are not used because they are constants
+        # k1 = 10.0
+        # k2 = -11.0
 
         # extratropic atm
         dx[0, 0] = -sigma
@@ -177,12 +183,15 @@ def tangent_linear(x, dt):
     return m
 
 
-def finite_time_tangent(x0, dt, iw):
-    # Return finite time tangent linear matrix (t0 -> t0 + dt * iw)
-    # x0     <- np.array(N_MODEL)       : state vector at the beginning of the window
-    # dt     <- float                : timestep
-    # iw     <- int                  : integration window (time in steps)
-    # return -> np.array(N_MODEL,N_MODEL)  : finite time tangent linear matrix M
+def finite_time_tangent(x0: np.ndarray, dt: float, iw: int) -> np.ndarray:
+    """
+    Return finite time tangent linear matrix (t0 -> t0 + dt * iw)
+
+    :param x0: [N_MODEL] state vector at the beginning of the window
+    :param dt: length of a time step
+    :param iw: integration window (time in steps)
+    :return:   [N_MODEL,N_MODEL]
+    """
 
     m_finite = np.identity(N_MODEL)
     x = np.copy(x0)
@@ -193,13 +202,16 @@ def finite_time_tangent(x0, dt, iw):
     return m_finite
 
 
-def finite_time_tangent_using_nonlinear(x0, dt, iw):
-    ### todo: boundary conditions needed if used for 4DVar
-    # Return tangent linear matrix, calculated numerically using the NL model
-    # x0     <- np.array(N_MODEL)       : state vector at t0
-    # dt     <- float                : timestep
-    # iw     <- int                  : integration window (time in steps)
-    # return -> np.array(N_MODEL,N_MODEL)  : finite time (t0 -> t0 + iw*DT) tangent linear matrix M
+def finite_time_tangent_using_nonlinear(x0: np.ndarray, dt: float, iw: int) -> np.ndarray:
+    """
+    Return tangent linear matrix, calculated numerically using the NL model
+    todo: boundary conditions needed if used for 4DVar
+
+    :param x0: [N_MODEL] state vector at the beginning of the window
+    :param dt: length of a time step
+    :param iw: integration window (time in steps)
+    :return:   [N_MODEL,N_MODEL]
+    """
 
     m_finite = np.identity(N_MODEL)
     eps = 1.0e-9
