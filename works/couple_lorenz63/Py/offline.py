@@ -113,10 +113,11 @@ def obtain_stats_etkf():
                 corr[i, j] /= np.sqrt(cov[i, i] * cov[j, j])
         return corr
 
-    # delta_t1 = delta_t2 = 0 for analysis, 8 for background correlation
-    # delta_t1 != delta_t2 for lagged correlation
-    delta_t1 = 8
-    delta_t2 = 8
+    # delta_ti = delta_tj = 0 for analysis, 8 for background correlation
+    # delta_ti != delta_tj for lagged correlation
+    delta_ti = 0
+    delta_tj = 4
+    diff_t = delta_tj - delta_ti
 
     np.random.seed((10 ** 8 + 7) * 12)
     nature = main.exec_nature()
@@ -138,19 +139,19 @@ def obtain_stats_etkf():
 
     for it in range(STEPS // 2, STEPS):
         if it % AINT == 0:
-            fcst1 = hist_fcst[it, :, :].copy()
-            fcst2 = hist_fcst[it, :, :].copy()
+            fcsti = hist_fcst[it, :, :].copy()
+            fcstj = hist_fcst[it, :, :].copy()
             for k in range(nmem):
-                for jt in range(delta_t1):
-                    fcst1[k, :] = model.timestep(fcst1[k, :], DT)
-                for jt in range(delta_t2):
-                    fcst2[k, :] = model.timestep(fcst2[k, :], DT)
+                for jt in range(delta_ti):
+                    fcsti[k, :] = model.timestep(fcsti[k, :], DT)
+                for jt in range(delta_tj):
+                    fcstj[k, :] = model.timestep(fcstj[k, :], DT)
 
             for i in range(N_MODEL):
                 for j in range(N_MODEL):
                     # a38p40
-                    vector_i = np.copy(fcst1[:, i])
-                    vector_j = np.copy(fcst2[:, j])
+                    vector_i = np.copy(fcsti[:, i])
+                    vector_j = np.copy(fcstj[:, j])
                     vector_i[:] -= np.mean(vector_i)
                     vector_j[:] -= np.mean(vector_j)
                     numera = np.sum(vector_i * vector_j)
@@ -187,10 +188,10 @@ def obtain_stats_etkf():
                  "covariance-instant": cov_instant_ij, "correlation-instant": corr_instant_ij}
     # "BHHtRi-mean":bhhtri_mean_ij, "BHHtRi-rms":bhhtri_rms_ij, "random":rand_ij,
     for name in data_hash:
-        plot_matrix(data_hash[name], title=name, xlabel="grid index i", ylabel="grid index j", logscale=True,
-                    linthresh=1e-1)
-        plot_matrix(data_hash[name], title=(name + "_linear"), xlabel="grid index i", ylabel="grid index j",
-                    logscale=False)
+        plot_matrix(data_hash[name], title=name, xlabel="grid index i (leading by %d steps)" % diff_t,
+                    ylabel="grid index j", logscale=True, linthresh=1e-1)
+        plot_matrix(data_hash[name], title=(name + "_linear"), xlabel="grid index i (leading by %d steps)" % diff_t,
+                    ylabel="grid index j", logscale=False)
         print(name)
         matrix_order(np.abs(data_hash[name]), name)
 
