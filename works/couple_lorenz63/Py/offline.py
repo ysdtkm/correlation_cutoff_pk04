@@ -138,8 +138,8 @@ def obtain_stats_etkf():
 
     for it in range(STEPS // 2, STEPS):
         if it % AINT == 0:
-            fcst1 = hist_fcst[it - AINT, :, :].copy()
-            fcst2 = hist_fcst[it - AINT, :, :].copy()
+            fcst1 = hist_fcst[it, :, :].copy()
+            fcst2 = hist_fcst[it, :, :].copy()
             for k in range(nmem):
                 for jt in range(delta_t1):
                     fcst1[k, :] = model.timestep(fcst1[k, :], DT)
