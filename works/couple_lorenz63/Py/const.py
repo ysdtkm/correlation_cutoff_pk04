@@ -82,8 +82,8 @@ def geth() -> np.ndarray:
     #                   % (P_OBS, N_MODEL))
     # ttk
     # h = np.diag([0, 1, 0, 0, 1, 0, 0, 1, 0])  # y-only
-    h = np.diag([0, 0, 1, 0, 0, 1, 0, 0, 1])  # z-only
-    # h = np.diag([1, 1, 1, 1, 1, 1, 1, 1, 1])
+    # h = np.diag([0, 0, 1, 0, 0, 1, 0, 0, 1])  # z-only
+    h = np.diag([1, 1, 1, 1, 1, 1, 1, 1, 1])
     return h
 
 
