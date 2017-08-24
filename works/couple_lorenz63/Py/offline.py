@@ -113,7 +113,10 @@ def obtain_stats_etkf():
                 corr[i, j] /= np.sqrt(cov[i, i] * cov[j, j])
         return corr
 
-    use_posterior = False
+    # delta_t1 = delta_t2 = 0 for analysis, 8 for background correlation
+    # delta_t1 != delta_t2 for lagged correlation
+    delta_t1 = 8
+    delta_t2 = 8
 
     np.random.seed((10 ** 8 + 7) * 12)
     nature = main.exec_nature()
@@ -135,18 +138,19 @@ def obtain_stats_etkf():
 
     for it in range(STEPS // 2, STEPS):
         if it % AINT == 0:
-            if use_posterior:
-                fcst = hist_fcst[it, :, :].copy()
-            else:
-                fcst = hist_fcst[it - AINT, :, :].copy()
-                for jt in range(AINT):
-                    for k in range(nmem):
-                        fcst[k, :] = model.timestep(fcst[k, :], DT)
+            fcst1 = hist_fcst[it - AINT, :, :].copy()
+            fcst2 = hist_fcst[it - AINT, :, :].copy()
+            for k in range(nmem):
+                for jt in range(delta_t1):
+                    fcst1[k, :] = model.timestep(fcst1[k, :], DT)
+                for jt in range(delta_t2):
+                    fcst2[k, :] = model.timestep(fcst2[k, :], DT)
+
             for i in range(N_MODEL):
                 for j in range(N_MODEL):
                     # a38p40
-                    vector_i = np.copy(fcst[:, i])
-                    vector_j = np.copy(fcst[:, j])
+                    vector_i = np.copy(fcst1[:, i])
+                    vector_j = np.copy(fcst2[:, j])
                     vector_i[:] -= np.mean(vector_i)
                     vector_j[:] -= np.mean(vector_j)
                     numera = np.sum(vector_i * vector_j)
