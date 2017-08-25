@@ -113,89 +113,91 @@ def obtain_stats_etkf():
                 corr[i, j] /= np.sqrt(cov[i, i] * cov[j, j])
         return corr
 
-    # delta_ti = delta_tj = 0 for analysis, 8 for background correlation
-    # delta_ti != delta_tj for lagged correlation
-    delta_ti = 0
-    delta_tj = 4
-    diff_t = delta_tj - delta_ti
+    def obtain_cycle():
+        np.random.seed((10 ** 8 + 7) * 12)
+        nature = main.exec_nature()
+        obs = main.exec_obs(nature)
+        settings = dict(name="etkf", rho="adaptive", nmem=10, method="etkf", couple="strong", r_local="full")
+        np.random.seed((10 ** 8 + 7) * 13)
+        free = main.exec_free_run(settings)
+        anl = main.exec_assim_cycle(settings, free, obs)
 
-    np.random.seed((10 ** 8 + 7) * 12)
-    nature = main.exec_nature()
-    obs = main.exec_obs(nature)
-    settings = dict(name="etkf", rho="adaptive", nmem=10, method="etkf", couple="strong", r_local="full")
-    np.random.seed((10 ** 8 + 7) * 13)
-    free = main.exec_free_run(settings)
-    anl = main.exec_assim_cycle(settings, free, obs)
+        nmem = settings["nmem"]
+        hist_fcst = np.fromfile("data/%s_cycle.bin" % settings["name"], np.float64)
+        hist_fcst = hist_fcst.reshape((STEPS, nmem, N_MODEL))
+        return hist_fcst, nature, nmem
 
-    nmem = settings["nmem"]
-    hist_fcst = np.fromfile("data/%s_cycle.bin" % settings["name"], np.float64)
-    hist_fcst = hist_fcst.reshape((STEPS, nmem, N_MODEL))
+    def obtain_covs_corrs(hist_fcst, nature, nmem):
+        # delta_ti = delta_tj = 0 for analysis, 8 for background correlation
+        # delta_ti != delta_tj for lagged correlation
+        delta_ti = 0
+        delta_tj = 4
+        diff_t = delta_tj - delta_ti
 
-    corr_ijt = np.empty((STEPS, N_MODEL, N_MODEL))
-    corr_ijt[:, :, :] = np.nan
-    cov_ijt = np.empty((STEPS, N_MODEL, N_MODEL))
-    cov_ijt[:, :, :] = np.nan
-    r = getr()
+        corr_ijt = np.empty((STEPS, N_MODEL, N_MODEL))
+        corr_ijt[:, :, :] = np.nan
+        cov_ijt = np.empty((STEPS, N_MODEL, N_MODEL))
+        cov_ijt[:, :, :] = np.nan
 
-    for it in range(STEPS // 2, STEPS):
-        if it % AINT == 0:
-            fcsti = hist_fcst[it, :, :].copy()
-            fcstj = hist_fcst[it, :, :].copy()
-            for k in range(nmem):
-                for jt in range(delta_ti):
-                    fcsti[k, :] = model.timestep(fcsti[k, :], DT)
-                for jt in range(delta_tj):
-                    fcstj[k, :] = model.timestep(fcstj[k, :], DT)
+        for it in range(STEPS // 2, STEPS):
+            if it % AINT == 0:
+                fcsti = hist_fcst[it, :, :].copy()
+                fcstj = hist_fcst[it, :, :].copy()
+                for k in range(nmem):
+                    for jt in range(delta_ti):
+                        fcsti[k, :] = model.timestep(fcsti[k, :], DT)
+                    for jt in range(delta_tj):
+                        fcstj[k, :] = model.timestep(fcstj[k, :], DT)
 
+                for i in range(N_MODEL):
+                    for j in range(N_MODEL):
+                        # a38p40
+                        vector_i = np.copy(fcsti[:, i])
+                        vector_j = np.copy(fcstj[:, j])
+                        vector_i[:] -= np.mean(vector_i)
+                        vector_j[:] -= np.mean(vector_j)
+                        numera = np.sum(vector_i * vector_j)
+                        denomi = (np.sum(vector_i ** 2) * np.sum(vector_j ** 2)) ** 0.5
+                        corr_ijt[it, i, j] = numera / denomi
+                        cov_ijt[it, i, j] = numera / (nmem - 1.0)
+                cov_instant_ij = cov_ijt[it, :, :].copy()
+
+        clim_mean = np.mean(nature[STEPS // 2:, :], axis=0)
+        cov_clim_ij = np.empty((N_MODEL, N_MODEL))
+        k = 0
+        for it in range(STEPS // 2, STEPS):
+            anom = nature[it, :] - clim_mean[:]
             for i in range(N_MODEL):
-                for j in range(N_MODEL):
-                    # a38p40
-                    vector_i = np.copy(fcsti[:, i])
-                    vector_j = np.copy(fcstj[:, j])
-                    vector_i[:] -= np.mean(vector_i)
-                    vector_j[:] -= np.mean(vector_j)
-                    numera = np.sum(vector_i * vector_j)
-                    denomi = (np.sum(vector_i ** 2) * np.sum(vector_j ** 2)) ** 0.5
-                    corr_ijt[it, i, j] = numera / denomi
-                    cov_ijt[it, i, j] = numera / (nmem - 1.0)
-            cov_instant_ij = cov_ijt[it, :, :].copy()
+                cov_clim_ij[i, :] += anom[i] * anom[:]
+            k += 1
+        tmp = cov_clim_ij  # to remove assymetry caused by numerical errors
+        cov_clim_ij[:, :] += tmp.T
+        cov_clim_ij[:, :] /= (2.0 * (k - 1.0))
 
-    corr_mean_ij = np.nanmean(corr_ijt, axis=0)
-    corr_rms_ij = np.sqrt(np.nanmean(corr_ijt ** 2, axis=0))
-    cov_mean_ij = np.nanmean(cov_ijt, axis=0)
-    cov_rms_ij = np.sqrt(np.nanmean(cov_ijt ** 2, axis=0))
-    ri = np.linalg.inv(getr())
-    bhhtri_rms_ij = cov_rms_ij.dot(ri)
-    bhhtri_mean_ij = cov_mean_ij.dot(ri)
-    rand_ij = np.random.randn(N_MODEL, N_MODEL)
-    corr_instant_ij = cov_to_corr(cov_instant_ij)
+        return corr_ijt, cov_ijt, cov_instant_ij, cov_clim_ij, diff_t
 
-    clim_mean = np.mean(nature[STEPS // 2:, :], axis=0)
-    cov_clim_ij = np.empty((N_MODEL, N_MODEL))
-    k = 0
-    for it in range(STEPS // 2, STEPS):
-        anom = nature[it, :] - clim_mean[:]
-        for i in range(N_MODEL):
-            cov_clim_ij[i, :] += anom[i] * anom[:]
-        k += 1
-    tmp = cov_clim_ij  # to remove assymetry caused by numerical errors
-    cov_clim_ij[:, :] += tmp.T
-    cov_clim_ij[:, :] /= (2.0 * (k - 1.0))
-    corr_clim_ij = cov_to_corr(cov_clim_ij)
+    def reduce_and_plot(corr_ijt, cov_ijt, cov_instant_ij, cov_clim_ij):
+        corr_mean_ij = np.nanmean(corr_ijt, axis=0)
+        corr_rms_ij = np.sqrt(np.nanmean(corr_ijt ** 2, axis=0))
+        cov_mean_ij = np.nanmean(cov_ijt, axis=0)
+        cov_rms_ij = np.sqrt(np.nanmean(cov_ijt ** 2, axis=0))
+        corr_instant_ij = cov_to_corr(cov_instant_ij)
+        corr_clim_ij = cov_to_corr(cov_clim_ij)
 
-    data_hash = {"correlation-mean": corr_mean_ij, "correlation-rms": corr_rms_ij, "covariance-mean": cov_mean_ij,
-                 "covariance-rms": cov_rms_ij, "covariance-clim": cov_clim_ij, "correlation-clim": corr_clim_ij,
-                 "covariance-instant": cov_instant_ij, "correlation-instant": corr_instant_ij}
-    # "BHHtRi-mean":bhhtri_mean_ij, "BHHtRi-rms":bhhtri_rms_ij, "random":rand_ij,
-    for name in data_hash:
-        plot_matrix(data_hash[name], title=name, xlabel="grid index i (leading by %d steps)" % diff_t,
-                    ylabel="grid index j", logscale=True, linthresh=1e-1)
-        plot_matrix(data_hash[name], title=(name + "_linear"), xlabel="grid index i (leading by %d steps)" % diff_t,
-                    ylabel="grid index j", logscale=False)
-        print(name)
-        matrix_order(np.abs(data_hash[name]), name)
+        data_hash = {"correlation-mean": corr_mean_ij, "correlation-rms": corr_rms_ij, "covariance-mean": cov_mean_ij,
+                     "covariance-rms": cov_rms_ij, "covariance-clim": cov_clim_ij, "correlation-clim": corr_clim_ij,
+                     "covariance-instant": cov_instant_ij, "correlation-instant": corr_instant_ij}
+        for name in data_hash:
+            plot_matrix(data_hash[name], title=name, xlabel="grid index i",
+                        ylabel="grid index j", logscale=True, linthresh=1e-1)
+            plot_matrix(data_hash[name], title=(name + "_linear"), xlabel="grid index i",
+                        ylabel="grid index j", logscale=False)
+            print(name)
+            matrix_order(np.abs(data_hash[name]), name)
 
-    return 0
+    hist_fcst, nature, nmem = obtain_cycle()
+    corr_ijt, cov_ijt, cov_instant_ij, cov_clim_ij, diff_t = obtain_covs_corrs(hist_fcst, nature, nmem)
+    reduce_and_plot(corr_ijt, cov_ijt, cov_instant_ij, cov_clim_ij)
 
 
 def matrix_order(mat_ij_in, name, prioritize_diag=False, max_odr=81):
