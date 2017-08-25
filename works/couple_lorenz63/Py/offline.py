@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import os
 import numpy as np
 from const import N_MODEL, STEPS, AINT, DT, FERR_INI, getr
 import model
@@ -82,7 +83,7 @@ def print_two_dim_nparray(data, format="%12.9g"):
             print("]")
 
 
-def plot_matrix(data, name="", title="", color=plt.cm.bwr, xlabel="", ylabel="", logscale=False, linthresh=1e-3):
+def plot_matrix(data, dir, name="", title="", color=plt.cm.bwr, xlabel="", ylabel="", logscale=False, linthresh=1e-3):
     fig, ax = plt.subplots(1)
     fig.subplots_adjust(left=0.12, right=0.95, bottom=0.12, top=0.92)
     cmax = np.max(np.abs(data))
@@ -100,7 +101,8 @@ def plot_matrix(data, name="", title="", color=plt.cm.bwr, xlabel="", ylabel="",
     cbar = plt.colorbar(map1)
     plt.title(title)
     plt.gca().invert_yaxis()
-    plt.savefig("./matrix_%s_%s.pdf" % (name, title))
+    os.system("mkdir -p %s" % dir)
+    plt.savefig("./%s/matrix_%s_%s.pdf" % (dir, name, title))
     plt.close()
     return 0
 
@@ -127,12 +129,7 @@ def obtain_stats_etkf():
         hist_fcst = hist_fcst.reshape((STEPS, nmem, N_MODEL))
         return hist_fcst, nature, nmem
 
-    def obtain_covs_corrs(hist_fcst, nature, nmem):
-        # delta_ti = delta_tj = 0 for analysis, 8 for background correlation
-        # delta_ti != delta_tj for lagged correlation
-        delta_ti = 0
-        delta_tj = 4
-        diff_t = delta_tj - delta_ti
+    def obtain_covs_corrs(hist_fcst, nature, nmem, delta_ti, delta_tj):
 
         corr_ijt = np.empty((STEPS, N_MODEL, N_MODEL))
         corr_ijt[:, :, :] = np.nan
@@ -176,7 +173,7 @@ def obtain_stats_etkf():
 
         return corr_ijt, cov_ijt, cov_instant_ij, cov_clim_ij, diff_t
 
-    def reduce_and_plot(corr_ijt, cov_ijt, cov_instant_ij, cov_clim_ij):
+    def reduce_and_plot(corr_ijt, cov_ijt, cov_instant_ij, cov_clim_ij, diff_t):
         corr_mean_ij = np.nanmean(corr_ijt, axis=0)
         corr_rms_ij = np.sqrt(np.nanmean(corr_ijt ** 2, axis=0))
         cov_mean_ij = np.nanmean(cov_ijt, axis=0)
@@ -185,22 +182,36 @@ def obtain_stats_etkf():
         corr_clim_ij = cov_to_corr(cov_clim_ij)
 
         data_hash = {"correlation-mean": corr_mean_ij, "correlation-rms": corr_rms_ij, "covariance-mean": cov_mean_ij,
-                     "covariance-rms": cov_rms_ij, "covariance-clim": cov_clim_ij, "correlation-clim": corr_clim_ij,
-                     "covariance-instant": cov_instant_ij, "correlation-instant": corr_instant_ij}
+                     "covariance-rms": cov_rms_ij} # , "covariance-clim": cov_clim_ij, "correlation-clim": corr_clim_ij,
+                     # "covariance-instant": cov_instant_ij, "correlation-instant": corr_instant_ij}
         for name in data_hash:
-            plot_matrix(data_hash[name], title=name, xlabel="grid index i",
+            name2 = name + "_" + str(diff_t)
+            dir="offline_%d" % diff_t
+            plot_matrix(data_hash[name], dir, title=name2, xlabel="grid index i",
                         ylabel="grid index j", logscale=True, linthresh=1e-1)
-            plot_matrix(data_hash[name], title=(name + "_linear"), xlabel="grid index i",
+            plot_matrix(data_hash[name], dir, title=(name2 + "_linear"), xlabel="grid index i",
                         ylabel="grid index j", logscale=False)
-            print(name)
-            matrix_order(np.abs(data_hash[name]), name)
+            print(name2)
+            try:
+                matrix_order(np.abs(data_hash[name]), dir, name2)
+            except Exception as e:
+                print(e)
 
     hist_fcst, nature, nmem = obtain_cycle()
-    corr_ijt, cov_ijt, cov_instant_ij, cov_clim_ij, diff_t = obtain_covs_corrs(hist_fcst, nature, nmem)
-    reduce_and_plot(corr_ijt, cov_ijt, cov_instant_ij, cov_clim_ij)
+
+    # delta_ti = delta_tj = 0 for analysis, 8 for background correlation
+    # delta_ti != delta_tj for lagged correlation
+    delt_set = [(0, 0), (0, 8), (0, 16), (0, 24)]
+    for delt in delt_set:
+        delta_ti = delt[0]
+        delta_tj = delt[1]
+        diff_t = delta_tj - delta_ti
+        corr_ijt, cov_ijt, cov_instant_ij, cov_clim_ij, diff_t = \
+            obtain_covs_corrs(hist_fcst, nature, nmem, delta_ti, delta_tj)
+        reduce_and_plot(corr_ijt, cov_ijt, cov_instant_ij, cov_clim_ij, diff_t)
 
 
-def matrix_order(mat_ij_in, name, prioritize_diag=False, max_odr=81):
+def matrix_order(mat_ij_in, dir, name, prioritize_diag=False, max_odr=81):
     n = len(mat_ij_in)
     if len(mat_ij_in[0]) != n:
         raise Exception("input matrix non-square")
@@ -251,10 +262,12 @@ def matrix_order(mat_ij_in, name, prioritize_diag=False, max_odr=81):
     plt.yscale("log")
     plt.ylim(1.0e-4, 1.0)
     plt.legend()
-    plt.savefig("histogram_%s.pdf" % name)
+    os.system("mkdir -p %s" % dir)
+    plt.savefig("%s/histogram_%s.pdf" % (dir, name))
     plt.clf()
 
     return 0
 
 
-obtain_stats_etkf()
+if __name__ == "__main__":
+    obtain_stats_etkf()
