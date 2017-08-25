@@ -178,12 +178,15 @@ def obtain_stats_etkf():
         corr_rms_ij = np.sqrt(np.nanmean(corr_ijt ** 2, axis=0))
         cov_mean_ij = np.nanmean(cov_ijt, axis=0)
         cov_rms_ij = np.sqrt(np.nanmean(cov_ijt ** 2, axis=0))
-        corr_instant_ij = cov_to_corr(cov_instant_ij)
-        corr_clim_ij = cov_to_corr(cov_clim_ij)
 
-        data_hash = {"correlation-mean": corr_mean_ij, "correlation-rms": corr_rms_ij, "covariance-mean": cov_mean_ij,
-                     "covariance-rms": cov_rms_ij} # , "covariance-clim": cov_clim_ij, "correlation-clim": corr_clim_ij,
-                     # "covariance-instant": cov_instant_ij, "correlation-instant": corr_instant_ij}
+        data_hash = {"correlation-mean": corr_mean_ij, "correlation-rms": corr_rms_ij,
+                     "covariance-mean": cov_mean_ij, "covariance-rms": cov_rms_ij}
+        if diff_t == 0:
+            corr_instant_ij = cov_to_corr(cov_instant_ij)
+            corr_clim_ij = cov_to_corr(cov_clim_ij)
+            data_hash2 = {"covariance-clim": cov_clim_ij, "correlation-clim": corr_clim_ij,
+                          "covariance-instant": cov_instant_ij, "correlation-instant": corr_instant_ij}
+            data_hash.update(data_hash2)
         for name in data_hash:
             name2 = name + "_" + str(diff_t)
             dir="offline_%d" % diff_t
