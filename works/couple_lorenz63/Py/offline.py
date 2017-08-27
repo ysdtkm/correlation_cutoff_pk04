@@ -83,10 +83,12 @@ def print_two_dim_nparray(data, format="%12.9g"):
             print("]")
 
 
-def plot_matrix(data, dir, name="", title="", color=plt.cm.bwr, xlabel="", ylabel="", logscale=False, linthresh=1e-3):
+def plot_matrix(data, dir, name="", title="", color=plt.cm.bwr, xlabel="", ylabel="",
+                logscale=False, linthresh=1e-3, cmax = None):
     fig, ax = plt.subplots(1)
     fig.subplots_adjust(left=0.12, right=0.95, bottom=0.12, top=0.92)
-    cmax = np.max(np.abs(data))
+    if cmax == None:
+        cmax = np.max(np.abs(data))
     if logscale:
         map1 = ax.pcolor(data, cmap=color, norm=colors.SymLogNorm(linthresh=linthresh * cmax))
     else:
@@ -190,10 +192,11 @@ def obtain_stats_etkf():
         for name in data_hash:
             name2 = name + "_" + str(diff_t)
             dir="offline_%d" % diff_t
+            cmax = 1.0 if "corr" in name else None
             plot_matrix(data_hash[name], dir, title=name2, xlabel="grid index i",
-                        ylabel="grid index j", logscale=True, linthresh=1e-1)
+                        ylabel="grid index j", logscale=True, linthresh=1e-1, cmax=cmax)
             plot_matrix(data_hash[name], dir, title=(name2 + "_linear"), xlabel="grid index i",
-                        ylabel="grid index j", logscale=False)
+                        ylabel="grid index j", logscale=False, cmax=cmax)
             print(name2)
             try:
                 matrix_order(np.abs(data_hash[name]), dir, name2)
@@ -204,7 +207,7 @@ def obtain_stats_etkf():
 
     # delta_ti = delta_tj = 0 for analysis, 8 for background correlation
     # delta_ti != delta_tj for lagged correlation
-    delt_set = [(0, 0), (0, 8), (0, 16), (0, 24)]
+    delt_set = [(0, 0), (0, 4), (0, 8), (0, 12), (0, 16), (0, 20), (0, 24)]
     for delt in delt_set:
         delta_ti = delt[0]
         delta_tj = delt[1]
