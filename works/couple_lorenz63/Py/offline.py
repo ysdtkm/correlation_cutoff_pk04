@@ -100,10 +100,10 @@ def plot_matrix(data, img_dir, name="", title="", color=plt.cm.bwr, xlabel="", y
     ax.set_aspect(abs(x1 - x0) / abs(y1 - y0))
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
-    cbar = plt.colorbar(map1)
+    plt.colorbar(map1)
     plt.title(title)
     plt.gca().invert_yaxis()
-    os.system("mkdir -p %s" % img_dir)
+    os.makedirs(img_dir, exist_ok=True)
     plt.savefig("./%s/matrix_%s_%s.pdf" % (img_dir, name, title))
     plt.close()
     return 0
@@ -183,12 +183,11 @@ def obtain_stats_etkf():
     def plot_covs_corrs(mean_corr_ij, rms_corr_ij, mean_cov_ij, rms_cov_ij, cov_clim_ij, num_delt):
         data_hash = {"correlation-mean": mean_corr_ij, "correlation-rms": rms_corr_ij,
                      "covariance-mean": mean_cov_ij, "covariance-rms": rms_cov_ij}
+        corr_clim_ij = cov_to_corr(cov_clim_ij)
+        data_hash2 = {"covariance-clim": cov_clim_ij, "correlation-clim": corr_clim_ij}
+        data_hash.update(data_hash2)
 
         for delt in range(num_delt):
-            if delt == 0:
-                corr_clim_ij = cov_to_corr(cov_clim_ij)
-                data_hash2 = {"covariance-clim": cov_clim_ij, "correlation-clim": corr_clim_ij}
-                data_hash.update(data_hash2)
             for name in data_hash:
                 if "clim" in name:
                     data = data_hash[name][:, :]
@@ -207,9 +206,21 @@ def obtain_stats_etkf():
                 except Exception as e:
                     print(e)
 
+        for name in data_hash:
+            if "clim" in name:
+                continue
+            data = data_hash[name][:, :, :]
+            i = 7
+            j = 4
+            plt.plot(data[:, i, j])
+            img_dir = "offline/time"
+            os.makedirs(img_dir, exist_ok=True)
+            plt.savefig("./%s/time_%s.pdf" % (img_dir, name))
+            plt.close()
+
     hist_fcst, nature, nmem = obtain_cycle()
 
-    num_delt = 2 # ttk 25
+    num_delt = 50
     delt_set = list(range(num_delt))
 
     mean_corr_ij = np.empty((num_delt, N_MODEL, N_MODEL))
@@ -229,9 +240,10 @@ def obtain_stats_etkf():
 
 
 def matrix_order(mat_ij_in, img_dir, name, prioritize_diag=False, max_odr=81):
-    n = len(mat_ij_in)
-    if len(mat_ij_in[0]) != n:
+    if not (len(mat_ij_in.shape) == 2 and mat_ij_in.shape[0] == mat_ij_in.shape[1]):
         raise Exception("input matrix non-square")
+    else:
+        n = mat_ij_in.shape[0]
     mat_ij = mat_ij_in.copy()
 
     def find_last_order(sorted_vals, test):
