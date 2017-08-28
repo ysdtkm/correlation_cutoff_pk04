@@ -173,12 +173,14 @@ def obtain_stats_etkf():
 
         return corr_ijt, cov_ijt, cov_clim_ij
 
-    def reduce_and_plot(corr_ijt, cov_ijt, cov_clim_ij, diff_t):
+    def reduce_covs_corrs(corr_ijt, cov_ijt):
         corr_mean_ij = np.nanmean(corr_ijt, axis=0)
         corr_rms_ij = np.sqrt(np.nanmean(corr_ijt ** 2, axis=0))
         cov_mean_ij = np.nanmean(cov_ijt, axis=0)
         cov_rms_ij = np.sqrt(np.nanmean(cov_ijt ** 2, axis=0))
+        return corr_mean_ij, corr_rms_ij, cov_mean_ij, cov_rms_ij
 
+    def plot_covs_corrs(mean_corr_ij, rms_corr_ij, mean_cov_ij, rms_cov_ij, cov_clim_ij, num_delt):
         data_hash = {"correlation-mean": corr_mean_ij, "correlation-rms": corr_rms_ij,
                      "covariance-mean": cov_mean_ij, "covariance-rms": cov_rms_ij}
         if diff_t == 0:
@@ -201,16 +203,23 @@ def obtain_stats_etkf():
 
     hist_fcst, nature, nmem = obtain_cycle()
 
-    # delta_ti = delta_tj = 0 for analysis, 8 for background correlation
-    # delta_ti != delta_tj for lagged correlation
-    delt_set = [(0, 0), (0, 4), (0, 8), (0, 12), (0, 16), (0, 20), (0, 24)]
+    num_delt = 25
+    delt_set = list(range(num_delt))
+
+    mean_corr_ij = np.empty((num_delt, N_MODEL, N_MODEL))
+    rms_corr_ij = np.empty((num_delt, N_MODEL, N_MODEL))
+    mean_cov_ij = np.empty((num_delt, N_MODEL, N_MODEL))
+    rms_cov_ij = np.empty((num_delt, N_MODEL, N_MODEL))
+
     for delt in delt_set:
-        delta_ti = delt[0]
-        delta_tj = delt[1]
-        diff_t = delta_tj - delta_ti
+        delta_ti = 0
+        delta_tj = delt
         corr_ijt, cov_ijt, cov_clim_ij = \
             obtain_instant_covs_corrs(hist_fcst, nature, nmem, delta_ti, delta_tj)
-        reduce_and_plot(corr_ijt, cov_ijt, cov_clim_ij, diff_t)
+        mean_corr_ij[delt, :, :], rms_corr_ij[delt, :, :], mean_cov_ij[delt, :, :], rms_cov_ij[delt, :, :] = \
+            reduce_covs_corrs(corr_ijt, cov_ijt)
+
+    # plot_covs_corrs(mean_corr_ij, rms_corr_ij, mean_cov_ij, rms_cov_ij, cov_clim_ij, num_delt)
 
 
 def matrix_order(mat_ij_in, img_dir, name, prioritize_diag=False, max_odr=81):
