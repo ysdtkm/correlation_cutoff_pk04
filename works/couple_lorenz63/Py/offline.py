@@ -83,32 +83,6 @@ def print_two_dim_nparray(data, format="%12.9g"):
             print("]")
 
 
-def plot_matrix(data, img_dir, name="", title="", color=plt.cm.bwr, xlabel="", ylabel="",
-                logscale=False, linthresh=1e-3, cmax=None):
-    fig, ax = plt.subplots(1)
-    fig.subplots_adjust(left=0.12, right=0.95, bottom=0.12, top=0.92)
-    if cmax is None:
-        cmax = np.max(np.abs(data))
-    if logscale:
-        map1 = ax.pcolor(data, cmap=color, norm=colors.SymLogNorm(linthresh=linthresh * cmax))
-    else:
-        map1 = ax.pcolor(data, cmap=color)
-    if color == plt.cm.bwr:
-        map1.set_clim(-1.0 * cmax, cmax)
-    x0, x1 = ax.get_xlim()
-    y0, y1 = ax.get_ylim()
-    ax.set_aspect(abs(x1 - x0) / abs(y1 - y0))
-    ax.set_xlabel(xlabel)
-    ax.set_ylabel(ylabel)
-    plt.colorbar(map1)
-    plt.title(title)
-    plt.gca().invert_yaxis()
-    os.makedirs(img_dir, exist_ok=True)
-    plt.savefig("./%s/matrix_%s_%s.pdf" % (img_dir, name, title))
-    plt.close()
-    return 0
-
-
 def obtain_stats_etkf():
     def cov_to_corr(cov):
         corr = cov.copy()
@@ -180,7 +154,45 @@ def obtain_stats_etkf():
         cov_rms_ij = np.sqrt(np.nanmean(cov_ijt ** 2, axis=0))
         return corr_mean_ij, corr_rms_ij, cov_mean_ij, cov_rms_ij
 
-    def plot_covs_corrs(mean_corr_ij, rms_corr_ij, mean_cov_ij, rms_cov_ij, cov_clim_ij, num_delt):
+    def plot_time_corr(data_rms, data_mean, name, i, j, delt_set):
+        plt.plot(delt_set, data_rms[:, i, j], label="RMS")
+        plt.plot(delt_set, data_mean[:, i, j], label="Mean")
+        img_dir = "offline/time"
+        os.makedirs(img_dir, exist_ok=True)
+        plt.xlabel("lagged time (steps)")
+        plt.ylabel("correlation")
+        plt.ylim(-1.0, 1.0)
+        plt.legend()
+        plt.axhline(y=0.0, color="black", alpha=0.5)
+        plt.savefig("./%s/time_%s.pdf" % (img_dir, name))
+        plt.close()
+
+    def plot_matrix(data, img_dir, name="", title="", color=plt.cm.bwr, xlabel="", ylabel="",
+                    logscale=False, linthresh=1e-3, cmax=None):
+        fig, ax = plt.subplots(1)
+        fig.subplots_adjust(left=0.12, right=0.95, bottom=0.12, top=0.92)
+        if cmax is None:
+            cmax = np.max(np.abs(data))
+        if logscale:
+            map1 = ax.pcolor(data, cmap=color, norm=colors.SymLogNorm(linthresh=linthresh * cmax))
+        else:
+            map1 = ax.pcolor(data, cmap=color)
+        if color == plt.cm.bwr:
+            map1.set_clim(-1.0 * cmax, cmax)
+        x0, x1 = ax.get_xlim()
+        y0, y1 = ax.get_ylim()
+        ax.set_aspect(abs(x1 - x0) / abs(y1 - y0))
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
+        plt.colorbar(map1)
+        plt.title(title)
+        plt.gca().invert_yaxis()
+        os.makedirs(img_dir, exist_ok=True)
+        plt.savefig("./%s/matrix_%s_%s.pdf" % (img_dir, name, title))
+        plt.close()
+        return 0
+
+    def plot_covs_corrs(mean_corr_ij, rms_corr_ij, mean_cov_ij, rms_cov_ij, cov_clim_ij, num_delt, delt_set):
         data_hash = {"correlation-mean": mean_corr_ij, "correlation-rms": rms_corr_ij,
                      "covariance-mean": mean_cov_ij, "covariance-rms": rms_cov_ij}
         corr_clim_ij = cov_to_corr(cov_clim_ij)
@@ -201,42 +213,34 @@ def obtain_stats_etkf():
                 plot_matrix(data, img_dir, title=(name2 + "_linear"), xlabel="grid index i",
                             ylabel="grid index j", logscale=False, cmax=cmax)
                 print(name2)
-                try:
-                    matrix_order(np.abs(data), img_dir, name2)
-                except Exception as e:
-                    print(e)
+                # matrix_order(np.abs(data), img_dir, name2)
 
-        for name in data_hash:
-            if "clim" in name:
-                continue
-            data = data_hash[name][:, :, :]
-            i = 7
-            j = 4
-            plt.plot(data[:, i, j])
-            img_dir = "offline/time"
-            os.makedirs(img_dir, exist_ok=True)
-            plt.savefig("./%s/time_%s.pdf" % (img_dir, name))
-            plt.close()
+        set_ij = [(1, 1), (4, 4), (7, 7), (1, 4), (4, 7), (7, 1)]
+        for i, j in set_ij:
+            data_rms = rms_corr_ij
+            data_mean = mean_corr_ij
+            name = "corr_%d_%d" % (i, j)
+            plot_time_corr(data_rms, data_mean, name, i, j, delt_set)
 
     hist_fcst, nature, nmem = obtain_cycle()
 
-    num_delt = 50
-    delt_set = list(range(num_delt))
+    num_delt = 26
+    delt_set = list(np.linspace(0, 50, num_delt, dtype=np.int))
 
     mean_corr_ij = np.empty((num_delt, N_MODEL, N_MODEL))
     rms_corr_ij = np.empty((num_delt, N_MODEL, N_MODEL))
     mean_cov_ij = np.empty((num_delt, N_MODEL, N_MODEL))
     rms_cov_ij = np.empty((num_delt, N_MODEL, N_MODEL))
 
-    for delt in delt_set:
+    for i, delt in enumerate(delt_set):
         delta_ti = 0
         delta_tj = delt
         corr_ijt, cov_ijt, cov_clim_ij = \
             obtain_instant_covs_corrs(hist_fcst, nature, nmem, delta_ti, delta_tj)
-        mean_corr_ij[delt, :, :], rms_corr_ij[delt, :, :], mean_cov_ij[delt, :, :], rms_cov_ij[delt, :, :] = \
+        mean_corr_ij[i, :, :], rms_corr_ij[i, :, :], mean_cov_ij[i, :, :], rms_cov_ij[i, :, :] = \
             reduce_covs_corrs(corr_ijt, cov_ijt)
 
-    plot_covs_corrs(mean_corr_ij, rms_corr_ij, mean_cov_ij, rms_cov_ij, cov_clim_ij, num_delt)
+    plot_covs_corrs(mean_corr_ij, rms_corr_ij, mean_cov_ij, rms_cov_ij, cov_clim_ij, num_delt, delt_set)
 
 
 def matrix_order(mat_ij_in, img_dir, name, prioritize_diag=False, max_odr=81):
