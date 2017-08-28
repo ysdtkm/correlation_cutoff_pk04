@@ -165,7 +165,7 @@ def obtain_stats_etkf():
         os.makedirs(img_dir, exist_ok=True)
         vars = ["x_e", "y_e", "z_e", "x_t", "y_t", "z_t", "X", "Y", "Z"]
         plt.title("lagged correlation: %s vs %s" % (vars[i], vars[j]))
-        plt.xlabel("lagged time (steps): positive means %s follows %s" % (vars[i], vars[j]))
+        plt.xlabel("lagged time (steps): positive means %s leads %s" % (vars[i], vars[j]))
         plt.ylabel("correlation")
         plt.ylim(-1.0, 1.0)
         plt.legend()
@@ -221,7 +221,7 @@ def obtain_stats_etkf():
                 print(name2)
                 # matrix_order(np.abs(data), img_dir, name2)
 
-        set_ij = [(1, 1), (4, 4), (7, 7), (1, 4), (4, 7), (7, 1)]
+        set_ij = [(1, 1), (4, 4), (7, 7), (1, 4), (4, 7), (1, 7)]
         for i, j in set_ij:
             data_rms  = np.concatenate((np.transpose( rms_corr_ij[:0:-1,:,:], axes=(0, 2, 1)),  rms_corr_ij[:,:,:]), axis=0)
             data_mean = np.concatenate((np.transpose(mean_corr_ij[:0:-1,:,:], axes=(0, 2, 1)), mean_corr_ij[:,:,:]), axis=0)
