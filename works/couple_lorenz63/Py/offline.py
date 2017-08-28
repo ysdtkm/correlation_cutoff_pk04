@@ -131,8 +131,7 @@ def obtain_stats_etkf():
         hist_fcst = hist_fcst.reshape((STEPS, nmem, N_MODEL))
         return hist_fcst, nature, nmem
 
-    def obtain_covs_corrs(hist_fcst, nature, nmem, delta_ti, delta_tj):
-
+    def obtain_instant_covs_corrs(hist_fcst, nature, nmem, delta_ti, delta_tj):
         corr_ijt = np.empty((STEPS, N_MODEL, N_MODEL))
         corr_ijt[:, :, :] = np.nan
         cov_ijt = np.empty((STEPS, N_MODEL, N_MODEL))
@@ -159,7 +158,6 @@ def obtain_stats_etkf():
                         denomi = (np.sum(vector_i ** 2) * np.sum(vector_j ** 2)) ** 0.5
                         corr_ijt[it, i, j] = numera / denomi
                         cov_ijt[it, i, j] = numera / (nmem - 1.0)
-                cov_instant_ij = cov_ijt[it, :, :].copy()
 
         clim_mean = np.mean(nature[STEPS // 2:, :], axis=0)
         cov_clim_ij = np.empty((N_MODEL, N_MODEL))
@@ -173,9 +171,9 @@ def obtain_stats_etkf():
         cov_clim_ij[:, :] += tmp.T
         cov_clim_ij[:, :] /= (2.0 * (k - 1.0))
 
-        return corr_ijt, cov_ijt, cov_instant_ij, cov_clim_ij, diff_t
+        return corr_ijt, cov_ijt, cov_clim_ij
 
-    def reduce_and_plot(corr_ijt, cov_ijt, cov_instant_ij, cov_clim_ij, diff_t):
+    def reduce_and_plot(corr_ijt, cov_ijt, cov_clim_ij, diff_t):
         corr_mean_ij = np.nanmean(corr_ijt, axis=0)
         corr_rms_ij = np.sqrt(np.nanmean(corr_ijt ** 2, axis=0))
         cov_mean_ij = np.nanmean(cov_ijt, axis=0)
@@ -184,22 +182,20 @@ def obtain_stats_etkf():
         data_hash = {"correlation-mean": corr_mean_ij, "correlation-rms": corr_rms_ij,
                      "covariance-mean": cov_mean_ij, "covariance-rms": cov_rms_ij}
         if diff_t == 0:
-            corr_instant_ij = cov_to_corr(cov_instant_ij)
             corr_clim_ij = cov_to_corr(cov_clim_ij)
-            data_hash2 = {"covariance-clim": cov_clim_ij, "correlation-clim": corr_clim_ij,
-                          "covariance-instant": cov_instant_ij, "correlation-instant": corr_instant_ij}
+            data_hash2 = {"covariance-clim": cov_clim_ij, "correlation-clim": corr_clim_ij}
             data_hash.update(data_hash2)
         for name in data_hash:
             name2 = name + "_" + str(diff_t)
-            dir="offline_%d" % diff_t
+            img_dir = "offline_%d" % diff_t
             cmax = 1.0 if "corr" in name else None
-            plot_matrix(data_hash[name], dir, title=name2, xlabel="grid index i",
+            plot_matrix(data_hash[name], img_dir, title=name2, xlabel="grid index i",
                         ylabel="grid index j", logscale=True, linthresh=1e-1, cmax=cmax)
-            plot_matrix(data_hash[name], dir, title=(name2 + "_linear"), xlabel="grid index i",
+            plot_matrix(data_hash[name], img_dir, title=(name2 + "_linear"), xlabel="grid index i",
                         ylabel="grid index j", logscale=False, cmax=cmax)
             print(name2)
             try:
-                matrix_order(np.abs(data_hash[name]), dir, name2)
+                matrix_order(np.abs(data_hash[name]), img_dir, name2)
             except Exception as e:
                 print(e)
 
@@ -212,12 +208,12 @@ def obtain_stats_etkf():
         delta_ti = delt[0]
         delta_tj = delt[1]
         diff_t = delta_tj - delta_ti
-        corr_ijt, cov_ijt, cov_instant_ij, cov_clim_ij, diff_t = \
-            obtain_covs_corrs(hist_fcst, nature, nmem, delta_ti, delta_tj)
-        reduce_and_plot(corr_ijt, cov_ijt, cov_instant_ij, cov_clim_ij, diff_t)
+        corr_ijt, cov_ijt, cov_clim_ij = \
+            obtain_instant_covs_corrs(hist_fcst, nature, nmem, delta_ti, delta_tj)
+        reduce_and_plot(corr_ijt, cov_ijt, cov_clim_ij, diff_t)
 
 
-def matrix_order(mat_ij_in, dir, name, prioritize_diag=False, max_odr=81):
+def matrix_order(mat_ij_in, img_dir, name, prioritize_diag=False, max_odr=81):
     n = len(mat_ij_in)
     if len(mat_ij_in[0]) != n:
         raise Exception("input matrix non-square")
@@ -268,8 +264,8 @@ def matrix_order(mat_ij_in, dir, name, prioritize_diag=False, max_odr=81):
     plt.yscale("log")
     plt.ylim(1.0e-4, 1.0)
     plt.legend()
-    os.system("mkdir -p %s" % dir)
-    plt.savefig("%s/histogram_%s.pdf" % (dir, name))
+    os.system("mkdir -p %s" % img_dir)
+    plt.savefig("%s/histogram_%s.pdf" % (img_dir, name))
     plt.clf()
 
     return 0
