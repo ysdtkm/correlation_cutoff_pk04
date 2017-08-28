@@ -83,11 +83,11 @@ def print_two_dim_nparray(data, format="%12.9g"):
             print("]")
 
 
-def plot_matrix(data, dir, name="", title="", color=plt.cm.bwr, xlabel="", ylabel="",
-                logscale=False, linthresh=1e-3, cmax = None):
+def plot_matrix(data, img_dir, name="", title="", color=plt.cm.bwr, xlabel="", ylabel="",
+                logscale=False, linthresh=1e-3, cmax=None):
     fig, ax = plt.subplots(1)
     fig.subplots_adjust(left=0.12, right=0.95, bottom=0.12, top=0.92)
-    if cmax == None:
+    if cmax is None:
         cmax = np.max(np.abs(data))
     if logscale:
         map1 = ax.pcolor(data, cmap=color, norm=colors.SymLogNorm(linthresh=linthresh * cmax))
@@ -103,8 +103,8 @@ def plot_matrix(data, dir, name="", title="", color=plt.cm.bwr, xlabel="", ylabe
     cbar = plt.colorbar(map1)
     plt.title(title)
     plt.gca().invert_yaxis()
-    os.system("mkdir -p %s" % dir)
-    plt.savefig("./%s/matrix_%s_%s.pdf" % (dir, name, title))
+    os.system("mkdir -p %s" % img_dir)
+    plt.savefig("./%s/matrix_%s_%s.pdf" % (img_dir, name, title))
     plt.close()
     return 0
 
@@ -181,29 +181,35 @@ def obtain_stats_etkf():
         return corr_mean_ij, corr_rms_ij, cov_mean_ij, cov_rms_ij
 
     def plot_covs_corrs(mean_corr_ij, rms_corr_ij, mean_cov_ij, rms_cov_ij, cov_clim_ij, num_delt):
-        data_hash = {"correlation-mean": corr_mean_ij, "correlation-rms": corr_rms_ij,
-                     "covariance-mean": cov_mean_ij, "covariance-rms": cov_rms_ij}
-        if diff_t == 0:
-            corr_clim_ij = cov_to_corr(cov_clim_ij)
-            data_hash2 = {"covariance-clim": cov_clim_ij, "correlation-clim": corr_clim_ij}
-            data_hash.update(data_hash2)
-        for name in data_hash:
-            name2 = name + "_" + str(diff_t)
-            img_dir = "offline_%d" % diff_t
-            cmax = 1.0 if "corr" in name else None
-            plot_matrix(data_hash[name], img_dir, title=name2, xlabel="grid index i",
-                        ylabel="grid index j", logscale=True, linthresh=1e-1, cmax=cmax)
-            plot_matrix(data_hash[name], img_dir, title=(name2 + "_linear"), xlabel="grid index i",
-                        ylabel="grid index j", logscale=False, cmax=cmax)
-            print(name2)
-            try:
-                matrix_order(np.abs(data_hash[name]), img_dir, name2)
-            except Exception as e:
-                print(e)
+        data_hash = {"correlation-mean": mean_corr_ij, "correlation-rms": rms_corr_ij,
+                     "covariance-mean": mean_cov_ij, "covariance-rms": rms_cov_ij}
+
+        for delt in range(num_delt):
+            if delt == 0:
+                corr_clim_ij = cov_to_corr(cov_clim_ij)
+                data_hash2 = {"covariance-clim": cov_clim_ij, "correlation-clim": corr_clim_ij}
+                data_hash.update(data_hash2)
+            for name in data_hash:
+                if "clim" in name:
+                    data = data_hash[name][:, :]
+                else:
+                    data = data_hash[name][delt, :, :]
+                name2 = name + "_" + str(delt)
+                img_dir = "offline/del_t_%d" % delt
+                cmax = 1.0 if "corr" in name else None
+                plot_matrix(data, img_dir, title=name2, xlabel="grid index i",
+                            ylabel="grid index j", logscale=True, linthresh=1e-1, cmax=cmax)
+                plot_matrix(data, img_dir, title=(name2 + "_linear"), xlabel="grid index i",
+                            ylabel="grid index j", logscale=False, cmax=cmax)
+                print(name2)
+                try:
+                    matrix_order(np.abs(data), img_dir, name2)
+                except Exception as e:
+                    print(e)
 
     hist_fcst, nature, nmem = obtain_cycle()
 
-    num_delt = 25
+    num_delt = 2 # ttk 25
     delt_set = list(range(num_delt))
 
     mean_corr_ij = np.empty((num_delt, N_MODEL, N_MODEL))
@@ -219,7 +225,7 @@ def obtain_stats_etkf():
         mean_corr_ij[delt, :, :], rms_corr_ij[delt, :, :], mean_cov_ij[delt, :, :], rms_cov_ij[delt, :, :] = \
             reduce_covs_corrs(corr_ijt, cov_ijt)
 
-    # plot_covs_corrs(mean_corr_ij, rms_corr_ij, mean_cov_ij, rms_cov_ij, cov_clim_ij, num_delt)
+    plot_covs_corrs(mean_corr_ij, rms_corr_ij, mean_cov_ij, rms_cov_ij, cov_clim_ij, num_delt)
 
 
 def matrix_order(mat_ij_in, img_dir, name, prioritize_diag=False, max_odr=81):
