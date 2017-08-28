@@ -84,6 +84,10 @@ def print_two_dim_nparray(data, format="%12.9g"):
 
 
 def obtain_stats_etkf():
+    """
+    For lagged correlation, delta_t is always defined as tj - ti.
+    (i.e., delta_t > 0 iff x_j is defined later than x_i)
+    """
     def cov_to_corr(cov):
         corr = cov.copy()
         for i in range(N_MODEL):
@@ -154,12 +158,14 @@ def obtain_stats_etkf():
         cov_rms_ij = np.sqrt(np.nanmean(cov_ijt ** 2, axis=0))
         return corr_mean_ij, corr_rms_ij, cov_mean_ij, cov_rms_ij
 
-    def plot_time_corr(data_rms, data_mean, name, i, j, delt_set):
-        plt.plot(delt_set, data_rms[:, i, j], label="RMS")
-        plt.plot(delt_set, data_mean[:, i, j], label="Mean")
+    def plot_time_corr(data_rms, data_mean, name, i, j, delta_t_set):
+        plt.plot(delta_t_set, data_rms[:, i, j], label="RMS")
+        plt.plot(delta_t_set, data_mean[:, i, j], label="Mean")
         img_dir = "offline/time"
         os.makedirs(img_dir, exist_ok=True)
-        plt.xlabel("lagged time (steps)")
+        vars = ["x_e", "y_e", "z_e", "x_t", "y_t", "z_t", "X", "Y", "Z"]
+        plt.title("lagged correlation: %s vs %s" % (vars[i], vars[j]))
+        plt.xlabel("lagged time (steps): positive means %s follows %s" % (vars[i], vars[j]))
         plt.ylabel("correlation")
         plt.ylim(-1.0, 1.0)
         plt.legend()
@@ -192,21 +198,21 @@ def obtain_stats_etkf():
         plt.close()
         return 0
 
-    def plot_covs_corrs(mean_corr_ij, rms_corr_ij, mean_cov_ij, rms_cov_ij, cov_clim_ij, num_delt, delt_set):
+    def plot_covs_corrs(mean_corr_ij, rms_corr_ij, mean_cov_ij, rms_cov_ij, cov_clim_ij, num_delta_t, delta_t_set):
         data_hash = {"correlation-mean": mean_corr_ij, "correlation-rms": rms_corr_ij,
                      "covariance-mean": mean_cov_ij, "covariance-rms": rms_cov_ij}
         corr_clim_ij = cov_to_corr(cov_clim_ij)
         data_hash2 = {"covariance-clim": cov_clim_ij, "correlation-clim": corr_clim_ij}
         data_hash.update(data_hash2)
 
-        for delt in range(num_delt):
+        for delta_t in range(num_delta_t):
             for name in data_hash:
                 if "clim" in name:
                     data = data_hash[name][:, :]
                 else:
-                    data = data_hash[name][delt, :, :]
-                name2 = name + "_" + str(delt)
-                img_dir = "offline/del_t_%d" % delt
+                    data = data_hash[name][delta_t, :, :]
+                name2 = name + "_" + str(delta_t)
+                img_dir = "offline/del_t_%d" % delta_t
                 cmax = 1.0 if "corr" in name else None
                 plot_matrix(data, img_dir, title=name2, xlabel="grid index i",
                             ylabel="grid index j", logscale=True, linthresh=1e-1, cmax=cmax)
@@ -217,30 +223,32 @@ def obtain_stats_etkf():
 
         set_ij = [(1, 1), (4, 4), (7, 7), (1, 4), (4, 7), (7, 1)]
         for i, j in set_ij:
-            data_rms = rms_corr_ij
-            data_mean = mean_corr_ij
+            data_rms  = np.concatenate((np.transpose( rms_corr_ij[:0:-1,:,:], axes=(0, 2, 1)),  rms_corr_ij[:,:,:]), axis=0)
+            data_mean = np.concatenate((np.transpose(mean_corr_ij[:0:-1,:,:], axes=(0, 2, 1)), mean_corr_ij[:,:,:]), axis=0)
+            x_list = list(map(lambda x: -x, delta_t_set[:0:-1])) + delta_t_set[:]
             name = "corr_%d_%d" % (i, j)
-            plot_time_corr(data_rms, data_mean, name, i, j, delt_set)
+            plot_time_corr(data_rms, data_mean, name, i, j, x_list)
 
     hist_fcst, nature, nmem = obtain_cycle()
 
-    num_delt = 26
-    delt_set = list(np.linspace(0, 50, num_delt, dtype=np.int))
+    num_delta_t = 26
+    delta_t_set = list(np.linspace(0, 50, num_delta_t, dtype=np.int))
 
-    mean_corr_ij = np.empty((num_delt, N_MODEL, N_MODEL))
-    rms_corr_ij = np.empty((num_delt, N_MODEL, N_MODEL))
-    mean_cov_ij = np.empty((num_delt, N_MODEL, N_MODEL))
-    rms_cov_ij = np.empty((num_delt, N_MODEL, N_MODEL))
+    # delta_t, i, j
+    mean_corr_ij = np.empty((num_delta_t, N_MODEL, N_MODEL))
+    rms_corr_ij = np.empty((num_delta_t, N_MODEL, N_MODEL))
+    mean_cov_ij = np.empty((num_delta_t, N_MODEL, N_MODEL))
+    rms_cov_ij = np.empty((num_delta_t, N_MODEL, N_MODEL))
 
-    for i, delt in enumerate(delt_set):
+    for it, delta_t in enumerate(delta_t_set):
         delta_ti = 0
-        delta_tj = delt
+        delta_tj = delta_t
         corr_ijt, cov_ijt, cov_clim_ij = \
             obtain_instant_covs_corrs(hist_fcst, nature, nmem, delta_ti, delta_tj)
-        mean_corr_ij[i, :, :], rms_corr_ij[i, :, :], mean_cov_ij[i, :, :], rms_cov_ij[i, :, :] = \
+        mean_corr_ij[it, :, :], rms_corr_ij[it, :, :], mean_cov_ij[it, :, :], rms_cov_ij[it, :, :] = \
             reduce_covs_corrs(corr_ijt, cov_ijt)
 
-    plot_covs_corrs(mean_corr_ij, rms_corr_ij, mean_cov_ij, rms_cov_ij, cov_clim_ij, num_delt, delt_set)
+    plot_covs_corrs(mean_corr_ij, rms_corr_ij, mean_cov_ij, rms_cov_ij, cov_clim_ij, num_delta_t, delta_t_set)
 
 
 def matrix_order(mat_ij_in, img_dir, name, prioritize_diag=False, max_odr=81):
