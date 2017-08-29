@@ -217,7 +217,8 @@ def obtain_stats_etkf():
         plt.close()
         return 0
 
-    def plot_covs_corrs(mean_corr_ij, rms_corr_ij, mean_cov_ij, rms_cov_ij, corr_clim_ij, cov_clim_ij, num_delta_t, delta_t_set):
+    def plot_covs_corrs(mean_corr_ij, rms_corr_ij, mean_cov_ij, rms_cov_ij,
+                        corr_clim_ij, cov_clim_ij, num_delta_t, delta_t_set):
         data_hash = {"correlation-mean": mean_corr_ij, "correlation-rms": rms_corr_ij,
                      "covariance-mean": mean_cov_ij, "covariance-rms": rms_cov_ij,
                      "covariance-clim": cov_clim_ij, "correlation-clim": corr_clim_ij}
@@ -237,9 +238,12 @@ def obtain_stats_etkf():
 
         set_ij = [(1, 1), (4, 4), (7, 7), (1, 4), (4, 7), (1, 7)]
         for i, j in set_ij:
-            data_rms  = np.concatenate((np.transpose( rms_corr_ij[:0:-1,:,:], axes=(0, 2, 1)),  rms_corr_ij[:,:,:]), axis=0)
-            data_mean = np.concatenate((np.transpose(mean_corr_ij[:0:-1,:,:], axes=(0, 2, 1)), mean_corr_ij[:,:,:]), axis=0)
-            data_clim = np.concatenate((np.transpose(corr_clim_ij[:0:-1,:,:], axes=(0, 2, 1)), corr_clim_ij[:,:,:]), axis=0)
+            data_rms  = np.concatenate((np.transpose( rms_corr_ij[:0:-1,:,:], axes=(0, 2, 1)),
+                                        rms_corr_ij[:,:,:]), axis=0)
+            data_mean = np.concatenate((np.transpose(mean_corr_ij[:0:-1,:,:], axes=(0, 2, 1)),
+                                        mean_corr_ij[:,:,:]), axis=0)
+            data_clim = np.concatenate((np.transpose(corr_clim_ij[:0:-1,:,:], axes=(0, 2, 1)),
+                                        corr_clim_ij[:,:,:]), axis=0)
             x_list = list(map(lambda x: -x, delta_t_set[:0:-1])) + delta_t_set[:]
             name = "corr_%d_%d" % (i, j)
             plot_time_corr(data_rms, data_mean, data_clim, name, i, j, x_list)
@@ -265,7 +269,8 @@ def obtain_stats_etkf():
         mean_corr_ij[it, :, :], rms_corr_ij[it, :, :], mean_cov_ij[it, :, :], rms_cov_ij[it, :, :] = \
             reduce_covs_corrs(corr_ijt, cov_ijt)
 
-    plot_covs_corrs(mean_corr_ij, rms_corr_ij, mean_cov_ij, rms_cov_ij, clim_corr_ij, clim_cov_ij, num_delta_t, delta_t_set)
+    plot_covs_corrs(mean_corr_ij, rms_corr_ij, mean_cov_ij, rms_cov_ij,
+                    clim_corr_ij, clim_cov_ij, num_delta_t, delta_t_set)
 
 
 def matrix_order(mat_ij_in, img_dir, name, prioritize_diag=False, max_odr=81):
