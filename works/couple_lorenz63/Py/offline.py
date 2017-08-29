@@ -246,7 +246,7 @@ def obtain_stats_etkf():
 
     hist_fcst, nature, nmem = obtain_cycle()
 
-    num_delta_t = 6
+    num_delta_t = 26
     delta_t_set = list(np.linspace(0, 50, num_delta_t, dtype=np.int))
 
     # delta_t, i, j
