@@ -110,6 +110,7 @@ def obtain_stats_etkf():
         return hist_fcst, nature, nmem
 
     def obtain_instant_covs_corrs(hist_fcst, nmem, delta_ti, delta_tj):
+        # a40 (17.3)
         corr_ijt = np.empty((STEPS, N_MODEL, N_MODEL))
         corr_ijt[:, :, :] = np.nan
         cov_ijt = np.empty((STEPS, N_MODEL, N_MODEL))
@@ -139,24 +140,24 @@ def obtain_stats_etkf():
         return corr_ijt, cov_ijt
 
     def obtain_clim_covs_corrs(nature, delta_ti, delta_tj):
-        clim_mean = np.mean(nature[STEPS // 2:, :], axis=0)
+        # a40 (17.4)
+
         cov_clim_ij = np.zeros((N_MODEL, N_MODEL))
         var_clim_i = np.zeros(N_MODEL)
         var_clim_j = np.zeros(N_MODEL)
         k = 0
-        for it in range(STEPS // 2, STEPS - max(delta_ti, delta_tj)):
-            anom1 = nature[it + delta_ti, :] - clim_mean[:]
-            anom2 = nature[it + delta_tj, :] - clim_mean[:]
+        step_start = STEPS // 2
+        step_end = STEPS - max(delta_ti, delta_tj)
+        mean1 = np.mean(nature[step_start+delta_ti:step_end+delta_ti, :], axis=0)
+        mean2 = np.mean(nature[step_start+delta_tj:step_end+delta_tj, :], axis=0)
+        for it in range(step_start, step_end):
+            anom1 = nature[it + delta_ti, :] - mean1[:]
+            anom2 = nature[it + delta_tj, :] - mean2[:]
             for i in range(N_MODEL):
                 cov_clim_ij[i, :] += anom1[i] * anom2[:]
             var_clim_i[:] += anom1[:] ** 2
             var_clim_j[:] += anom2[:] ** 2
             k += 1
-
-        # # remove assymetry caused by numerical errors
-        # tmp = cov_clim_ij
-        # cov_clim_ij[:, :] += tmp.T
-        # cov_clim_ij[:, :] /= 2.0
 
         corr_clim_ij = cov_clim_ij.copy()
         for i in range(N_MODEL):
