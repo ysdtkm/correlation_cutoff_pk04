@@ -2,7 +2,7 @@
 
 import os
 import numpy as np
-from const import N_MODEL, STEPS, AINT, DT, FERR_INI, getr
+from const import N_MODEL, STEPS, AINT, DT, FERR_INI, getr, RAW_DIR, TAR_DIR
 import model
 import main
 import matplotlib as mpl
@@ -180,7 +180,7 @@ def obtain_stats_etkf():
         plt.plot(delta_t_set, data_rms[:, i, j], label="RMS")
         plt.plot(delta_t_set, data_mean[:, i, j], label="Mean")
         plt.plot(delta_t_set, data_clim[:, i, j], label="Clim")
-        img_dir = "offline/time"
+        img_dir = "%s/time" % RAW_DIR
         os.makedirs(img_dir, exist_ok=True)
         vars = ["x_e", "y_e", "z_e", "x_t", "y_t", "z_t", "X", "Y", "Z"]
         plt.title("lagged correlation: %s vs %s" % (vars[i], vars[j]))
@@ -227,7 +227,7 @@ def obtain_stats_etkf():
             for name in data_hash:
                 data = data_hash[name][delta_t, :, :]
                 name2 = name + "_" + str(delta_t)
-                img_dir = "offline/del_t_%d" % delta_t
+                img_dir = "%s/del_t_%d" % (TAR_DIR, delta_t)
                 cmax = 1.0 if "corr" in name else None
                 plot_matrix(data, img_dir, title=name2, xlabel="grid index i",
                             ylabel="grid index j", logscale=True, linthresh=1e-1, cmax=cmax)
@@ -250,7 +250,7 @@ def obtain_stats_etkf():
 
     hist_fcst, nature, nmem = obtain_cycle()
 
-    num_delta_t = 26
+    num_delta_t = 3
     delta_t_set = list(np.linspace(0, 50, num_delta_t, dtype=np.int))
 
     # delta_t, i, j

@@ -2,6 +2,9 @@
 
 import numpy as np
 
+RAW_DIR = "raw"
+TAR_DIR = "tar"
+
 # note: "dimc" in comments is dimension of component (for non/weakly coupled)
 N_MODEL = 9  # dimension of model variable n
 P_OBS = N_MODEL  # dimension of observation variable m
