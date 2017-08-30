@@ -32,8 +32,8 @@ cmd_tex = cd latex && python3 write_tex.py
 
 src_save =
 dep_save = tex
-out_save =
-cmd_save = mkdir -p raw tar && mv -f data image tar/ && mv latex/out.pdf raw
+out_save = raw tar
+cmd_save = rm -rf raw tar && mkdir -p raw tar && mv -f data image tar/ && mv latex/out.pdf raw
 
 # ===============================================
 # end of settings

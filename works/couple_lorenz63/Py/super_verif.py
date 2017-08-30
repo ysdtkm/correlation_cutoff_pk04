@@ -8,6 +8,7 @@ import re
 mpl.use('Agg')
 import matplotlib.pyplot as plt
 
+TAR_DIR = "tar"
 
 def verif(param1s, param2s, param3s_raw, param3s_arr):
     len1 = len(param1s)
@@ -24,7 +25,7 @@ def verif(param1s, param2s, param3s_raw, param3s_arr):
         for j, param2 in enumerate(param2s):
             param3s = list(map(int, param3s_arr[i][j]))
 
-            rf = open("image_%s_%s/true/rmse.txt" % (param1, param2), "r")
+            rf = open("%s/image_%s_%s/true/rmse.txt" % (TAR_DIR, param1, param2), "r")
             for k, line in enumerate(rf):
                 xval = int(re.sub(param2 + "_", "", line.split()[0]))
                 if param3s[k] != xval:
