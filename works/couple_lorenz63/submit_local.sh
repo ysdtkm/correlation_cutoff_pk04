@@ -28,8 +28,8 @@ WDIR_IN_REPOS=works/couple_lorenz63
 SAVE_TAR="tar"
 SAVE_RAW="raw"
 
-COMMANDS="./exec_from_template.py ${JOBNAME2}"
-# COMMANDS="make clean all"
+# COMMANDS="./exec_from_template.py ${JOBNAME2}"
+COMMANDS="make clean all"
 
 mkdir -p ~/shrt/log ${WDIR}
 nohup bash /home/tak/repos/works/submit_halo/exec_bow.sh ${COMMIT} ${JOBNAME2} $$ ${WDIR} ${WDIR_IN_REPOS} ${SAVE_TAR} ${SAVE_RAW} ${COMMANDS} >& ~/shrt/log/${JOBNAME2}_$$.log &
