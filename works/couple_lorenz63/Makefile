@@ -10,7 +10,7 @@
 # cmd_step : 実行コマンド
 #================================
 
-STEP_ALL = calc plot tex
+STEP_ALL = calc plot tex save
 # time = time --format="spent %E sec"
 time =
 
@@ -29,6 +29,11 @@ src_tex = latex/write_tex.py
 dep_tex = plot
 out_tex =
 cmd_tex = cd latex && python3 write_tex.py
+
+src_save =
+dep_save = tex
+out_save =
+cmd_save = mkdir -p raw tar && mv -f data image tar/ && mv latex/out.pdf raw
 
 # ===============================================
 # end of settings

@@ -25,10 +25,10 @@ DATE=`date "+%Y%m%d_%H%M"`
 JOBNAME2=${DATE}_${COMMIT}_${JOBNAME}
 WDIR=/homes/metogra/tyoshida/shrt/submit
 WDIR_IN_REPOS=works/couple_lorenz63
-SAVE_TAR="data"
-SAVE_PDF="image"
+SAVE_TAR="tar"
+SAVE_RAW="raw"
 
 # COMMANDS="./exec_from_template.py ${JOBNAME2}"
 COMMANDS="make clean all"
 
-ssh tyoshida@halo.atmos.umd.edu -t "nohup bash /homes/metogra/tyoshida/repos/works/submit_halo/exec_halo.sh ${COMMIT} ${JOBNAME2} \$\$ ${WDIR} ${WDIR_IN_REPOS} ${SAVE_TAR} ${SAVE_PDF} ${COMMANDS} >& ~/shrt/log/${JOBNAME2}_\$\$.log &"
+ssh tyoshida@halo.atmos.umd.edu -t "nohup bash /homes/metogra/tyoshida/repos/works/submit_halo/exec_halo.sh ${COMMIT} ${JOBNAME2} \$\$ ${WDIR} ${WDIR_IN_REPOS} ${SAVE_TAR} ${SAVE_RAW} ${COMMANDS} >& ~/shrt/log/${JOBNAME2}_\$\$.log &"
