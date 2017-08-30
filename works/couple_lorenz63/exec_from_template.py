@@ -13,7 +13,7 @@ if from_template:
     param2s = ["correlation-rms", "covariance-rms"]
     # param2s = ["correlation-rms", "correlation-mean", "covariance-rms", "covariance-mean",
     #            "BHHtRi-mean", "BHHtRi-rms", "covariance-clim", "correlation-clim"]
-    param3s = ["9"] # , "10", "81"]  # list(map(str, range(9, 82)))
+    param3s = ["81"] # , "10", "81"]  # list(map(str, range(9, 82)))
 # ====================================
 
 RAW_DIR = "raw"
