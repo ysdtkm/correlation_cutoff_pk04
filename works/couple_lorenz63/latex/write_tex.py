@@ -67,6 +67,7 @@ def main():
     f.close()
     subprocess.check_output("make")
     os.system("mkdir -p ./archive")
+    os.system("cp -f out.pdf ../image")
     return 0
 
 
