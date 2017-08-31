@@ -12,7 +12,7 @@ N_ATM = 6
 P_ATM = N_ATM
 
 DT = 0.01
-TMAX = 1000
+TMAX = 10
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 FCST_LT = 0
@@ -28,7 +28,7 @@ amp_b_tdvar = 2.0
 amp_b_fdvar = 1.5
 
 EXPLIST = [ \
-  {"name":"covariance-rms_81", "rho":rho, "nmem":6, "method":"etkf", "couple":"strong", "r_local":"covariance-rms", "num_yes":81},
+  {"name":"correlation-rms_81", "rho":rho, "nmem":4, "method":"etkf", "couple":"strong", "r_local":"correlation-rms", "num_yes":81},
 ]
 
 # dict(name="etkf", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="full"),
