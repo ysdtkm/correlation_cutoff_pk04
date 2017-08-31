@@ -148,7 +148,7 @@ def plot_lagged_correlation():
     def load_data():
         datadir = "data/offline"
         names = ["mean_corr", "rms_corr", "mean_cov", "rms_cov",
-                 "clim_cov", "clim_corr", "num_delta_t", "delta_t_set"]
+                 "clim_corr", "clim_cov", "num_delta_t", "delta_t_set"]
         datas = []
         for name in names:
             data = np.load("%s/%s.npy" % (datadir, name))
