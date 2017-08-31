@@ -188,9 +188,10 @@ def obtain_stats_etkf():
             data = name_and_data[name]
             np.save("%s/%s.npy" % (datadir, name), data)
 
+    os.system("mkdir -p data")
     hist_fcst, nature, nmem = obtain_cycle()
 
-    num_delta_t = 3
+    num_delta_t = 26
     delta_t_set = list(np.linspace(0, 50, num_delta_t, dtype=np.int))
 
     # delta_t, i, j
@@ -215,3 +216,6 @@ def obtain_stats_etkf():
 
 if __name__ == "__main__":
     obtain_stats_etkf()
+    import offline_plot
+    offline_plot.plot_lagged_correlation()
+
