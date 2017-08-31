@@ -2,13 +2,9 @@
 
 import os
 import numpy as np
-from const import N_MODEL, STEPS, AINT, DT, FERR_INI, getr, RAW_DIR, TAR_DIR
+from const import N_MODEL, STEPS, AINT, DT, FERR_INI
 import model
 import main
-import matplotlib as mpl
-mpl.use('Agg')
-import matplotlib.pyplot as plt
-import matplotlib.colors as colors
 
 
 def obtain_climatology():
@@ -66,14 +62,14 @@ def obtain_tdvar_b():
     return 0
 
 
-def print_two_dim_nparray(data, format="%12.9g"):
+def print_two_dim_nparray(data, fmt="%12.9g"):
     n = data.shape[0]
     m = data.shape[1]
     print("[ \\")
     for i in range(n):
         print("[", end="")
         for j in range(m):
-            print(format % data[i, j], end="")
+            print(fmt % data[i, j], end="")
             if j < (m - 1):
                 print(", ", end="")
         if i < (n - 1):
@@ -193,7 +189,7 @@ def obtain_stats_etkf():
     hist_fcst, nature, nmem = obtain_cycle()
 
     print("calculating statistics")
-    num_delta_t = 26
+    num_delta_t = 2
     delta_t_set = list(np.linspace(0, 50, num_delta_t, dtype=np.int))
 
     # delta_t, i, j
@@ -218,4 +214,3 @@ def obtain_stats_etkf():
 
 if __name__ == "__main__":
     obtain_stats_etkf()
-

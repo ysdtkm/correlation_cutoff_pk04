@@ -2,13 +2,13 @@
 
 import os
 import numpy as np
-from const import N_MODEL, STEPS, AINT, DT, FERR_INI, getr, RAW_DIR, TAR_DIR
-import model
-import main
+from const import RAW_DIR, TAR_DIR
 import matplotlib as mpl
+
 mpl.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
+
 
 def plot_lagged_correlation():
     def plot_time_corr(data_rms, data_mean, data_clim, name, i, j, delta_t_set):
@@ -20,9 +20,9 @@ def plot_lagged_correlation():
                 plt.plot(delta_t_set, data_clim[:, i, j], label="Anomaly")
             img_dir = "%s/time" % RAW_DIR
             os.makedirs(img_dir, exist_ok=True)
-            vars = ["x_e", "y_e", "z_e", "x_t", "y_t", "z_t", "X", "Y", "Z"]
-            plt.title("lagged correlation: %s vs %s" % (vars[i], vars[j]))
-            plt.xlabel("lagged time (steps): positive means %s leads %s" % (vars[i], vars[j]))
+            var_names = ["x_e", "y_e", "z_e", "x_t", "y_t", "z_t", "X", "Y", "Z"]
+            plt.title("lagged correlation: %s vs %s" % (var_names[i], var_names[j]))
+            plt.xlabel("lagged time (steps): positive means %s leads %s" % (var_names[i], var_names[j]))
             plt.ylabel("correlation")
             plt.ylim(-1.2, 1.2)
             plt.legend()
@@ -77,12 +77,12 @@ def plot_lagged_correlation():
 
         set_ij = [(1, 1), (4, 4), (7, 7), (1, 4), (4, 7), (1, 7)]
         for i, j in set_ij:
-            data_rms  = np.concatenate((np.transpose( rms_corr_ij[:0:-1,:,:], axes=(0, 2, 1)),
-                                        rms_corr_ij[:,:,:]), axis=0)
-            data_mean = np.concatenate((np.transpose(mean_corr_ij[:0:-1,:,:], axes=(0, 2, 1)),
-                                        mean_corr_ij[:,:,:]), axis=0)
-            data_clim = np.concatenate((np.transpose(corr_clim_ij[:0:-1,:,:], axes=(0, 2, 1)),
-                                        corr_clim_ij[:,:,:]), axis=0)
+            data_rms = np.concatenate((np.transpose(rms_corr_ij[:0:-1, :, :], axes=(0, 2, 1)),
+                                       rms_corr_ij[:, :, :]), axis=0)
+            data_mean = np.concatenate((np.transpose(mean_corr_ij[:0:-1, :, :], axes=(0, 2, 1)),
+                                        mean_corr_ij[:, :, :]), axis=0)
+            data_clim = np.concatenate((np.transpose(corr_clim_ij[:0:-1, :, :], axes=(0, 2, 1)),
+                                        corr_clim_ij[:, :, :]), axis=0)
             x_list = list(map(lambda x: -x, delta_t_set[:0:-1])) + delta_t_set[:]
             name = "corr_%d_%d" % (i, j)
             plot_time_corr(data_rms, data_mean, data_clim, name, i, j, x_list)
