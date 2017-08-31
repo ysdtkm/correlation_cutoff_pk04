@@ -4,7 +4,6 @@ import os
 import subprocess
 import sys
 import re
-import socket
 
 
 # ====================================
@@ -14,25 +13,25 @@ if from_template:
     param2s = ["correlation-rms", "covariance-rms"]
     # param2s = ["correlation-rms", "correlation-mean", "covariance-rms", "covariance-mean",
     #            "BHHtRi-mean", "BHHtRi-rms", "covariance-clim", "correlation-clim"]
-    param3s = ["81"] # , "10", "81"]  # list(map(str, range(9, 82)))
+    param3s = ["81"]  # , "10", "81"]  # list(map(str, range(9, 82)))
 # ====================================
 
 RAW_DIR = "raw"
 TAR_DIR = "tar"
 
+
 def main():
-    flag_local = (socket.gethostname()[:7] == "DESKTOP")
     job_name = sys.argv[1] if len(sys.argv) > 1 else "dummy_job"
     os.system("rm -rf %s %s" % (RAW_DIR, TAR_DIR))
     os.system("mkdir -p %s %s" % (RAW_DIR, TAR_DIR))
 
     if not from_template:
-        exec_not_from_template(job_name, flag_local)
+        exec_not_from_template(job_name)
     else:
-        exec_from_template(param1s, param2s, param3s, job_name, flag_local)
+        exec_from_template(param1s, param2s, param3s)
 
 
-def exec_not_from_template(job_name, flag_local):
+def exec_not_from_template(job_name):
     subprocess.check_call(["make", "tex"])
     os.system("cp -f data/lyapunov.txt image/true/")
     os.system("cp -f latex/out.pdf image/")
@@ -40,7 +39,7 @@ def exec_not_from_template(job_name, flag_local):
     os.system("cp -f latex/out.pdf %s/%s.pdf" % (RAW_DIR, job_name))
 
 
-def exec_from_template(param1s, param2s, param3s_raw, job_name, flag_local):
+def exec_from_template(param1s, param2s, param3s_raw):
     def sanitize_num(strin):
         tmp = strin
         tmp = re.sub("\"", "", tmp)

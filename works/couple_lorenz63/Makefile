@@ -35,17 +35,17 @@ cmd_tex = cd latex && python3 write_tex.py
 src_save =
 dep_save = tex
 out_save = raw tar
-cmd_save = rm -rf raw tar && mkdir -p raw tar && mv -f data image tar/ && mv latex/out.pdf raw
+cmd_save = rm -rf raw tar; mkdir -p raw tar && mv -f data image tar/ && mv latex/out.pdf raw
 
 src_offline_calc = Py/offline.py Py/const.py
 dep_offline_calc =
 out_offline_calc = offline
-cmd_offline_calc = rm -rf offline && python3 Py/offline.py
+cmd_offline_calc = rm -rf offline; python3 Py/offline.py
 
 src_offline = Py/offline_plot.py
 dep_offline = offline_calc
 out_offline = raw tar
-cmd_offline = rm -rf raw tar && python3 Py/offline_plot.py
+cmd_offline = rm -rf raw tar; python3 Py/offline_plot.py
 
 # ===============================================
 # end of settings
