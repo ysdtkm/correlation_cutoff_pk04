@@ -4,11 +4,10 @@ import numpy as np
 import matplotlib as mpl
 import const
 import re
+from const import TAR_DIR
 
 mpl.use('Agg')
 import matplotlib.pyplot as plt
-
-TAR_DIR = "tar"
 
 def verif(param1s, param2s, param3s_raw, param3s_arr):
     len1 = len(param1s)

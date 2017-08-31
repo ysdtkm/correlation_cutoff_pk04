@@ -11,6 +11,8 @@
 #================================
 
 STEP_ALL = calc plot tex save
+STEP_OTHER = offline_calc offline
+
 # time = time --format="spent %E sec"
 time =
 
@@ -35,6 +37,16 @@ dep_save = tex
 out_save = raw tar
 cmd_save = rm -rf raw tar && mkdir -p raw tar && mv -f data image tar/ && mv latex/out.pdf raw
 
+src_offline_calc = Py/offline.py Py/const.py
+dep_offline_calc =
+out_offline_calc = offline
+cmd_offline_calc = rm -rf offline && python3 Py/offline.py
+
+src_offline = Py/offline_plot.py
+dep_offline = offline_calc
+out_offline = raw tar
+cmd_offline = rm -rf raw tar && python3 Py/offline_plot.py
+
 # ===============================================
 # end of settings
 # ===============================================
@@ -56,10 +68,10 @@ clean_$1:
 endef
 
 # 第三要素の$i部分をSTEP_ALL変数の各要素で置換
-$(foreach i, $(STEP_ALL), $(eval $(call rule_comm,$i)))
+$(foreach i, $(STEP_ALL) $(STEP_OTHER), $(eval $(call rule_comm,$i)))
 
 clean:
-	rm -rf $(foreach i,$(STEP_ALL),$(out_$i))
+	rm -rf $(foreach i,$(STEP_ALL) $(STEP_OTHER),$(out_$i))
 	@rm -rf $(VPATH)
 
 .PHONY: all clean

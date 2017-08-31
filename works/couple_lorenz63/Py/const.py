@@ -2,6 +2,9 @@
 
 import numpy as np
 
+RAW_DIR = "raw"
+TAR_DIR = "tar"
+
 # note: "dimc" in comments is dimension of component (for non/weakly coupled)
 N_MODEL = 9  # dimension of model variable n
 P_OBS = N_MODEL  # dimension of observation variable m
@@ -9,7 +12,7 @@ N_ATM = 6
 P_ATM = N_ATM
 
 DT = 0.01
-TMAX = 10
+TMAX = 100
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 FCST_LT = 0
