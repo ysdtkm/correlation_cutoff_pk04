@@ -12,20 +12,23 @@ import matplotlib.colors as colors
 
 def plot_lagged_correlation():
     def plot_time_corr(data_rms, data_mean, data_clim, name, i, j, delta_t_set):
-        plt.plot(delta_t_set, data_rms[:, i, j], label="RMS")
-        plt.plot(delta_t_set, data_mean[:, i, j], label="Mean")
-        plt.plot(delta_t_set, data_clim[:, i, j], label="Clim")
-        img_dir = "%s/time" % RAW_DIR
-        os.makedirs(img_dir, exist_ok=True)
-        vars = ["x_e", "y_e", "z_e", "x_t", "y_t", "z_t", "X", "Y", "Z"]
-        plt.title("lagged correlation: %s vs %s" % (vars[i], vars[j]))
-        plt.xlabel("lagged time (steps): positive means %s leads %s" % (vars[i], vars[j]))
-        plt.ylabel("correlation")
-        plt.ylim(-1.2, 1.2)
-        plt.legend()
-        plt.axhline(y=0.0, color="black", alpha=0.5)
-        plt.savefig("./%s/time_%s.pdf" % (img_dir, name))
-        plt.close()
+        for target in ["error", "anomaly"]:
+            if target == "error":
+                plt.plot(delta_t_set, data_rms[:, i, j], label="RMS")
+                plt.plot(delta_t_set, data_mean[:, i, j], label="Mean")
+            else:
+                plt.plot(delta_t_set, data_clim[:, i, j], label="Anomaly")
+            img_dir = "%s/time" % RAW_DIR
+            os.makedirs(img_dir, exist_ok=True)
+            vars = ["x_e", "y_e", "z_e", "x_t", "y_t", "z_t", "X", "Y", "Z"]
+            plt.title("lagged correlation: %s vs %s" % (vars[i], vars[j]))
+            plt.xlabel("lagged time (steps): positive means %s leads %s" % (vars[i], vars[j]))
+            plt.ylabel("correlation")
+            plt.ylim(-1.2, 1.2)
+            plt.legend()
+            plt.axhline(y=0.0, color="black", alpha=0.5)
+            plt.savefig("./%s/time_%s_%s.pdf" % (img_dir, name, target))
+            plt.close()
 
     def plot_matrix(data, img_dir, name="", title="", color=plt.cm.bwr, xlabel="", ylabel="",
                     logscale=False, linthresh=1e-3, cmax=None):
@@ -84,6 +87,64 @@ def plot_lagged_correlation():
             name = "corr_%d_%d" % (i, j)
             plot_time_corr(data_rms, data_mean, data_clim, name, i, j, x_list)
 
+    def matrix_order(mat_ij_in, img_dir, name, prioritize_diag=False, max_odr=81):
+        if not (len(mat_ij_in.shape) == 2 and mat_ij_in.shape[0] == mat_ij_in.shape[1]):
+            raise Exception("input matrix non-square")
+        else:
+            n = mat_ij_in.shape[0]
+        mat_ij = mat_ij_in.copy()
+
+        def find_last_order(sorted_vals, test):
+            for i, val in reversed(list(enumerate(sorted_vals))):
+                if val == test:
+                    return i
+            raise Exception("find_last_order overflow")
+
+        def print_order(order):
+            for i in range(n):
+                print("[", end="")
+                for j in range(n):
+                    if order[i][j] < max_odr:
+                        print("%2d" % order[i][j], end="")
+                    else:
+                        print("**", end="")
+                    if j < n - 1:
+                        print(", ", end="")
+                print("],")
+            print("")
+            return
+
+        if prioritize_diag:
+            for i in range(n):
+                mat_ij[i, i] = np.inf
+
+        all_vals = []
+        for i in range(n):
+            for j in range(n):
+                all_vals.append(mat_ij[i, j])
+        sorted_vals = sorted(all_vals, reverse=True)
+
+        order = [[0 for j in range(n)] for i in range(n)]
+        for i in range(n):
+            for j in range(n):
+                order[i][j] = find_last_order(sorted_vals, mat_ij[i, j])
+
+        print_order(order)
+
+        x = np.array(range(1, len(sorted_vals) + 1))
+        y = np.array(sorted_vals)
+        plt.bar(x, y / np.max(y), label=name)
+        plt.xlabel("descending order (1-based)")
+        plt.ylabel("relative amplitude")
+        plt.yscale("log")
+        plt.ylim(1.0e-4, 1.0)
+        plt.legend()
+        os.system("mkdir -p %s" % img_dir)
+        plt.savefig("%s/histogram_%s.pdf" % (img_dir, name))
+        plt.clf()
+
+        return 0
+
     def load_data():
         datadir = "data/offline"
         names = ["mean_corr", "rms_corr", "mean_cov", "rms_cov",
@@ -98,65 +159,6 @@ def plot_lagged_correlation():
     clim_corr_ij, clim_cov_ij, num_delta_t, delta_t_set = load_data()
     plot_covs_corrs(mean_corr_ij, rms_corr_ij, mean_cov_ij, rms_cov_ij,
                     clim_corr_ij, clim_cov_ij, int(num_delta_t), list(delta_t_set), skip_matrix=True)
-
-
-def matrix_order(mat_ij_in, img_dir, name, prioritize_diag=False, max_odr=81):
-    if not (len(mat_ij_in.shape) == 2 and mat_ij_in.shape[0] == mat_ij_in.shape[1]):
-        raise Exception("input matrix non-square")
-    else:
-        n = mat_ij_in.shape[0]
-    mat_ij = mat_ij_in.copy()
-
-    def find_last_order(sorted_vals, test):
-        for i, val in reversed(list(enumerate(sorted_vals))):
-            if val == test:
-                return i
-        raise Exception("find_last_order overflow")
-
-    def print_order(order):
-        for i in range(n):
-            print("[", end="")
-            for j in range(n):
-                if order[i][j] < max_odr:
-                    print("%2d" % order[i][j], end="")
-                else:
-                    print("**", end="")
-                if j < n - 1:
-                    print(", ", end="")
-            print("],")
-        print("")
-        return
-
-    if prioritize_diag:
-        for i in range(n):
-            mat_ij[i, i] = np.inf
-
-    all_vals = []
-    for i in range(n):
-        for j in range(n):
-            all_vals.append(mat_ij[i, j])
-    sorted_vals = sorted(all_vals, reverse=True)
-
-    order = [[0 for j in range(n)] for i in range(n)]
-    for i in range(n):
-        for j in range(n):
-            order[i][j] = find_last_order(sorted_vals, mat_ij[i, j])
-
-    print_order(order)
-
-    x = np.array(range(1, len(sorted_vals) + 1))
-    y = np.array(sorted_vals)
-    plt.bar(x, y / np.max(y), label=name)
-    plt.xlabel("descending order (1-based)")
-    plt.ylabel("relative amplitude")
-    plt.yscale("log")
-    plt.ylim(1.0e-4, 1.0)
-    plt.legend()
-    os.system("mkdir -p %s" % img_dir)
-    plt.savefig("%s/histogram_%s.pdf" % (img_dir, name))
-    plt.clf()
-
-    return 0
 
 
 if __name__ == "__main__":

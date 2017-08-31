@@ -189,9 +189,11 @@ def obtain_stats_etkf():
             np.save("%s/%s.npy" % (datadir, name), data)
 
     os.system("mkdir -p data")
+    print("calculating analysis cycle")
     hist_fcst, nature, nmem = obtain_cycle()
 
-    num_delta_t = 3
+    print("calculating statistics")
+    num_delta_t = 26
     delta_t_set = list(np.linspace(0, 50, num_delta_t, dtype=np.int))
 
     # delta_t, i, j
