@@ -53,23 +53,24 @@ def plot_lagged_correlation():
         return 0
 
     def plot_covs_corrs(mean_corr_ij, rms_corr_ij, mean_cov_ij, rms_cov_ij,
-                        corr_clim_ij, cov_clim_ij, num_delta_t, delta_t_set):
+                        corr_clim_ij, cov_clim_ij, num_delta_t, delta_t_set, skip_matrix=True):
         data_hash = {"correlation-mean": mean_corr_ij, "correlation-rms": rms_corr_ij,
                      "covariance-mean": mean_cov_ij, "covariance-rms": rms_cov_ij,
                      "covariance-clim": cov_clim_ij, "correlation-clim": corr_clim_ij}
 
-        for delta_t in range(num_delta_t):
-            for name in data_hash:
-                data = data_hash[name][delta_t, :, :]
-                name2 = name + "_" + str(delta_t)
-                img_dir = "%s/del_t_%d" % (TAR_DIR, delta_t)
-                cmax = 1.0 if "corr" in name else None
-                plot_matrix(data, img_dir, title=name2, xlabel="grid index i",
-                            ylabel="grid index j", logscale=True, linthresh=1e-1, cmax=cmax)
-                plot_matrix(data, img_dir, title=(name2 + "_linear"), xlabel="grid index i",
-                            ylabel="grid index j", logscale=False, cmax=cmax)
-                print(name2)
-                # matrix_order(np.abs(data), img_dir, name2)
+        if not skip_matrix:
+            for delta_t in range(num_delta_t):
+                for name in data_hash:
+                    data = data_hash[name][delta_t, :, :]
+                    name2 = name + "_" + str(delta_t)
+                    img_dir = "%s/del_t_%d" % (TAR_DIR, delta_t)
+                    cmax = 1.0 if "corr" in name else None
+                    plot_matrix(data, img_dir, title=name2, xlabel="grid index i",
+                                ylabel="grid index j", logscale=True, linthresh=1e-1, cmax=cmax)
+                    plot_matrix(data, img_dir, title=(name2 + "_linear"), xlabel="grid index i",
+                                ylabel="grid index j", logscale=False, cmax=cmax)
+                    print(name2)
+                    matrix_order(np.abs(data), img_dir, name2)
 
         set_ij = [(1, 1), (4, 4), (7, 7), (1, 4), (4, 7), (1, 7)]
         for i, j in set_ij:
@@ -96,7 +97,7 @@ def plot_lagged_correlation():
     mean_corr_ij, rms_corr_ij, mean_cov_ij, rms_cov_ij, \
     clim_corr_ij, clim_cov_ij, num_delta_t, delta_t_set = load_data()
     plot_covs_corrs(mean_corr_ij, rms_corr_ij, mean_cov_ij, rms_cov_ij,
-                    clim_corr_ij, clim_cov_ij, int(num_delta_t), list(delta_t_set))
+                    clim_corr_ij, clim_cov_ij, int(num_delta_t), list(delta_t_set), skip_matrix=True)
 
 
 def matrix_order(mat_ij_in, img_dir, name, prioritize_diag=False, max_odr=81):
