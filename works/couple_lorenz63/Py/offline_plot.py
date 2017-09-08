@@ -11,13 +11,13 @@ import matplotlib.colors as colors
 
 
 def plot_lagged_correlation():
-    def plot_time_corr(data_rms, data_mean, data_clim, name, i, j, delta_t_set):
+    def plot_time_corr(data_rms, data_mean, data_clim, name, i, j, delta_t_list):
         for target in ["error", "anomaly"]:
             if target == "error":
-                plt.plot(delta_t_set, data_rms[:, i, j], label="RMS")
-                plt.plot(delta_t_set, data_mean[:, i, j], label="Mean")
+                plt.plot(delta_t_list, data_rms[:, i, j], label="RMS")
+                plt.plot(delta_t_list, data_mean[:, i, j], label="Mean")
             else:
-                plt.plot(delta_t_set, data_clim[:, i, j], label="Anomaly")
+                plt.plot(delta_t_list, data_clim[:, i, j], label="Anomaly")
             img_dir = "%s/time" % RAW_DIR
             os.makedirs(img_dir, exist_ok=True)
             var_names = ["x_e", "y_e", "z_e", "x_t", "y_t", "z_t", "X", "Y", "Z"]
@@ -56,7 +56,7 @@ def plot_lagged_correlation():
         return 0
 
     def plot_covs_corrs(mean_corr_ij, rms_corr_ij, mean_cov_ij, rms_cov_ij,
-                        corr_clim_ij, cov_clim_ij, num_delta_t, delta_t_set, skip_matrix=True):
+                        corr_clim_ij, cov_clim_ij, num_delta_t, delta_t_list, skip_matrix=True):
         data_hash = {"correlation-mean": mean_corr_ij, "correlation-rms": rms_corr_ij,
                      "covariance-mean": mean_cov_ij, "covariance-rms": rms_cov_ij,
                      "covariance-clim": cov_clim_ij, "correlation-clim": corr_clim_ij}
@@ -83,7 +83,7 @@ def plot_lagged_correlation():
                                         mean_corr_ij[:, :, :]), axis=0)
             data_clim = np.concatenate((np.transpose(corr_clim_ij[:0:-1, :, :], axes=(0, 2, 1)),
                                         corr_clim_ij[:, :, :]), axis=0)
-            x_list = list(map(lambda x: -x, delta_t_set[:0:-1])) + delta_t_set[:]
+            x_list = list(map(lambda x: -x, delta_t_list[:0:-1])) + delta_t_list[:]
             name = "corr_%d_%d" % (i, j)
             plot_time_corr(data_rms, data_mean, data_clim, name, i, j, x_list)
 
@@ -148,7 +148,7 @@ def plot_lagged_correlation():
     def load_data():
         datadir = "data/offline"
         names = ["mean_corr", "rms_corr", "mean_cov", "rms_cov",
-                 "clim_corr", "clim_cov", "num_delta_t", "delta_t_set"]
+                 "clim_corr", "clim_cov", "num_delta_t", "delta_t_list"]
         datas = []
         for name in names:
             data = np.load("%s/%s.npy" % (datadir, name))
@@ -156,9 +156,9 @@ def plot_lagged_correlation():
         return datas
 
     mean_corr_ij, rms_corr_ij, mean_cov_ij, rms_cov_ij, \
-    clim_corr_ij, clim_cov_ij, num_delta_t, delta_t_set = load_data()
+    clim_corr_ij, clim_cov_ij, num_delta_t, delta_t_list = load_data()
     plot_covs_corrs(mean_corr_ij, rms_corr_ij, mean_cov_ij, rms_cov_ij,
-                    clim_corr_ij, clim_cov_ij, int(num_delta_t), list(delta_t_set), skip_matrix=True)
+                    clim_corr_ij, clim_cov_ij, int(num_delta_t), list(delta_t_list), skip_matrix=True)
 
 
 if __name__ == "__main__":

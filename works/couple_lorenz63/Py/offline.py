@@ -173,13 +173,13 @@ def obtain_stats_etkf():
         return corr_mean_ij, corr_rms_ij, cov_mean_ij, cov_rms_ij
 
     def save_data(mean_corr_ij, rms_corr_ij, mean_cov_ij, rms_cov_ij,
-                  clim_corr_ij, clim_cov_ij, num_delta_t, delta_t_set):
+                  clim_corr_ij, clim_cov_ij, num_delta_t, delta_t_list):
         datadir = "data/offline"
         os.system("mkdir -p %s" % datadir)
         name_and_data = dict(mean_corr = mean_corr_ij, rms_corr = rms_corr_ij,
                              mean_cov = mean_cov_ij, rms_cov = rms_cov_ij,
                              clim_cov = clim_cov_ij, clim_corr = clim_corr_ij,
-                             num_delta_t = np.array(num_delta_t), delta_t_set = np.array(delta_t_set))
+                             num_delta_t = np.array(num_delta_t), delta_t_list = np.array(delta_t_list))
         for name in name_and_data:
             data = name_and_data[name]
             np.save("%s/%s.npy" % (datadir, name), data)
@@ -189,8 +189,8 @@ def obtain_stats_etkf():
     hist_fcst, nature, nmem = obtain_cycle()
 
     print("calculating statistics")
-    num_delta_t = 26
-    delta_t_set = list(np.linspace(0, 50, num_delta_t, dtype=np.int))
+    num_delta_t = 1  # ttk 26
+    delta_t_list = list(np.linspace(0, 50, num_delta_t, dtype=np.int))
 
     # delta_t, i, j
     mean_corr_ij = np.empty((num_delta_t, N_MODEL, N_MODEL))
@@ -200,7 +200,7 @@ def obtain_stats_etkf():
     clim_cov_ij = np.empty((num_delta_t, N_MODEL, N_MODEL))
     clim_corr_ij = np.empty((num_delta_t, N_MODEL, N_MODEL))
 
-    for it, delta_t in enumerate(delta_t_set):
+    for it, delta_t in enumerate(delta_t_list):
         delta_ti = 0
         delta_tj = delta_t
         corr_ijt, cov_ijt = obtain_instant_covs_corrs(hist_fcst, nmem, delta_ti, delta_tj)
@@ -209,7 +209,7 @@ def obtain_stats_etkf():
             reduce_covs_corrs(corr_ijt, cov_ijt)
 
     save_data(mean_corr_ij, rms_corr_ij, mean_cov_ij, rms_cov_ij,
-              clim_corr_ij, clim_cov_ij, num_delta_t, delta_t_set)
+              clim_corr_ij, clim_cov_ij, num_delta_t, delta_t_list)
 
 
 if __name__ == "__main__":
