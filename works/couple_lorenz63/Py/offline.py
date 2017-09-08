@@ -36,7 +36,7 @@ def obtain_tdvar_b():
     nature = main.exec_nature()
     obs = main.exec_obs(nature)
     settings = {"name": "etkf_strong_int8", "rho": 1.1, "aint": 8, "nmem": 10,
-                "method": "etkf", "couple": "strong", "r_local": "full"}
+                "method": "etkf", "couple": "strong", "r_local": "strong"}
     np.random.seed((10 ** 8 + 7) * 13)
     free = main.exec_free_run(settings)
     anl = main.exec_assim_cycle(settings, free, obs)
@@ -95,7 +95,7 @@ def obtain_stats_etkf():
         np.random.seed((10 ** 8 + 7) * 12)
         nature = main.exec_nature()
         obs = main.exec_obs(nature)
-        settings = dict(name="etkf", rho="adaptive", nmem=10, method="etkf", couple="strong", r_local="full")
+        settings = dict(name="etkf", rho="adaptive", nmem=10, method="etkf", couple="strong", r_local="individual")
         np.random.seed((10 ** 8 + 7) * 13)
         free = main.exec_free_run(settings)
         anl = main.exec_assim_cycle(settings, free, obs)

@@ -158,7 +158,7 @@ def plot_lagged_correlation():
     mean_corr_ij, rms_corr_ij, mean_cov_ij, rms_cov_ij, \
     clim_corr_ij, clim_cov_ij, num_delta_t, delta_t_list = load_data()
     plot_covs_corrs(mean_corr_ij, rms_corr_ij, mean_cov_ij, rms_cov_ij,
-                    clim_corr_ij, clim_cov_ij, int(num_delta_t), list(delta_t_list), skip_matrix=True)
+                    clim_corr_ij, clim_cov_ij, int(num_delta_t), list(delta_t_list), skip_matrix=False)
 
 
 if __name__ == "__main__":
