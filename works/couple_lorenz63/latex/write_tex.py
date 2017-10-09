@@ -17,7 +17,7 @@ def main():
     commit_name = last_commit + " " + expname
 
     # rmse and lyapunov exponents
-    txt_out += figure_table("", ["../image/true/rmse_bar.png"], 1, 1, datestr, commit_name)
+    txt_out += figure_table("", ["../image/true/rmse_bar.pdf"], 1, 1, datestr, commit_name)
     txt_out += write_txt(datestr, commit_name,
                          "../image/true/rmse_for_tex.txt", "9pt", "rmse")
     txt_out += write_txt(datestr, commit_name,
