@@ -34,7 +34,8 @@ def plot_lagged_correlation():
                     logscale=False, linthresh=1e-3, cmax=None):
         plt.rcParams["font.size"] = 16
         fig, ax = plt.subplots(1)
-        fig.subplots_adjust(left=0.10, right=0.93, bottom=0.06, top=0.86)
+        fig.subplots_adjust(left=0.05, right=0.93, bottom=0.06, top=0.90)
+        # fig.subplots_adjust(left=0.10, right=0.93, bottom=0.06, top=0.86)  # with label
         if cmax is None:
             cmax = np.max(np.abs(data))
         if logscale:
@@ -51,13 +52,16 @@ def plot_lagged_correlation():
 
         ax.xaxis.tick_top()
         ax.xaxis.set_label_position('top')
-        ax.set_xlabel(xlabel)
+        # ax.set_xlabel(xlabel)
         ax.set_xticks(np.arange(0, data.shape[1]) + 0.5)
         ax.xaxis.set_tick_params(size=0)
         tlabel = ["$x_e$", "$y_e$", "$z_e$", "$x_t$", "$y_t$", "$z_t$", "$X$", "$Y$", "$Z$"]
         ax.set_xticklabels(tlabel, rotation=0, fontsize=14)
 
-        ax.set_ylabel(ylabel)
+        # ax.set_ylabel(ylabel)
+        ax.set_yticks(np.arange(0, data.shape[1]) + 0.5)
+        ax.yaxis.set_tick_params(size=0)
+        ax.set_yticklabels(tlabel, rotation=0, fontsize=14)
 
         plt.colorbar(map1)
         # plt.title(title)
@@ -82,8 +86,8 @@ def plot_lagged_correlation():
                     cmax = 1.0 if "corr" in name else None
                     plot_matrix(data, img_dir, title=name2, xlabel="grid index i",
                                 ylabel="grid index j", logscale=True, linthresh=1e-1, cmax=cmax)
-                    plot_matrix(data, img_dir, title=(name2 + "_linear"), xlabel="grid index i",
-                                ylabel="grid index j", logscale=False, cmax=cmax, color=plt.cm.gray_r)
+                    plot_matrix(data, img_dir, title=(name2 + "_linear"), xlabel="grid j",
+                                ylabel="grid i", logscale=False, cmax=cmax, color=plt.cm.gray_r)
                     print(name2)
                     matrix_order(np.abs(data), img_dir, name2)
 
