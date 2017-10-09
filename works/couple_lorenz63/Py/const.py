@@ -23,7 +23,7 @@ FERR_INI = 10.0
 AINT = 8
 
 rho = "adaptive"
-nmem = 10
+nmem = 100
 amp_b_tdvar = 2.0
 amp_b_fdvar = 1.5
 
