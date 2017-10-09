@@ -34,7 +34,7 @@ def plot_lagged_correlation():
                     logscale=False, linthresh=1e-3, cmax=None):
         plt.rcParams["font.size"] = 16
         fig, ax = plt.subplots(1)
-        fig.subplots_adjust(left=0.10, right=0.93, bottom=0.14, top=0.94)
+        fig.subplots_adjust(left=0.10, right=0.93, bottom=0.06, top=0.86)
         if cmax is None:
             cmax = np.max(np.abs(data))
         if logscale:
@@ -48,13 +48,17 @@ def plot_lagged_correlation():
         x0, x1 = ax.get_xlim()
         y0, y1 = ax.get_ylim()
         ax.set_aspect(abs(x1 - x0) / abs(y1 - y0))
+
+        ax.xaxis.tick_top()
+        ax.xaxis.set_label_position('top')
         ax.set_xlabel(xlabel)
         ax.set_xticks(np.arange(0, data.shape[1]) + 0.5)
         ax.xaxis.set_tick_params(size=0)
-        xtlabel = np.arange(1, 10)
-        ax.set_xticklabels(xtlabel, rotation=0, fontsize=14)
+        tlabel = ["$x_e$", "$y_e$", "$z_e$", "$x_t$", "$y_t$", "$z_t$", "$X$", "$Y$", "$Z$"]
+        ax.set_xticklabels(tlabel, rotation=0, fontsize=14)
 
         ax.set_ylabel(ylabel)
+
         plt.colorbar(map1)
         # plt.title(title)
         plt.gca().invert_yaxis()
