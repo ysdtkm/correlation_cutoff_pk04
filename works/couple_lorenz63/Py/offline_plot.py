@@ -160,7 +160,7 @@ def plot_lagged_correlation():
         plt.ylim(0.0, 1.0)
         # plt.legend()
         os.system("mkdir -p %s" % img_dir)
-        plt.savefig("%s/histogram_%s.pdf" % (img_dir, name))
+        plt.savefig("%s/bar_%s.pdf" % (img_dir, name))
         plt.clf()
         plt.close("all")
 
