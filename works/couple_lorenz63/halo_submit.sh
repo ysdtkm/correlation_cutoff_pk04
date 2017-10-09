@@ -30,6 +30,6 @@ SAVE_TAR="tar"
 SAVE_RAW="raw"
 
 # COMMANDS="./exec_from_template.py ${JOBNAME2}"
-COMMANDS="make clean offline"
+COMMANDS="make clean all"
 
 ssh tyoshida@halo.atmos.umd.edu -t "nohup bash /homes/metogra/tyoshida/repos/works/submit_halo/exec_halo.sh ${COMMIT} ${JOBNAME2} \$\$ ${WDIR} ${WDIR_IN_REPOS} ${SAVE_TAR} ${SAVE_RAW} ${COMMANDS} >& ~/shrt/log/${JOBNAME2}_\$\$.log &"
