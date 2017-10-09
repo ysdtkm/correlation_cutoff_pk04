@@ -32,7 +32,7 @@ def plot_lagged_correlation():
 
     def plot_matrix(data, img_dir, name="", title="", color=plt.cm.bwr, xlabel="", ylabel="",
                     logscale=False, linthresh=1e-3, cmax=None):
-        plt.rcParams["font.size"] = 16
+        plt.rcParams["font.size"] = 18
         fig, ax = plt.subplots(1)
         fig.subplots_adjust(left=0.05, right=0.93, bottom=0.06, top=0.90)
         # fig.subplots_adjust(left=0.10, right=0.93, bottom=0.06, top=0.86)  # with label
@@ -56,12 +56,12 @@ def plot_lagged_correlation():
         ax.set_xticks(np.arange(0, data.shape[1]) + 0.5)
         ax.xaxis.set_tick_params(size=0)
         tlabel = ["$x_e$", "$y_e$", "$z_e$", "$x_t$", "$y_t$", "$z_t$", "$X$", "$Y$", "$Z$"]
-        ax.set_xticklabels(tlabel, rotation=0, fontsize=14)
+        ax.set_xticklabels(tlabel, rotation=0)
 
         # ax.set_ylabel(ylabel)
         ax.set_yticks(np.arange(0, data.shape[1]) + 0.5)
         ax.yaxis.set_tick_params(size=0)
-        ax.set_yticklabels(tlabel, rotation=0, fontsize=14)
+        ax.set_yticklabels(tlabel, rotation=0)
 
         plt.colorbar(map1)
         # plt.title(title)
@@ -147,7 +147,7 @@ def plot_lagged_correlation():
 
         print_order(order)
 
-        plt.rcParams["font.size"] = 16
+        plt.rcParams["font.size"] = 18
         fig, ax = plt.subplots()
         fig.subplots_adjust(left=0.13, right=0.97, bottom=0.15, top=0.95)
         x = np.array(range(1, len(sorted_vals) + 1))
