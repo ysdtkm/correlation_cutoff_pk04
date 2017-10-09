@@ -49,6 +49,11 @@ def plot_lagged_correlation():
         y0, y1 = ax.get_ylim()
         ax.set_aspect(abs(x1 - x0) / abs(y1 - y0))
         ax.set_xlabel(xlabel)
+        ax.set_xticks(np.arange(0, data.shape[1]) + 0.5)
+        ax.xaxis.set_tick_params(size=0)
+        xtlabel = np.arange(1, 10)
+        ax.set_xticklabels(xtlabel, rotation=0, fontsize=14)
+
         ax.set_ylabel(ylabel)
         plt.colorbar(map1)
         # plt.title(title)
