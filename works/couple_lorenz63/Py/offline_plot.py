@@ -32,8 +32,10 @@ def plot_lagged_correlation():
 
     def plot_matrix(data, img_dir, name="", title="", color=plt.cm.bwr, xlabel="", ylabel="",
                     logscale=False, linthresh=1e-3, cmax=None):
+        plt.rcParams["font.size"] = 20
         fig, ax = plt.subplots(1)
-        fig.subplots_adjust(left=0.12, right=0.95, bottom=0.12, top=0.92)
+        fig.subplots_adjust(left=0.05, right=0.93, bottom=0.06, top=0.90)
+        # fig.subplots_adjust(left=0.10, right=0.93, bottom=0.06, top=0.86)  # with label
         if cmax is None:
             cmax = np.max(np.abs(data))
         if logscale:
@@ -42,13 +44,27 @@ def plot_lagged_correlation():
             map1 = ax.pcolor(data, cmap=color)
         if color == plt.cm.bwr:
             map1.set_clim(-1.0 * cmax, cmax)
+        elif color == plt.cm.gray_r:
+            map1.set_clim(0, cmax)
         x0, x1 = ax.get_xlim()
         y0, y1 = ax.get_ylim()
         ax.set_aspect(abs(x1 - x0) / abs(y1 - y0))
-        ax.set_xlabel(xlabel)
-        ax.set_ylabel(ylabel)
+
+        ax.xaxis.tick_top()
+        ax.xaxis.set_label_position('top')
+        # ax.set_xlabel(xlabel)
+        ax.set_xticks(np.arange(0, data.shape[1]) + 0.5)
+        ax.xaxis.set_tick_params(size=0)
+        tlabel = ["$x_e$", "$y_e$", "$z_e$", "$x_t$", "$y_t$", "$z_t$", "$X$", "$Y$", "$Z$"]
+        ax.set_xticklabels(tlabel, rotation=0)
+
+        # ax.set_ylabel(ylabel)
+        ax.set_yticks(np.arange(0, data.shape[1]) + 0.5)
+        ax.yaxis.set_tick_params(size=0)
+        ax.set_yticklabels(tlabel, rotation=0)
+
         plt.colorbar(map1)
-        plt.title(title)
+        # plt.title(title)
         plt.gca().invert_yaxis()
         os.makedirs(img_dir, exist_ok=True)
         plt.savefig("./%s/matrix_%s_%s.pdf" % (img_dir, name, title))
@@ -70,8 +86,8 @@ def plot_lagged_correlation():
                     cmax = 1.0 if "corr" in name else None
                     plot_matrix(data, img_dir, title=name2, xlabel="grid index i",
                                 ylabel="grid index j", logscale=True, linthresh=1e-1, cmax=cmax)
-                    plot_matrix(data, img_dir, title=(name2 + "_linear"), xlabel="grid index i",
-                                ylabel="grid index j", logscale=False, cmax=cmax)
+                    plot_matrix(data, img_dir, title=(name2 + "_linear"), xlabel="grid j",
+                                ylabel="grid i", logscale=False, cmax=cmax, color=plt.cm.gray_r)
                     print(name2)
                     matrix_order(np.abs(data), img_dir, name2)
 
@@ -131,17 +147,22 @@ def plot_lagged_correlation():
 
         print_order(order)
 
+        plt.rcParams["font.size"] = 20
+        fig, ax = plt.subplots()
+        fig.subplots_adjust(left=0.15, right=0.97, bottom=0.15, top=0.95)
         x = np.array(range(1, len(sorted_vals) + 1))
         y = np.array(sorted_vals)
-        plt.bar(x, y / np.max(y), label=name)
-        plt.xlabel("descending order (1-based)")
-        plt.ylabel("relative amplitude")
-        plt.yscale("log")
-        plt.ylim(1.0e-4, 1.0)
-        plt.legend()
+        plt.bar(x, y / np.max(y), label=name, color="gray")
+        plt.xlabel("descending order")
+        plt.ylabel("RMS of correlation")
+        # plt.yscale("log")
+        plt.xlim(0, 82)
+        plt.ylim(0.0, 1.0)
+        # plt.legend()
         os.system("mkdir -p %s" % img_dir)
-        plt.savefig("%s/histogram_%s.pdf" % (img_dir, name))
+        plt.savefig("%s/bar_%s.pdf" % (img_dir, name))
         plt.clf()
+        plt.close("all")
 
         return 0
 

@@ -95,7 +95,7 @@ def obtain_stats_etkf():
         np.random.seed((10 ** 8 + 7) * 12)
         nature = main.exec_nature()
         obs = main.exec_obs(nature)
-        settings = dict(name="etkf", rho="adaptive", nmem=100, method="etkf", couple="strong", r_local="individual")
+        settings = dict(name="etkf", rho="adaptive", nmem=10, method="etkf", couple="strong", r_local="full")
         np.random.seed((10 ** 8 + 7) * 13)
         free = main.exec_free_run(settings)
         anl = main.exec_assim_cycle(settings, free, obs)
@@ -190,7 +190,8 @@ def obtain_stats_etkf():
 
     print("calculating statistics")
     num_delta_t = 1  # ttk 26
-    delta_t_list = list(np.linspace(0, 50, num_delta_t, dtype=np.int))
+    # delta_t_list = list(np.linspace(0, 50, num_delta_t, dtype=np.int))
+    delta_t_list = [0]
 
     # delta_t, i, j
     mean_corr_ij = np.empty((num_delta_t, N_MODEL, N_MODEL))
@@ -200,9 +201,9 @@ def obtain_stats_etkf():
     clim_cov_ij = np.empty((num_delta_t, N_MODEL, N_MODEL))
     clim_corr_ij = np.empty((num_delta_t, N_MODEL, N_MODEL))
 
+    delta_ti = 8
     for it, delta_t in enumerate(delta_t_list):
-        delta_ti = 0
-        delta_tj = delta_t
+        delta_tj = delta_ti + delta_t
         corr_ijt, cov_ijt = obtain_instant_covs_corrs(hist_fcst, nmem, delta_ti, delta_tj)
         clim_corr_ij[it, :, :], clim_cov_ij[it, :, :] = obtain_clim_covs_corrs(nature, delta_ti, delta_tj)
         mean_corr_ij[it, :, :], rms_corr_ij[it, :, :], mean_cov_ij[it, :, :], rms_cov_ij[it, :, :] = \

@@ -457,15 +457,15 @@ def plot_rmse_bar(hist_true):
         return 0
 
     global rmse_hash
-    plt.rcParams["font.size"] = 9
+    plt.rcParams["font.size"] = 16
 
     nexp = len(rmse_hash)
     width = 1.0 / (nexp + 1)
 
     fig, ax = plt.subplots()
-    fig.subplots_adjust(top=0.85, bottom=0.2, right=0.67)
-    oerr_a = ax.axhline(y=OERR_A, label="obs_error(atmos)", alpha=0.5, color="red")
-    oerr_o = ax.axhline(y=OERR_O, label="obs_error(ocean)", alpha=0.5, color="blue")
+    fig.subplots_adjust(top=0.8, bottom=0.26, right=0.54)
+    oerr_o = ax.axhline(y=OERR_O, label="obs error (ocean)", alpha=0.5, color="blue")
+    oerr_a = ax.axhline(y=OERR_A, label="obs error (atmos)", alpha=0.5, color="red")
 
     plist = []
     j = 0
@@ -483,7 +483,7 @@ def plot_rmse_bar(hist_true):
 
     plist += [oerr_a, oerr_o]
     ax.legend(plist, [i.get_label() for i in plist], bbox_to_anchor=(1.03, 1), loc="upper left")
-    plt.savefig("./image/true/rmse_bar.png")
+    plt.savefig("./image/true/rmse_bar.pdf")
 
     return 0
 
