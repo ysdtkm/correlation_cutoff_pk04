@@ -39,9 +39,9 @@ def plot_lagged_correlation():
         if cmax is None:
             cmax = np.max(np.abs(data))
         if logscale:
-            map1 = ax.pcolor(data, cmap=color, norm=colors.SymLogNorm(linthresh=linthresh * cmax))
+            map1 = ax.imshow(data, cmap=color, norm=colors.SymLogNorm(linthresh=linthresh * cmax))
         else:
-            map1 = ax.pcolor(data, cmap=color)
+            map1 = ax.imshow(data, cmap=color)
         if color == plt.cm.bwr:
             map1.set_clim(-1.0 * cmax, cmax)
         elif color == plt.cm.gray_r:
@@ -53,19 +53,18 @@ def plot_lagged_correlation():
         ax.xaxis.tick_top()
         ax.xaxis.set_label_position('top')
         # ax.set_xlabel(xlabel)
-        ax.set_xticks(np.arange(0, data.shape[1]) + 0.5)
+        ax.set_xticks(np.arange(0, data.shape[1]))
         ax.xaxis.set_tick_params(size=0)
         tlabel = ["$x_e$", "$y_e$", "$z_e$", "$x_t$", "$y_t$", "$z_t$", "$X$", "$Y$", "$Z$"]
         ax.set_xticklabels(tlabel, rotation=0)
 
         # ax.set_ylabel(ylabel)
-        ax.set_yticks(np.arange(0, data.shape[1]) + 0.5)
+        ax.set_yticks(np.arange(0, data.shape[1]))
         ax.yaxis.set_tick_params(size=0)
         ax.set_yticklabels(tlabel, rotation=0)
 
         plt.colorbar(map1)
         # plt.title(title)
-        plt.gca().invert_yaxis()
         os.makedirs(img_dir, exist_ok=True)
         plt.savefig("./%s/matrix_%s_%s.pdf" % (img_dir, name, title))
         plt.close()
