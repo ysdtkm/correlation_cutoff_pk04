@@ -39,9 +39,9 @@ def plot_lagged_correlation():
         if cmax is None:
             cmax = np.max(np.abs(data))
         if logscale:
-            map1 = ax.imshow(data, cmap=color, norm=colors.SymLogNorm(linthresh=linthresh * cmax))
+            map1 = ax.imshow(data ** 2, cmap=color, norm=colors.SymLogNorm(linthresh=linthresh * cmax))
         else:
-            map1 = ax.imshow(data, cmap=color)
+            map1 = ax.imshow(data ** 2, cmap=color)
         if color == plt.cm.bwr:
             map1.set_clim(-1.0 * cmax, cmax)
         elif color == plt.cm.gray_r:
@@ -70,6 +70,13 @@ def plot_lagged_correlation():
         plt.close()
         return 0
 
+    def print_matrix(data):
+        n = data.shape[0]
+        for i in range(n):
+            for j in range(n):
+                print("%5.03f  " % data[i][j] ** 2, end="")
+            print("")
+
     def plot_covs_corrs(mean_corr_ij, rms_corr_ij, mean_cov_ij, rms_cov_ij,
                         corr_clim_ij, cov_clim_ij, num_delta_t, delta_t_list, skip_matrix=True):
         data_hash = {"correlation-mean": mean_corr_ij, "correlation-rms": rms_corr_ij,
@@ -87,8 +94,11 @@ def plot_lagged_correlation():
                                 ylabel="grid index j", logscale=True, linthresh=1e-1, cmax=cmax)
                     plot_matrix(data, img_dir, title=(name2 + "_linear"), xlabel="grid j",
                                 ylabel="grid i", logscale=False, cmax=cmax, color=plt.cm.gray_r)
-                    print(name2)
-                    matrix_order(np.abs(data), img_dir, name2)
+                    if name == "correlation-rms":
+                        print_matrix(data)
+
+                    # print(name2)
+                    # matrix_order(np.abs(data), img_dir, name2)
 
         set_ij = [(1, 1), (4, 4), (7, 7), (1, 4), (4, 7), (1, 7)]
         for i, j in set_ij:
