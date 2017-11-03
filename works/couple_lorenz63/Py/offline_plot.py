@@ -97,8 +97,8 @@ def plot_lagged_correlation():
                     if name == "correlation-rms":
                         print_matrix(data)
 
-                    # print(name2)
-                    # matrix_order(np.abs(data), img_dir, name2)
+                    print(name2)
+                    matrix_order(np.abs(data), img_dir, name2)
 
         set_ij = [(1, 1), (4, 4), (7, 7), (1, 4), (4, 7), (1, 7)]
         for i, j in set_ij:
@@ -160,10 +160,10 @@ def plot_lagged_correlation():
         fig, ax = plt.subplots()
         fig.subplots_adjust(left=0.15, right=0.97, bottom=0.15, top=0.95)
         x = np.array(range(1, len(sorted_vals) + 1))
-        y = np.array(sorted_vals)
+        y = np.array(sorted_vals) ** 2
         plt.bar(x, y / np.max(y), label=name, color="gray")
         plt.xlabel("descending order")
-        plt.ylabel("RMS of correlation")
+        plt.ylabel("mean squared correlation")
         # plt.yscale("log")
         plt.xlim(0, 82)
         plt.ylim(0.0, 1.0)
