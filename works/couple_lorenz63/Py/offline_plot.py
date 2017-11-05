@@ -39,9 +39,9 @@ def plot_lagged_correlation():
         if cmax is None:
             cmax = np.max(np.abs(data))
         if logscale:
-            map1 = ax.pcolor(data, cmap=color, norm=colors.SymLogNorm(linthresh=linthresh * cmax))
+            map1 = ax.imshow(data ** 2, cmap=color, norm=colors.SymLogNorm(linthresh=linthresh * cmax))
         else:
-            map1 = ax.pcolor(data, cmap=color)
+            map1 = ax.imshow(data ** 2, cmap=color)
         if color == plt.cm.bwr:
             map1.set_clim(-1.0 * cmax, cmax)
         elif color == plt.cm.gray_r:
@@ -53,23 +53,29 @@ def plot_lagged_correlation():
         ax.xaxis.tick_top()
         ax.xaxis.set_label_position('top')
         # ax.set_xlabel(xlabel)
-        ax.set_xticks(np.arange(0, data.shape[1]) + 0.5)
+        ax.set_xticks(np.arange(0, data.shape[1]))
         ax.xaxis.set_tick_params(size=0)
         tlabel = ["$x_e$", "$y_e$", "$z_e$", "$x_t$", "$y_t$", "$z_t$", "$X$", "$Y$", "$Z$"]
         ax.set_xticklabels(tlabel, rotation=0)
 
         # ax.set_ylabel(ylabel)
-        ax.set_yticks(np.arange(0, data.shape[1]) + 0.5)
+        ax.set_yticks(np.arange(0, data.shape[1]))
         ax.yaxis.set_tick_params(size=0)
         ax.set_yticklabels(tlabel, rotation=0)
 
         plt.colorbar(map1)
         # plt.title(title)
-        plt.gca().invert_yaxis()
         os.makedirs(img_dir, exist_ok=True)
         plt.savefig("./%s/matrix_%s_%s.pdf" % (img_dir, name, title))
         plt.close()
         return 0
+
+    def print_matrix(data):
+        n = data.shape[0]
+        for i in range(n):
+            for j in range(n):
+                print("%5.03f  " % data[i][j] ** 2, end="")
+            print("")
 
     def plot_covs_corrs(mean_corr_ij, rms_corr_ij, mean_cov_ij, rms_cov_ij,
                         corr_clim_ij, cov_clim_ij, num_delta_t, delta_t_list, skip_matrix=True):
@@ -88,6 +94,9 @@ def plot_lagged_correlation():
                                 ylabel="grid index j", logscale=True, linthresh=1e-1, cmax=cmax)
                     plot_matrix(data, img_dir, title=(name2 + "_linear"), xlabel="grid j",
                                 ylabel="grid i", logscale=False, cmax=cmax, color=plt.cm.gray_r)
+                    if name == "correlation-rms":
+                        print_matrix(data)
+
                     print(name2)
                     matrix_order(np.abs(data), img_dir, name2)
 
@@ -151,10 +160,10 @@ def plot_lagged_correlation():
         fig, ax = plt.subplots()
         fig.subplots_adjust(left=0.15, right=0.97, bottom=0.15, top=0.95)
         x = np.array(range(1, len(sorted_vals) + 1))
-        y = np.array(sorted_vals)
+        y = np.array(sorted_vals) ** 2
         plt.bar(x, y / np.max(y), label=name, color="gray")
         plt.xlabel("descending order")
-        plt.ylabel("RMS of correlation")
+        plt.ylabel("mean squared correlation")
         # plt.yscale("log")
         plt.xlim(0, 82)
         plt.ylim(0.0, 1.0)
