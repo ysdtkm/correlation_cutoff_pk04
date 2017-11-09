@@ -143,7 +143,7 @@ def plot_lv_projection(hist_lv, hist_fcst, name, title, nmem, is_oblique):
     fig, ax = plt.subplots(1)
     fig.subplots_adjust(left=0.12, right=0.95, bottom=0.12, top=0.92)
     cmax = np.max(np.abs(data))
-    map1 = ax.pcolor(data, cmap=plt.cm.jet)
+    map1 = ax.imshow(data, cmap=plt.cm.jet)
     if is_oblique:
         map1.set_clim(-3.5, 1.5)
     else:
@@ -153,7 +153,6 @@ def plot_lv_projection(hist_lv, hist_fcst, name, title, nmem, is_oblique):
     ax.set_ylabel("index of vectors")
     cbar = plt.colorbar(map1)
     plt.title(title)
-    plt.gca().invert_yaxis()
     plt.savefig("./image/%s/%s.png" % (name, title))
     plt.close()
     return 0
@@ -416,7 +415,7 @@ def plot_matrix(data, name, title, color=plt.cm.bwr):
     fig, ax = plt.subplots(1)
     fig.subplots_adjust(left=0.12, right=0.95, bottom=0.12, top=0.92)
     cmax = np.max(np.abs(data))
-    map1 = ax.pcolor(data, cmap=color)
+    map1 = ax.imshow(data, cmap=color)
     if color == plt.cm.bwr:
         map1.set_clim(-1.0 * cmax, cmax)
     x0, x1 = ax.get_xlim()
@@ -425,7 +424,6 @@ def plot_matrix(data, name, title, color=plt.cm.bwr):
     ax.set_xlabel("x")
     cbar = plt.colorbar(map1)
     plt.title(title)
-    plt.gca().invert_yaxis()
     plt.savefig("./image/%s/%s.png" % (name, title))
     plt.close()
     return 0
