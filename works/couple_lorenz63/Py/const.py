@@ -12,7 +12,7 @@ N_ATM = 6
 P_ATM = N_ATM
 
 DT = 0.01
-TMAX = 1000
+TMAX = 10
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 FCST_LT = 0
@@ -23,7 +23,7 @@ FERR_INI = 10.0
 AINT = 8
 
 rho = "adaptive"
-nmem = 100
+nmem = 10
 amp_b_tdvar = 2.0
 amp_b_fdvar = 1.5
 
