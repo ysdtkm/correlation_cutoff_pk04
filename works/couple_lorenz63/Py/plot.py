@@ -470,10 +470,7 @@ def plot_rmse_bar(hist_true):
     for name in rmse_hash:
         shift = width * j
         x = [(i + shift) for i in range(3)]
-        cm = ["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00",
-              "#ffff33", "#a65628", "#f781bf", "#999999"]
-        hm = ["--", "..", "", "//", "\\\\", "++", "xx", "||", "**", "oo", "OO"]
-        p = ax.bar(x, rmse_hash[name], width, label=name, color="none", edgecolor="black", hatch=hm[j], lw=1)
+        p = ax.bar(x, rmse_hash[name], width, label=name)
         plist.append(p)
         j += 1
 
