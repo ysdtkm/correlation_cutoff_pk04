@@ -463,8 +463,8 @@ def plot_rmse_bar(hist_true):
     fig, ax = plt.subplots()
     fig.set_size_inches(9, 6)
     fig.subplots_adjust(top=0.8, bottom=0.26, right=0.59)
-    oerr_o = ax.axhline(y=OERR_O, label="obs error (ocean)", alpha=0.5, color="blue")
-    oerr_a = ax.axhline(y=OERR_A, label="obs error (atmos)", alpha=0.5, color="red")
+    oerr_o = ax.axhline(y=OERR_O, label="obs error (ocean)", alpha=0.5, color="k", ls="dashed")
+    oerr_a = ax.axhline(y=OERR_A, label="obs error (atmos)", alpha=0.5, color="k")
 
     plist = []
     j = 0
@@ -473,8 +473,9 @@ def plot_rmse_bar(hist_true):
         x = [(i + shift) for i in range(3)]
         cm = ["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00",
               "#ffff33", "#a65628", "#f781bf", "#999999"]
-        hm = ["--", "..", "", "//", "\\\\", "++", "xx", "||", "**", "oo", "OO"]
-        p = ax.bar(x, rmse_hash[name], width, label=name, color="none", edgecolor="black", hatch=hm[j], lw=1)
+        cm2 = ["#ffffff", "#ffffff", "#aaaaaa", "#ffffff", "#ffffff"]
+        hm = ["", "//", "", "..", "xx"]
+        p = ax.bar(x, rmse_hash[name], width, label=name, color=cm2[j], edgecolor="black", hatch=hm[j], lw=1)
         plist.append(p)
         j += 1
 
