@@ -12,7 +12,7 @@ N_ATM = 6
 P_ATM = N_ATM
 
 DT = 0.01
-TMAX = 1000
+TMAX = 10
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 FCST_LT = 0
@@ -28,11 +28,11 @@ amp_b_tdvar = 2.0
 amp_b_fdvar = 1.5
 
 EXPLIST = [
-    dict(name="full", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="full"),
-    dict(name="adjacent", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="adjacent"),
-    dict(name="ENSO_coupling", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="enso_coupling"),
-    dict(name="atmos_coupling", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="atmos_coupling"),
-    dict(name="individual", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="individual"),
+    dict(name="Full", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="full"),
+    dict(name="Adjacent", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="adjacent"),
+    dict(name="ENSO-coupling", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="enso_coupling"),
+    dict(name="Atmos-coupling", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="atmos_coupling"),
+    dict(name="Individual", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="individual"),
 ]
 
 # dict(name="etkf", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="full"),
