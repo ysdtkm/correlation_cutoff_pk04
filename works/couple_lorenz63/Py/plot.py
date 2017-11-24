@@ -455,22 +455,28 @@ def plot_rmse_bar(hist_true):
         return 0
 
     global rmse_hash
-    plt.rcParams["font.size"] = 16
+    plt.rcParams["font.size"] = 18
 
     nexp = len(rmse_hash)
     width = 1.0 / (nexp + 1)
 
     fig, ax = plt.subplots()
-    fig.subplots_adjust(top=0.8, bottom=0.26, right=0.54)
-    oerr_o = ax.axhline(y=OERR_O, label="obs error (ocean)", alpha=0.5, color="blue")
-    oerr_a = ax.axhline(y=OERR_A, label="obs error (atmos)", alpha=0.5, color="red")
+    fig.set_size_inches(9, 6)
+    fig.subplots_adjust(top=0.8, bottom=0.26, right=0.59)
+    oerr_o = ax.axhline(y=OERR_O, label="obs error (ocean)", zorder=1, alpha=0.5, color="k", ls="dashed")
+    oerr_a = ax.axhline(y=OERR_A, label="obs error (atmos)", zorder=1, alpha=0.5, color="k")
 
     plist = []
     j = 0
     for name in rmse_hash:
         shift = width * j
         x = [(i + shift) for i in range(3)]
-        p = ax.bar(x, rmse_hash[name], width, label=name)
+        cm = ["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00",
+              "#ffff33", "#a65628", "#f781bf", "#999999"]
+        cm2 = ["#ffffff", "#ffffff", "#aaaaaa", "#ffffff", "#ffffff"]
+        hm = ["", "//", "", "..", "xx"]
+        p = ax.bar(x, rmse_hash[name], width, label=name, zorder=2,
+            color=cm2[j], edgecolor="black", hatch=hm[j], lw=1)
         plist.append(p)
         j += 1
 
@@ -480,7 +486,8 @@ def plot_rmse_bar(hist_true):
     ax.set_ylabel("RMSE")
 
     plist += [oerr_a, oerr_o]
-    ax.legend(plist, [i.get_label() for i in plist], bbox_to_anchor=(1.03, 1), loc="upper left")
+    leg = ax.legend(plist, [i.get_label() for i in plist], bbox_to_anchor=(1.03, 1),
+                    loc="upper left", frameon=False)
     plt.savefig("./image/true/rmse_bar.pdf")
 
     return 0
