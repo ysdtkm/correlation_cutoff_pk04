@@ -23,16 +23,16 @@ FERR_INI = 10.0
 AINT = 8
 
 rho = "adaptive"
-nmem = 100
+nmem = 10
 amp_b_tdvar = 2.0
 amp_b_fdvar = 1.5
 
 EXPLIST = [
-    dict(name="full", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="full"),
-    dict(name="adjacent", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="adjacent"),
-    dict(name="ENSO_coupling", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="enso_coupling"),
-    dict(name="atmos_coupling", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="atmos_coupling"),
-    dict(name="individual", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="individual"),
+    dict(name="Full", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="full"),
+    dict(name="Adjacent", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="adjacent"),
+    dict(name="ENSO-coupling", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="enso_coupling"),
+    dict(name="Atmos-coupling", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="atmos_coupling"),
+    dict(name="Individual", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="individual"),
 ]
 
 # dict(name="etkf", rho=rho, nmem=nmem, method="etkf", couple="strong", r_local="full"),
@@ -75,9 +75,9 @@ def geth() -> np.ndarray:
     #     import warnings
     #     warnings.warn("geth() cannot correctly deal with P_OBS != N_MODEL. P_OBS=%d, N_MODEL=%d was passed."
     #                   % (P_OBS, N_MODEL))
-    h = np.diag([0, 1, 0, 0, 1, 0, 0, 1, 0])  # y-only
+    # h = np.diag([0, 1, 0, 0, 1, 0, 0, 1, 0])  # y-only
     # h = np.diag([0, 0, 1, 0, 0, 1, 0, 0, 1])  # z-only
-    # h = np.diag([1, 1, 1, 1, 1, 1, 1, 1, 1])
+    h = np.diag([1, 1, 1, 1, 1, 1, 1, 1, 1])
     return h
 
 

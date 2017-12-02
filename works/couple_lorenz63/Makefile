@@ -35,7 +35,7 @@ cmd_tex = cd latex && python3 write_tex.py
 src_save =
 dep_save = tex
 out_save = raw tar
-cmd_save = rm -rf raw tar; mkdir -p raw tar && cp -rf data image tar/ && mv latex/out.pdf raw
+cmd_save = rm -rf raw tar; mkdir -p raw tar && cp -rf data image tar/ && cp latex/out.pdf raw
 
 src_offline_calc = Py/offline.py Py/const.py
 dep_offline_calc =
