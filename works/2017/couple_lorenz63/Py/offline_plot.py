@@ -30,7 +30,7 @@ def plot_lagged_correlation():
             plt.savefig("./%s/time_%s_%s.pdf" % (img_dir, name, target))
             plt.close()
 
-    def plot_matrix(data, img_dir, name="", title="", color=plt.cm.bwr, xlabel="", ylabel="",
+    def plot_matrix(data, img_dir, name="", title="", color=plt.cm.RdBu_r, xlabel="", ylabel="",
                     logscale=False, linthresh=1e-3, cmax=None):
         plt.rcParams["font.size"] = 20
         fig, ax = plt.subplots(1)
@@ -39,10 +39,10 @@ def plot_lagged_correlation():
         if cmax is None:
             cmax = np.max(np.abs(data))
         if logscale:
-            map1 = ax.imshow(data ** 2, cmap=color, norm=colors.SymLogNorm(linthresh=linthresh * cmax))
+            map1 = ax.imshow(data, cmap=color, norm=colors.SymLogNorm(linthresh=linthresh * cmax))
         else:
-            map1 = ax.imshow(data ** 2, cmap=color)
-        if color == plt.cm.bwr:
+            map1 = ax.imshow(data, cmap=color)
+        if color in [plt.cm.bwr, plt.cm.RdBu_r]:
             map1.set_clim(-1.0 * cmax, cmax)
         elif color == plt.cm.gray_r:
             map1.set_clim(0, cmax)
@@ -93,7 +93,7 @@ def plot_lagged_correlation():
                     plot_matrix(data, img_dir, title=name2, xlabel="grid index i",
                                 ylabel="grid index j", logscale=True, linthresh=1e-1, cmax=cmax)
                     plot_matrix(data, img_dir, title=(name2 + "_linear"), xlabel="grid j",
-                                ylabel="grid i", logscale=False, cmax=cmax, color=plt.cm.gray_r)
+                                ylabel="grid i", logscale=False, cmax=cmax, color=plt.cm.RdBu_r)
                     if name == "correlation-rms":
                         print_matrix(data)
 
