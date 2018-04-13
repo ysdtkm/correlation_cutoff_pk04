@@ -15,6 +15,7 @@ detect updated source files, and execute minimal necessary commands).
     * 596f497 Attachment for reviewers, mean background covariance
 * Experiments above are conducted on *halo* server of AOSC, UMD
     * Red Hat Enterprise Linux Server release 7.5 (Maipo)
+    * GNU Bash 4.2.46
     * Python 3.6.2
     * numpy 1.13.1
     * scipy 0.19.1
