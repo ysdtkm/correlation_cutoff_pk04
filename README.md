@@ -6,7 +6,7 @@
 detect updated source files, and execute minimal necessary commands).
 * Most of the experimental parameters can be edited in Py/const.py
 
-## Note
+## Reproducibility Note
 * The figures on the paper are calculated by the commits specified below
     * fe8da36 Figure 2
     * 3785478 Figure 3, 4-member
