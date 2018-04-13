@@ -2,11 +2,9 @@
 * Source codes used for T. Yoshida and E. Kalnay (2018, under revision, MWR)
 
 ## Usage
-* Edit Py/const.py and type below (GNU make will resolve the dependency,
-detect updated source files, and execute minimal necessary calculations).
-```bash
-make
-```
+* Just type "make" (GNU make will resolve the dependency,
+detect updated source files, and execute minimal necessary commands).
+* Most of the experimental parameters can be edited in Py/const.py
 
 ## Note
 * The figures on the paper are calculated by the commits specified below
