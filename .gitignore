@@ -3,3 +3,6 @@ data/
 image/
 image_*/
 md5sum.txt
+.make/
+.*.swp
+__pycache__/
