@@ -12,7 +12,7 @@ N_ATM = 6
 P_ATM = N_ATM
 
 DT = 0.01
-TMAX = 3
+TMAX = 1000
 STEPS = int(TMAX / DT)
 STEP_FREE = STEPS // 4
 FCST_LT = 0
@@ -75,9 +75,9 @@ def geth() -> np.ndarray:
     #     import warnings
     #     warnings.warn("geth() cannot correctly deal with P_OBS != N_MODEL. P_OBS=%d, N_MODEL=%d was passed."
     #                   % (P_OBS, N_MODEL))
-    # h = np.diag([0, 1, 0, 0, 1, 0, 0, 1, 0])  # y-only
+    h = np.diag([0, 1, 0, 0, 1, 0, 0, 1, 0])  # y-only
     # h = np.diag([0, 0, 1, 0, 0, 1, 0, 0, 1])  # z-only
-    h = np.diag([1, 1, 1, 1, 1, 1, 1, 1, 1])
+    # h = np.diag([1, 1, 1, 1, 1, 1, 1, 1, 1])
     return h
 
 
