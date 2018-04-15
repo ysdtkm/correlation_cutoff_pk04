@@ -12,6 +12,7 @@ detect updated source files, and execute minimal necessary commands).
     * 3785478 Figure 3, 4-member
     * b833893 Figure 3, 6-member
     * 3a19d2f Figure 3, 10-member
+    * eff4dc1 Attachment for reviewers, 100-member
     * 596f497 Attachment for reviewers, mean background covariance
 * Experiments above are conducted on *halo* server of AOSC, UMD
     * AMD Opteron(TM) Processor 6272
