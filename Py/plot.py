@@ -475,7 +475,7 @@ def plot_rmse_bar(hist_true):
               "#ffff33", "#a65628", "#f781bf", "#999999"]
         cm2 = ["#ffffff", "#ffffff", "#aaaaaa", "#ffffff", "#ffffff"]
         hm = ["", "//", "", "..", "xx"]
-        name2 = name.replace("Full", "Full (Standard SCDA)").replace("Individual", "Individual (WCDA)")
+        name2 = name.replace("Full", "Full (Standard strongly coupled)").replace("Individual", "Individual (weakly coupled)")
         p = ax.bar(x, rmse_hash[name], width, label=name2, zorder=2,
             color=cm2[j], edgecolor="black", hatch=hm[j], lw=1)
         plist.append(p)
@@ -489,7 +489,7 @@ def plot_rmse_bar(hist_true):
     plist += [oerr_a, oerr_o]
     leg = ax.legend(plist, [i.get_label() for i in plist], bbox_to_anchor=(1.03, 1),
                     loc="upper left", frameon=False)
-    plt.savefig("./image/true/rmse_bar.pdf")
+    plt.savefig("./image/true/rmse_bar.pdf", bbox_inches="tight")
 
     return 0
 
