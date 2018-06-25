@@ -475,7 +475,8 @@ def plot_rmse_bar(hist_true):
               "#ffff33", "#a65628", "#f781bf", "#999999"]
         cm2 = ["#ffffff", "#ffffff", "#aaaaaa", "#ffffff", "#ffffff"]
         hm = ["", "//", "", "..", "xx"]
-        p = ax.bar(x, rmse_hash[name], width, label=name, zorder=2,
+        name2 = name.replace("Full", "Full (Standard SCDA)").replace("Individual", "Individual (WCDA)")
+        p = ax.bar(x, rmse_hash[name], width, label=name2, zorder=2,
             color=cm2[j], edgecolor="black", hatch=hm[j], lw=1)
         plist.append(p)
         j += 1
