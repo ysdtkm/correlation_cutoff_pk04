@@ -1,5 +1,5 @@
 # Correlation-cutoff method for Covariance localization in Strongly coupled DA
-* Source codes used for T. Yoshida and E. Kalnay (2018, under revision, MWR)
+* Source codes used for T. Yoshida and E. Kalnay (2018, MWR)
 
 ## Usage
 * Just type "make" (GNU make will resolve the dependency,
