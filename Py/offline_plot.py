@@ -2,7 +2,6 @@
 
 import os
 import numpy as np
-from const import RAW_DIR, TAR_DIR
 import matplotlib as mpl
 
 mpl.use('Agg')
@@ -18,7 +17,7 @@ def plot_lagged_correlation():
                 plt.plot(delta_t_list, data_mean[:, i, j], label="Mean")
             else:
                 plt.plot(delta_t_list, data_clim[:, i, j], label="Anomaly")
-            img_dir = "%s/time" % RAW_DIR
+            img_dir = "offline_image/time"
             os.makedirs(img_dir, exist_ok=True)
             var_names = ["x_e", "y_e", "z_e", "x_t", "y_t", "z_t", "X", "Y", "Z"]
             plt.title("lagged correlation: %s vs %s" % (var_names[i], var_names[j]))
@@ -88,7 +87,7 @@ def plot_lagged_correlation():
                 for name in data_hash:
                     data = data_hash[name][delta_t, :, :]
                     name2 = name + "_" + str(delta_t)
-                    img_dir = "%s/del_t_%d" % (TAR_DIR, delta_t)
+                    img_dir = "offline_image/del_t_%d" % delta_t
                     cmax = 1.0 if "corr" in name else None
                     plot_matrix(data, img_dir, title=name2, xlabel="grid index i",
                                 ylabel="grid index j", logscale=True, linthresh=1e-1, cmax=cmax)
